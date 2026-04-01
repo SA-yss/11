@@ -16,7 +16,6 @@
 </script>
 
   <style>
-    @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
     :root{
       --bg:#ffffff;
       --text:#111111;
@@ -976,7 +975,6 @@
     .authBtns{ display:flex; justify-content:flex-end; gap:10px; margin-top:0; }
     .authBtn.confirm{ background:#111; color:#fff; border-color:#111; }
 
-
     .loginScreen{
       min-height:100vh;
       display:flex;
@@ -1015,16 +1013,6 @@
       object-fit:contain;
     }
 
-    .loginLogoText{
-      font-family:'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
-      font-size:34px;
-      font-weight:700;
-      letter-spacing:-0.04em;
-      color:#111;
-      line-height:1;
-      display:none;
-    }
-
     .loginForm{
       width:100%;
       margin-top:8px;
@@ -1058,6 +1046,7 @@
       font-weight:600;
       margin:16px 0 34px;
       font-family:'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+      flex-wrap:wrap;
     }
 
     .loginSubLinks a{
@@ -1067,7 +1056,8 @@
 
     .loginSubLinks span{ color:#b5b5b5; }
 
-    .loginBtn{
+    .loginBtn,
+    .authSecondaryBtn{
       width:72%;
       min-width:220px;
       height:44px;
@@ -1083,18 +1073,52 @@
     }
 
     .authSecondaryBtn{
-      width:72%;
-      min-width:220px;
-      height:44px;
-      border:1px solid #d9d9d9;
       background:#fff;
       color:#111;
-      font-size:16px;
-      font-weight:700;
-      cursor:pointer;
-      display:block;
-      margin:12px auto 0;
+      border:1px solid #d9d9d9;
+      margin-top:12px;
+    }
+
+    .loginErrorText{
+      min-height:20px;
+      margin:10px 0 0;
+      text-align:center;
+      font-size:12px;
+      color:#c63e3e;
+      visibility:hidden;
       font-family:'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+      white-space:pre-line;
+    }
+
+    .loginErrorText.show{ visibility:visible; }
+
+    .authPageTitle{
+      width:100%;
+      margin:0 0 12px;
+      font-size:26px;
+      font-weight:700;
+      letter-spacing:-0.04em;
+      color:#111;
+      text-align:center;
+    }
+
+    .authPageDesc{
+      width:100%;
+      margin:0 0 24px;
+      font-size:13px;
+      line-height:1.6;
+      color:#666;
+      text-align:center;
+    }
+
+    .authBackLink{
+      display:block;
+      margin-top:18px;
+      text-align:center;
+      font-size:12px;
+      color:#111;
+      text-decoration:none;
+      font-weight:600;
     }
 
     .authInfoBox{
@@ -1108,17 +1132,6 @@
       margin-bottom:18px;
     }
 
-    .loginErrorText{
-      min-height:20px;
-      margin:10px 0 0;
-      text-align:center;
-      font-size:12px;
-      color:#c63e3e;
-      visibility:hidden;
-      font-family:'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
-    }
-
-    .loginErrorText.show{ visibility:visible; }
 
     @media (max-width: 1280px){
       .listGrid{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
@@ -1287,12 +1300,6 @@
       .dangerBtn{ align-self:stretch; text-align:center; }
 
       .mainHome{ padding-top:56px; text-align:center;}
-      .loginScreen{ padding:100px 18px 40px; }
-      .loginLogoBox{ height:190px; }
-      .loginLogoImage{ max-width:220px; max-height:82px; }
-      .loginLogoText{ font-size:26px; }
-      .loginInput{ height:48px; font-size:15px; }
-      .loginBtn{ width:100%; min-width:0; }
       .mainLogoArea{ min-height:96px; margin-bottom:28px; justify-content:center; }
       .mainLogoImg{ max-width:220px; max-height:82px; }
       .mainLogoPlaceholder{ width:220px; height:82px; font-size:13px; }
@@ -1312,7 +1319,10 @@
       .authTitle{ font-size:17px; }
       .authBtn{ min-width:92px; height:42px; font-size:13px; }
     }
-</style>
+  </style>
+
+
+
 </head>
 
 <body>
@@ -1374,23 +1384,9 @@
     </div>
   </div>
 
-  <div class="authModal" id="adminAuthModal" aria-hidden="true">
-    <div class="authOverlay" id="adminAuthOverlay"></div>
-    <div class="authDialog" role="dialog" aria-modal="true" aria-label="관리자 비밀번호 입력">
-      <h3 class="authTitle">관리자 모드</h3>
-      <p class="authDesc">관리자 비밀번호를 입력해주세요.</p>
-      <input type="password" id="adminPasswordInput" class="authInput" placeholder="비밀번호 입력" />
-      <div class="authError" id="adminAuthError">비밀번호가 올바르지 않습니다.</div>
-      <div class="authBtns">
-        <button class="authBtn cancel" id="adminAuthCancel" type="button">취소</button>
-        <button class="authBtn confirm" id="adminAuthConfirm" type="button">확인</button>
-      </div>
-    </div>
-  </div>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const SUPABASE_URL = "https://iznnctfnmeiqdjjounq.supabase.co";
+    const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_9p50RVtpPdmZOG2emGTDVg_NQ3bp8U8";
 
     let supabaseClient = null;
@@ -1401,11 +1397,33 @@
     };
 
     const HOME_LOGIN_SESSION_KEY = "warehouse_home_login_ok";
-    const AUTH_PUBLIC_HASHES = ["#/login", "#/signup", "#/find-id", "#/reset-password"];
 
-    const ADMIN_PASSWORD = "1234";
-    const ADMIN_SESSION_KEY = "warehouse_admin_ok";
-    let pendingAdminTarget = "#/admin";
+    async function getMyProfileRole(){
+      if(!supabaseClient) return null;
+
+      try{
+        const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+        if(userError) throw userError;
+        if(!user) return null;
+
+        const { data, error } = await supabaseClient
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .single();
+
+        if(error) throw error;
+        return data?.role || null;
+      }catch(err){
+        console.error("프로필 role 조회 실패:", err);
+        return null;
+      }
+    }
+
+    async function isAdminUser(){
+      const role = await getMyProfileRole();
+      return role === "admin";
+    }
 
     function isHomeLoggedIn(){
       return sessionStorage.getItem(HOME_LOGIN_SESSION_KEY) === "yes";
@@ -1417,212 +1435,6 @@
       }else{
         sessionStorage.removeItem(HOME_LOGIN_SESSION_KEY);
       }
-    }
-
-    function setAuthError(message){
-      const box = document.getElementById("homeLoginError");
-      if(!box) return;
-      const txt = String(message || "").trim();
-      box.textContent = txt;
-      box.classList.toggle("show", !!txt);
-    }
-
-    function getAuthInputValue(id){
-      const el = document.getElementById(id);
-      return String(el?.value || "").trim();
-    }
-
-    function attachAuthEnter(ids, handler){
-      ids.forEach((id) => {
-        const el = document.getElementById(id);
-        if(!el) return;
-        el.addEventListener("keydown", (e)=>{
-          if(e.key === "Enter"){
-            handler();
-          }
-        });
-      });
-    }
-
-    function renderAuthShell(innerHtml){
-      topbar.style.display = "none";
-      document.body.classList.remove("mode-request", "mode-list", "mode-admin");
-      app.innerHTML = `
-        <div class="loginScreen">
-          <div class="loginWrap">
-            <div class="loginLogoWrap">
-              <div class="loginLogoBox">
-                <img class="loginLogoImage" id="loginLogoImage" src="images/sa-logo_4.png" alt="Seoul Auction" />
-              </div>
-            </div>
-            ${innerHtml}
-          </div>
-        </div>
-      `;
-    }
-
-    function renderLoginPage(){
-      renderAuthShell(`
-        <div class="loginForm">
-          <input id="homeLoginId" class="loginInput" type="email" placeholder="이메일을 입력해 주세요." autocomplete="username" />
-          <input id="homeLoginPw" class="loginInput" type="password" placeholder="비밀번호를 입력해 주세요." autocomplete="current-password" />
-
-          <div class="loginSubLinks">
-            <a href="#/signup">회원가입</a>
-            <span>|</span>
-            <a href="#/find-id">아이디 찾기</a>
-            <span>|</span>
-            <a href="#/reset-password">비밀번호 찾기</a>
-          </div>
-
-          <button class="loginBtn" id="homeLoginBtn" type="button">로그인하기</button>
-          <div class="loginErrorText" id="homeLoginError"></div>
-        </div>
-      `);
-
-      async function submitHomeLogin(){
-        const email = getAuthInputValue("homeLoginId").toLowerCase();
-        const password = getAuthInputValue("homeLoginPw");
-
-        if(!email || !password){
-          setAuthError("이메일과 비밀번호를 입력해주세요.");
-          return;
-        }
-
-        if(!supabaseClient){
-          setAuthError("로그인 연결이 준비되지 않았습니다.");
-          return;
-        }
-
-        const { data, error } = await supabaseClient.auth.signInWithPassword({
-          email,
-          password
-        });
-
-        if(error){
-          setAuthError(error.message || "로그인에 실패했습니다.");
-          return;
-        }
-
-        setHomeLoggedIn(!!data?.session);
-        setAuthError("");
-        location.hash = "#/";
-      }
-
-      document.getElementById("homeLoginBtn").addEventListener("click", submitHomeLogin);
-      attachAuthEnter(["homeLoginId", "homeLoginPw"], submitHomeLogin);
-    }
-
-    function renderSignupPage(){
-      renderAuthShell(`
-        <div class="loginForm">
-          <input id="signupEmail" class="loginInput" type="email" placeholder="이메일을 입력해 주세요." autocomplete="email" />
-          <input id="signupPassword" class="loginInput" type="password" placeholder="비밀번호를 입력해 주세요." autocomplete="new-password" />
-          <input id="signupPasswordConfirm" class="loginInput" type="password" placeholder="비밀번호를 다시 입력해 주세요." autocomplete="new-password" />
-
-          <button class="loginBtn" id="signupSubmitBtn" type="button">회원가입 완료</button>
-          <button class="authSecondaryBtn" id="signupBackBtn" type="button">로그인으로 돌아가기</button>
-          <div class="loginErrorText" id="homeLoginError"></div>
-        </div>
-      `);
-
-      async function submitSignup(){
-        const email = getAuthInputValue("signupEmail").toLowerCase();
-        const password = getAuthInputValue("signupPassword");
-        const confirmPassword = getAuthInputValue("signupPasswordConfirm");
-
-        if(!email || !password || !confirmPassword){
-          setAuthError("이메일과 비밀번호를 모두 입력해주세요.");
-          return;
-        }
-
-        if(!email.endsWith("@seoulauction.com")){
-          setAuthError("서울옥션 이메일 계정으로만 가입할 수 있습니다.");
-          return;
-        }
-
-        if(password !== confirmPassword){
-          setAuthError("비밀번호가 서로 일치하지 않습니다.");
-          return;
-        }
-
-        if(password.length < 6){
-          setAuthError("비밀번호는 6자 이상으로 입력해주세요.");
-          return;
-        }
-
-        if(!supabaseClient){
-          setAuthError("회원가입 연결이 준비되지 않았습니다.");
-          return;
-        }
-
-        const { error } = await supabaseClient.auth.signUp({
-          email,
-          password
-        });
-
-        if(error){
-          setAuthError(error.message || "회원가입에 실패했습니다.");
-          return;
-        }
-
-        setAuthError("회원가입이 완료되었습니다. 로그인 화면에서 로그인해주세요.");
-      }
-
-      document.getElementById("signupSubmitBtn").addEventListener("click", submitSignup);
-      document.getElementById("signupBackBtn").addEventListener("click", ()=>{ location.hash = "#/login"; });
-      attachAuthEnter(["signupEmail", "signupPassword", "signupPasswordConfirm"], submitSignup);
-    }
-
-    function renderFindIdPage(){
-      renderAuthShell(`
-        <div class="loginForm">
-          <div class="authInfoBox">현재 로그인 아이디는 서울옥션 이메일 주소입니다.
-가입한 이메일 계정을 그대로 사용해주세요.</div>
-          <button class="authSecondaryBtn" id="findIdBackBtn" type="button">로그인으로 돌아가기</button>
-          <div class="loginErrorText show" id="homeLoginError">예: yss@seoulauction.com</div>
-        </div>
-      `);
-
-      document.getElementById("findIdBackBtn").addEventListener("click", ()=>{ location.hash = "#/login"; });
-    }
-
-    function renderResetPasswordPage(){
-      renderAuthShell(`
-        <div class="loginForm">
-          <input id="resetEmail" class="loginInput" type="email" placeholder="비밀번호를 재설정할 이메일을 입력해 주세요." autocomplete="email" />
-          <button class="loginBtn" id="resetPasswordBtn" type="button">비밀번호 재설정 메일 보내기</button>
-          <button class="authSecondaryBtn" id="resetPasswordBackBtn" type="button">로그인으로 돌아가기</button>
-          <div class="loginErrorText" id="homeLoginError"></div>
-        </div>
-      `);
-
-      async function submitResetPassword(){
-        const email = getAuthInputValue("resetEmail").toLowerCase();
-
-        if(!email){
-          setAuthError("이메일을 입력해주세요.");
-          return;
-        }
-
-        if(!supabaseClient){
-          setAuthError("비밀번호 재설정 연결이 준비되지 않았습니다.");
-          return;
-        }
-
-        const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
-
-        if(error){
-          setAuthError(error.message || "비밀번호 재설정 메일 발송에 실패했습니다.");
-          return;
-        }
-
-        setAuthError("비밀번호 재설정 메일을 보냈습니다. 메일함을 확인해주세요.");
-      }
-
-      document.getElementById("resetPasswordBtn").addEventListener("click", submitResetPassword);
-      document.getElementById("resetPasswordBackBtn").addEventListener("click", ()=>{ location.hash = "#/login"; });
-      attachAuthEnter(["resetEmail"], submitResetPassword);
     }
 
     async function syncHomeLoginSessionFromSupabase(){
@@ -1642,60 +1454,6 @@
         setHomeLoggedIn(false);
         return false;
       }
-    }
-
-    function isAdminAuthorized(){
-      return sessionStorage.getItem(ADMIN_SESSION_KEY) === "yes";
-    }
-
-    function openAdminAuthModal(targetHash = "#/admin"){
-      pendingAdminTarget = targetHash || "#/admin";
-      adminAuthError.classList.remove("show");
-      adminPasswordInput.value = "";
-      adminAuthModal.classList.add("show");
-      adminAuthModal.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-      setTimeout(() => adminPasswordInput.focus(), 20);
-    }
-
-    function closeAdminAuthModal(){
-      adminAuthModal.classList.remove("show");
-      adminAuthModal.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-      adminAuthError.classList.remove("show");
-      adminPasswordInput.value = "";
-    }
-
-    function confirmAdminAuth(){
-      const input = (adminPasswordInput.value || "").trim();
-
-      if(input === ADMIN_PASSWORD){
-        sessionStorage.setItem(ADMIN_SESSION_KEY, "yes");
-        closeAdminAuthModal();
-
-        const target = pendingAdminTarget || "#/admin";
-
-        if(location.hash === target){
-          router();
-        }else{
-          location.hash = target;
-        }
-        return;
-      }
-
-      adminAuthError.classList.add("show");
-      adminPasswordInput.focus();
-      adminPasswordInput.select();
-    }
-
-    function checkAdminAccess(targetHash = "#/admin"){
-      if(isAdminAuthorized()) return true;
-      openAdminAuthModal(targetHash);
-      return false;
-    }
-
-    function clearAdminAccess(){
-      sessionStorage.removeItem(ADMIN_SESSION_KEY);
     }
 
     function initSupabase(){
@@ -1912,13 +1670,6 @@
     const nSize = document.getElementById("nSize");
     const nBase = document.getElementById("nBase");
     const nImg = document.getElementById("nImg");
-
-    const adminAuthModal = document.getElementById("adminAuthModal");
-    const adminAuthOverlay = document.getElementById("adminAuthOverlay");
-    const adminPasswordInput = document.getElementById("adminPasswordInput");
-    const adminAuthError = document.getElementById("adminAuthError");
-    const adminAuthCancel = document.getElementById("adminAuthCancel");
-    const adminAuthConfirm = document.getElementById("adminAuthConfirm");
 
     function saveAllLocal(){
       try{
@@ -2388,6 +2139,241 @@
       }
     }
 
+
+    function renderAuthShell(innerHtml){
+      topbar.style.display = "none";
+      document.body.classList.remove("mode-request", "mode-list", "mode-admin");
+
+      app.innerHTML = `
+        <div class="loginScreen">
+          <div class="loginWrap">
+            <div class="loginLogoWrap">
+              <div class="loginLogoBox">
+                <img class="loginLogoImage" src="images/sa-logo_4.png" alt="Seoul Auction 로고" />
+              </div>
+            </div>
+            ${innerHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    function setAuthError(message){
+      const errorBox = document.getElementById("homeLoginError");
+      if(!errorBox) return;
+      if(message){
+        errorBox.textContent = message;
+        errorBox.classList.add("show");
+      }else{
+        errorBox.textContent = "";
+        errorBox.classList.remove("show");
+      }
+    }
+
+    function getAuthInputValue(id){
+      return (document.getElementById(id)?.value || "").trim();
+    }
+
+    function attachAuthEnter(ids, handler){
+      ids.forEach((id) => {
+        const el = document.getElementById(id);
+        if(!el) return;
+        el.addEventListener("keydown", (e)=>{
+          if(e.key === "Enter"){
+            handler();
+          }
+        });
+      });
+    }
+
+    function renderLoginPage(){
+      renderAuthShell(`
+        <div class="loginForm">
+          <input id="homeLoginId" class="loginInput" type="email" placeholder="이메일을 입력해 주세요." autocomplete="username" />
+          <input id="homeLoginPw" class="loginInput" type="password" placeholder="비밀번호를 입력해 주세요." autocomplete="current-password" />
+
+          <div class="loginSubLinks">
+            <a href="#/signup">회원가입</a>
+            <span>|</span>
+            <a href="#/find-id">아이디 찾기</a>
+            <span>|</span>
+            <a href="#/reset-password">비밀번호 찾기</a>
+          </div>
+
+          <button class="loginBtn" id="homeLoginBtn" type="button">로그인하기</button>
+          <div class="loginErrorText" id="homeLoginError"></div>
+        </div>
+      `);
+
+      async function submitHomeLogin(){
+        const email = getAuthInputValue("homeLoginId").toLowerCase();
+        const password = getAuthInputValue("homeLoginPw");
+
+        if(!email || !password){
+          setAuthError("이메일과 비밀번호를 입력해주세요.");
+          return;
+        }
+
+        if(!supabaseClient){
+          setAuthError("로그인 연결이 준비되지 않았습니다.");
+          return;
+        }
+
+        const { error } = await supabaseClient.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if(error){
+          setAuthError(error.message || "로그인에 실패했습니다.");
+          return;
+        }
+
+        setHomeLoggedIn(true);
+        setAuthError("");
+        location.hash = "#/";
+      }
+
+      document.getElementById("homeLoginBtn").addEventListener("click", submitHomeLogin);
+      attachAuthEnter(["homeLoginId", "homeLoginPw"], submitHomeLogin);
+    }
+
+    function renderSignupPage(){
+      renderAuthShell(`
+        <div class="loginForm">
+          <h2 class="authPageTitle">회원가입</h2>
+          <p class="authPageDesc">서울옥션 이메일 계정으로만 가입할 수 있습니다.</p>
+
+          <input id="signupEmail" class="loginInput" type="email" placeholder="이메일을 입력해 주세요." autocomplete="email" />
+          <input id="signupPassword" class="loginInput" type="password" placeholder="비밀번호를 입력해 주세요." autocomplete="new-password" />
+          <input id="signupPasswordConfirm" class="loginInput" type="password" placeholder="비밀번호를 다시 입력해 주세요." autocomplete="new-password" />
+
+          <button class="loginBtn" id="signupSubmitBtn" type="button">회원가입 완료</button>
+          <button class="authSecondaryBtn" id="signupBackBtn" type="button">로그인으로 돌아가기</button>
+          <div class="loginErrorText" id="homeLoginError"></div>
+        </div>
+      `);
+
+      async function submitSignup(){
+        const email = getAuthInputValue("signupEmail").toLowerCase();
+        const password = getAuthInputValue("signupPassword");
+        const confirmPassword = getAuthInputValue("signupPasswordConfirm");
+
+        if(!email || !password || !confirmPassword){
+          setAuthError("모든 항목을 입력해주세요.");
+          return;
+        }
+
+        if(password !== confirmPassword){
+          setAuthError("비밀번호가 일치하지 않습니다.");
+          return;
+        }
+
+        if(password.length < 6){
+          setAuthError("비밀번호는 6자 이상 입력해주세요.");
+          return;
+        }
+
+        if(!supabaseClient){
+          setAuthError("회원가입 연결이 준비되지 않았습니다.");
+          return;
+        }
+
+        const { error } = await supabaseClient.auth.signUp({
+          email,
+          password
+        });
+
+        if(error){
+          setAuthError(error.message || "회원가입에 실패했습니다.");
+          return;
+        }
+
+        setAuthError("회원가입이 완료되었습니다.\n로그인 화면에서 로그인해주세요.");
+      }
+
+      document.getElementById("signupSubmitBtn").addEventListener("click", submitSignup);
+      document.getElementById("signupBackBtn").addEventListener("click", ()=>{ location.hash = "#/login"; });
+      attachAuthEnter(["signupEmail", "signupPassword", "signupPasswordConfirm"], submitSignup);
+    }
+
+    function renderFindIdPage(){
+      renderAuthShell(`
+        <div class="loginForm">
+          <h2 class="authPageTitle">아이디 찾기</h2>
+          <p class="authPageDesc">홈 로그인 아이디는 서울옥션 이메일 전체 주소입니다.</p>
+
+          <div class="authInfoBox">
+            예시<br />
+            yss → yss@seoulauction.com<br />
+            사내 사용 계정도 동일하게 회사 이메일 전체 주소를 입력하면 됩니다.
+          </div>
+
+          <input id="findIdLocalPart" class="loginInput" type="text" placeholder="이메일 앞부분을 입력해 주세요." autocomplete="off" />
+          <button class="loginBtn" id="findIdBtn" type="button">아이디 확인</button>
+          <button class="authSecondaryBtn" id="findIdBackBtn" type="button">로그인으로 돌아가기</button>
+          <div class="loginErrorText" id="homeLoginError"></div>
+        </div>
+      `);
+
+      function submitFindId(){
+        const localPart = getAuthInputValue("findIdLocalPart");
+        if(!localPart){
+          setAuthError("이메일 앞부분을 입력해주세요.");
+          return;
+        }
+
+        setAuthError(`확인된 아이디\n${localPart}@seoulauction.com`);
+      }
+
+      document.getElementById("findIdBtn").addEventListener("click", submitFindId);
+      document.getElementById("findIdBackBtn").addEventListener("click", ()=>{ location.hash = "#/login"; });
+      attachAuthEnter(["findIdLocalPart"], submitFindId);
+    }
+
+    function renderResetPasswordPage(){
+      renderAuthShell(`
+        <div class="loginForm">
+          <h2 class="authPageTitle">비밀번호 찾기</h2>
+          <p class="authPageDesc">가입한 서울옥션 이메일을 입력하면 비밀번호 재설정 메일을 발송합니다.</p>
+
+          <input id="resetPasswordEmail" class="loginInput" type="email" placeholder="이메일을 입력해 주세요." autocomplete="email" />
+          <button class="loginBtn" id="resetPasswordBtn" type="button">재설정 메일 보내기</button>
+          <button class="authSecondaryBtn" id="resetPasswordBackBtn" type="button">로그인으로 돌아가기</button>
+          <div class="loginErrorText" id="homeLoginError"></div>
+        </div>
+      `);
+
+      async function submitResetPassword(){
+        const email = getAuthInputValue("resetPasswordEmail").toLowerCase();
+
+        if(!email){
+          setAuthError("이메일을 입력해주세요.");
+          return;
+        }
+
+        if(!supabaseClient){
+          setAuthError("비밀번호 재설정 연결이 준비되지 않았습니다.");
+          return;
+        }
+
+        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}${window.location.pathname}#/login`
+        });
+
+        if(error){
+          setAuthError(error.message || "재설정 메일 발송에 실패했습니다.");
+          return;
+        }
+
+        setAuthError("비밀번호 재설정 메일을 발송했습니다.\n이메일을 확인해주세요.");
+      }
+
+      document.getElementById("resetPasswordBtn").addEventListener("click", submitResetPassword);
+      document.getElementById("resetPasswordBackBtn").addEventListener("click", ()=>{ location.hash = "#/login"; });
+      attachAuthEnter(["resetPasswordEmail"], submitResetPassword);
+    }
+
     function renderMainHome(){
       topbar.style.display = "none";
       document.body.classList.remove("mode-request", "mode-list", "mode-admin");
@@ -2395,7 +2381,7 @@
       app.innerHTML = `
         <div class="mainHome">
           <div class="mainLogoArea" id="mainHomeLogoBtn">
-            ${renderSmartLogo("images/sa-logo_4.png", "Seoul Auction 로고")}
+            ${renderSmartLogo("sa-logo_4.png", "Seoul Auction 로고")}
           </div>
 
           <div class="mainHomeLine"></div>
@@ -2417,7 +2403,12 @@
         location.hash = "#/list";
       });
 
-      document.getElementById("goAdminPage").addEventListener("click", ()=>{
+      document.getElementById("goAdminPage").addEventListener("click", async ()=>{
+        const ok = await isAdminUser();
+        if(!ok){
+          alert("관리자 권한이 없습니다.");
+          return;
+        }
         location.hash = "#/admin";
       });
 
@@ -3129,26 +3120,19 @@
       render();
     }
 
-    function updateFabVisibility(){
+    async function updateFabVisibility(){
       const hash = location.hash || "#/";
-      const isAdminHome = hash === "#/admin" && isAdminAuthorized();
+      const isAdminHome = hash === "#/admin" && await isAdminUser();
       fabAddItem.style.display = isAdminHome ? "inline-flex" : "none";
     }
 
     async function router(){
-      updateFabVisibility();
+      await updateFabVisibility();
 
       const hash = location.hash || "#/login";
-      const isPublicAuthPage = AUTH_PUBLIC_HASHES.includes(hash);
+      const isPublicAuthPage = ["#/login", "#/signup", "#/find-id", "#/reset-password"].includes(hash);
 
-      let loggedIn = false;
-      if(supabaseClient){
-        loggedIn = await syncHomeLoginSessionFromSupabase();
-      }else{
-        loggedIn = isHomeLoggedIn();
-      }
-
-      if(!loggedIn && !isPublicAuthPage){
+      if(!isHomeLoggedIn() && !isPublicAuthPage){
         location.hash = "#/login";
         return;
       }
@@ -3172,12 +3156,22 @@
       }else if(hash === "#/list"){
         renderHome("list");
       }else if(hash === "#/admin"){
-        if(!checkAdminAccess("#/admin")) return;
+        const ok = await isAdminUser();
+        if(!ok){
+          alert("관리자 권한이 없습니다.");
+          location.hash = "#/";
+          return;
+        }
         renderHome("admin");
       }else if(requestItem){
         renderDetail(decodeURIComponent(requestItem[1]), "request");
       }else if(adminItem){
-        if(!checkAdminAccess(hash)) return;
+        const ok = await isAdminUser();
+        if(!ok){
+          alert("관리자 권한이 없습니다.");
+          location.hash = "#/";
+          return;
+        }
         renderDetail(decodeURIComponent(adminItem[1]), "admin");
       }else if(listItem){
         renderDetail(decodeURIComponent(listItem[1]), "list");
@@ -3261,10 +3255,15 @@
       router();
     });
 
-    doSearch.addEventListener("click", ()=>{
+    doSearch.addEventListener("click", async ()=>{
       const hash = location.hash || "#/";
       if(hash === "#/admin"){
-        if(!checkAdminAccess("#/admin")) return;
+        const ok = await isAdminUser();
+        if(!ok){
+          alert("관리자 권한이 없습니다.");
+          location.hash = "#/";
+          return;
+        }
         renderHome("admin");
       }else if(hash === "#/list"){
         renderHome("list");
@@ -3273,11 +3272,16 @@
       }
     });
 
-    q.addEventListener("keydown", (e)=>{
+    q.addEventListener("keydown", async (e)=>{
       if(e.key === "Enter"){
         const hash = location.hash || "#/";
         if(hash === "#/admin"){
-          if(!checkAdminAccess("#/admin")) return;
+          const ok = await isAdminUser();
+          if(!ok){
+            alert("관리자 권한이 없습니다.");
+            location.hash = "#/";
+            return;
+          }
           renderHome("admin");
         }else if(hash === "#/list"){
           renderHome("list");
@@ -3287,10 +3291,14 @@
       }
     });
 
-    q.addEventListener("input", ()=>{
+    q.addEventListener("input", async ()=>{
       const hash = location.hash || "#/";
       if(hash === "#/admin"){
-        if(!checkAdminAccess("#/admin")) return;
+        const ok = await isAdminUser();
+        if(!ok){
+          location.hash = "#/";
+          return;
+        }
         renderHome("admin");
       }else if(hash === "#/list"){
         renderHome("list");
@@ -3302,35 +3310,10 @@
     homeLink.addEventListener("click", (e)=>{
       e.preventDefault();
       q.value = "";
-      clearAdminAccess();
-      closeAdminAuthModal();
       location.hash = "#/";
     });
 
-    adminAuthOverlay.addEventListener("click", ()=>{
-      closeAdminAuthModal();
-      location.hash = "#/";
-    });
-
-    adminAuthCancel.addEventListener("click", ()=>{
-      closeAdminAuthModal();
-      location.hash = "#/";
-    });
-
-    adminAuthConfirm.addEventListener("click", confirmAdminAuth);
-
-    adminPasswordInput.addEventListener("keydown", (e)=>{
-      if(e.key === "Enter"){
-        confirmAdminAuth();
-      }else if(e.key === "Escape"){
-        closeAdminAuthModal();
-        location.hash = "#/";
-      }
-    });
-
-    window.addEventListener("hashchange", ()=>{
-      router();
-    });
+    window.addEventListener("hashchange", router);
 
     (async function boot(){
       loadAllLocal();
@@ -3355,12 +3338,12 @@
 
       supabaseClient.auth.onAuthStateChange((event, session) => {
         setHomeLoggedIn(!!session);
-        const currentHash = location.hash || "#/login";
-        if(session && AUTH_PUBLIC_HASHES.includes(currentHash)){
+        const authHashes = ["#/login", "#/signup", "#/find-id", "#/reset-password"];
+        if(session && authHashes.includes(location.hash || "#/login")){
           location.hash = "#/";
           return;
         }
-        if(!session && !AUTH_PUBLIC_HASHES.includes(currentHash)){
+        if(!session && !authHashes.includes(location.hash || "#/login")){
           location.hash = "#/login";
         }
       });
@@ -3369,5 +3352,6 @@
       router();
     })();
   </script>
+
 </body>
 </html>

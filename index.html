@@ -1,0 +1,2936 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>창고수량재고</title>
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#111111;
+      --muted:#666666;
+      --line:#dddddd;
+      --soft:#f7f7f7;
+      --card:#ffffff;
+      --chip:#f5f5f5;
+      --stockbg:#f8f8f8;
+      --out:#c63e3e;
+      --in:#2563eb;
+      --radius:0px;
+      --log-cols: 88px 74px 120px 120px 90px;
+      --blue:#2563eb;
+      --bluebg:#eef4ff;
+      --blueLine:#dbeafe;
+      --danger:#c63e3e;
+      --dangerBg:#fff5f5;
+      --dangerLine:#ffefef;
+      --saMint:#84cdc9;
+      --page-accent:#111111;
+      --page-accent-soft:#f7f7f7;
+      --header-h:72px;
+      --max:1560px;
+      --content-max:1320px;
+    }
+
+    *{box-sizing:border-box}
+
+    html{scroll-behavior:smooth}
+
+    body{
+      margin:0;
+      font-family:'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.5;
+      word-break:keep-all;
+    }
+
+    body.mode-request,
+    body.mode-list,
+    body.mode-admin{
+      --page-accent:#111111;
+      --page-accent-soft:#f7f7f7;
+    }
+
+    .wrap{
+      width:min(calc(100% - 50px), var(--content-max));
+      margin:0 auto;
+      padding:0 0 80px;
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:90;
+      min-height:var(--header-h);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+      padding:16px 0;
+      margin:0 0 42px;
+      background:rgba(255,255,255,0.92);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid rgba(0,0,0,0.06);
+    }
+
+    .brand{
+      color:inherit;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      min-width:0;
+      margin-left:20px;
+      font-family:"Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+      font-weight:600;
+      letter-spacing:-0.02em;
+    }
+
+    .brand a{
+      color:inherit;
+      text-decoration:none;
+      min-width:0;
+    }
+
+    h1{
+      font-size:22px;
+      font-weight:500;
+      margin:0;
+      letter-spacing:-0.02em;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    .search{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      margin-left:auto;
+      flex:1;
+    }
+
+    .search input{
+      width:min(240px, 100%);
+      height:40px;
+      padding:0 14px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      outline:none;
+      font-size:13px;
+      background:#fff;
+    }
+
+    .search input:focus{
+      border-color:#111;
+    }
+
+    .pill{
+      height:40px;
+      padding:0 16px;
+      border:1px solid transparent;
+      border-radius:999px;
+      background:none;
+      font-size:13px;
+      cursor:pointer;
+      user-select:none;
+      white-space:nowrap;
+      font-weight:500;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      transition:.2s ease;
+    }
+
+    .pill:hover,
+    .btn:hover,
+    .sheetClose:hover,
+    .dangerBtn:hover,
+    .authBtn.cancel:hover,
+    .stockInlineMini:hover,
+    .selDelBtn:hover,
+    .miniBtn:hover{
+      background:var(--soft);
+      border-color:var(--line);
+    }
+
+    .section{ margin-top:42px; }
+
+    .secHead{
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      gap:7px;
+      margin:0 0 16px;
+      padding-bottom:10px;
+      border-bottom:1px solid rgba(0,0,0,0.08);
+    }
+
+    .secHead h2{
+      margin:0;
+      font-size:12px;
+      color:var(--muted);
+      font-weight:500;
+      letter-spacing:0.12em;
+      text-transform:uppercase;
+    }
+
+    .list{ display:flex; flex-direction:column; gap:16px; }
+
+    body.mode-request .list,
+    body.mode-admin .list{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:16px;
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns:minmax(0, 1fr) 170px;
+      gap:20px;
+      align-items:stretch;
+    }
+
+    .card{
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      background:var(--card);
+      padding:18px;
+      display:flex;
+      gap:18px;
+      align-items:center;
+      min-height:124px;
+      cursor:pointer;
+      transition:transform .18s ease, border-color .18s ease;
+    }
+
+    .card:hover{
+      transform:translateY(-2px);
+      border-color:#bfbfbf;
+    }
+
+    .card:active{ transform:translateY(0); }
+
+    .thumb{
+      width:104px;
+      height:104px;
+      border-radius:0;
+      background:#f4f4f4;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex:0 0 auto;
+      overflow:hidden;
+      border:1px solid #efefef;
+    }
+
+    .thumb img,
+    .imgBox img,
+    .stockThumb img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      filter:saturate(.98);
+    }
+
+    .meta{ display:flex; flex-direction:column; align-items:flex-start; gap:10px; text-align:left; min-width:0; }
+    .meta-top{ width:100%; }
+
+    .meta-bot{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+      min-width:0;
+      flex-wrap:wrap;
+    }
+
+    .meta-bot span{ white-space:nowrap; }
+
+    .title{
+      font-weight:800;
+      font-size:24px;
+      line-height:1.25;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      letter-spacing:-0.04em;
+      margin-bottom:6px;
+    }
+
+    .size{
+      font-size:13px;
+      color:var(--muted);
+      white-space:nowrap;
+      font-weight:500;
+    }
+
+    .status{ font-weight:600; }
+    .status.out{ color:var(--out); }
+    .status.in{ color:var(--in); }
+
+    .delta{ white-space:nowrap; font-weight:500; }
+    .delta .qty{ font-weight:700; margin-left:6px; }
+    .delta .qty.out{ color:var(--out); }
+    .delta .qty.in{ color:var(--in); }
+
+    .stock{
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      background:#f8f8f8;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:800;
+      font-size:28px;
+      letter-spacing:-0.04em;
+      min-height:124px;
+    }
+
+    .stock small{
+      font-size:14px;
+      color:var(--muted);
+      font-weight:700;
+      margin-left:4px;
+    }
+
+    .paper{
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      background:#fff;
+      overflow:hidden;
+    }
+
+    .paper-head{
+      padding:18px 24px;
+      border-bottom:1px solid var(--line);
+      font-weight:600;
+      letter-spacing:0.08em;
+      font-size:12px;
+      color:var(--muted);
+      text-transform:uppercase;
+    }
+
+    .paper-body{ padding:28px 24px 24px; }
+
+    .imgRow{
+      display:flex;
+      justify-content:flex-start;
+      gap:20px;
+      padding:0 0 24px;
+      margin:0;
+    }
+
+    .imgBox{
+      width:min(100%, 260px);
+      aspect-ratio:1 / 1;
+      border-radius:0;
+      background:#f4f4f4;
+      border:1px solid #efefef;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .imgPh{ width:42px; height:42px; opacity:.55; }
+
+    .itemHeader{ padding:4px 0 0; }
+
+    .itemTop{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:20px;
+    }
+
+    .itemName{
+      font-size:40px;
+      font-weight:800;
+      letter-spacing:-0.06em;
+      line-height:1.04;
+      margin:0;
+      min-width:0;
+      word-break:keep-all;
+    }
+
+    .sizePill{
+      flex:0 0 auto;
+      padding:10px 14px;
+      border-radius:999px;
+      background:#f7f7f7;
+      border:1px solid #ececec;
+      color:#111827;
+      font-weight:600;
+      font-size:13px;
+      white-space:nowrap;
+      margin-top:3px;
+    }
+
+    .statsGrid{ display:grid; grid-template-columns:1fr; gap:10px; margin-top:3px; }
+
+    .statCard{
+      border-radius:0;
+      border:1px solid var(--line);
+      background:#fff;
+      padding:0;
+      min-height:70px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+
+    .statCard.current{ background:#f8f8f8; border-color:var(--line); }
+
+    .statRow{
+      width:100%;
+      display:grid;
+      grid-template-columns:220px 1fr;
+      align-items:center;
+      min-height:70px;
+    }
+
+    .statLabel,
+    .statValue{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:70px;
+      white-space:nowrap;
+      position:relative;
+    }
+
+    .statLabel{
+      font-size:16px;
+      font-weight:600;
+      color:#3b3b3b;
+      letter-spacing:-0.02em;
+    }
+
+    .statLabel .txt{ font-size:16px; line-height:1; white-space:nowrap; }
+
+    .statValue{
+      font-size:26px;
+      font-weight:800;
+      color:#111;
+      letter-spacing:-0.05em;
+    }
+
+    .statValue::before{
+      content:"";
+      position:absolute;
+      left:0;
+      top:50%;
+      transform:translateY(-50%);
+      width:1px;
+      height:36px;
+      background:#d9d9d9;
+    }
+
+    .statValue .unit{ font-size:17px; font-weight:800; color:#2f2f2f; margin-left:0; }
+
+    .divider{ height:1px; background:var(--line); margin:28px 0 24px; }
+
+    .boxTitleRow{ display:flex; align-items:center; justify-content:flex-start; gap:10px; padding:0 0 8px; }
+
+    .boxTitle{
+      font-size:14px;
+      font-weight:600;
+      letter-spacing:0.08em;
+      margin-bottom:5px;
+      padding:0;
+      color:var(--muted);
+      text-transform:uppercase;
+    }
+
+    .selDelBtn,
+    .btn,
+    .dangerBtn,
+    .stockInlineMini,
+    .miniBtn,
+    .sheetClose,
+    .authBtn{
+      padding:0 14px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:#fff;
+      font-weight:500;
+      cursor:pointer;
+      white-space:nowrap;
+      min-width:86px;
+      height:38px;
+      font-size:12px;
+      transition:.2s ease;
+    }
+
+    .logBox{
+      margin:0;
+      border:1px solid var(--line);
+      border-radius:0;
+      background:#fff;
+      overflow-x:auto;
+      overflow-y:hidden;
+      -webkit-overflow-scrolling:touch;
+    }
+
+    .logMinWidth{ min-width:520px; }
+
+    .logHead,
+    .logRow{
+      display:grid;
+      grid-template-columns:var(--log-cols);
+      align-items:center;
+      width:100%;
+      column-gap:0;
+    }
+
+    .logHead > div,
+    .logRow > div{ min-width:0; padding:0 18px; }
+
+    .logHead{
+      padding:0;
+      min-height:52px;
+      background:#fafafa;
+      border-bottom:1px solid var(--line);
+      font-weight:600;
+      font-size:12px;
+    }
+
+    .logRow{
+      padding:0;
+      min-height:56px;
+      border-top:1px solid var(--line);
+      font-size:13px;
+      background:#fff;
+    }
+
+    .logHeadCell,
+    .logDate,
+    .logType,
+    .logDept,
+    .logPerson,
+    .logQty{
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      min-height:52px;
+      text-align:left;
+    }
+
+    .logHeadLabel{ font-size:12px; color:var(--muted); font-weight:600; white-space:nowrap; }
+
+    .logHead .hselect{
+      width:100%;
+      min-width:0;
+      margin:0;
+      padding:0 14px;
+      text-align:left;
+      height:38px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:#fff;
+      font-weight:600;
+      font-size:12px;
+      outline:none;
+    }
+
+    .logHead .hdateWrap{ width:100%; }
+    .logHead .hbtn{ width:100%; }
+    .logHead .qtySortBtn{ width:100%; display:flex; justify-content:flex-start; align-items:center; }
+    .logRow:first-child{ border-top:none; }
+    .logRow.clickable{ cursor:pointer; }
+
+    .logRow.selected{ outline:1px solid #111; outline-offset:-1px; background:#fcfcfc; }
+
+    .hbtn{ display:inline-flex; align-items:center; gap:6px; cursor:pointer; font-weight:700; }
+    .arrow{ font-size:10px; color:var(--muted); transform:translateY(-0.5px); }
+
+    .hdateWrap{ position:relative; }
+
+    .hdate{
+      position:absolute;
+      left:0;
+      top:44px;
+      width:min(92vw, 320px);
+      padding:8px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:#fff;
+      display:none;
+      z-index:50;
+      box-shadow:0 10px 30px rgba(17,24,39,0.08);
+    }
+
+    .hdate input{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:9px 10px;
+      font-size:12px;
+      font-weight:600;
+      outline:none;
+      background:#fff;
+    }
+
+    .hdate .row2{ display:flex; justify-content:flex-end; gap:6px; margin-top:8px; }
+
+    .requestActionWrap{ margin:8px 0 18px; }
+
+    .requestSubmitBtn{
+      width:100%;
+      padding:15px 16px;
+      border:0;
+      border-radius:0;
+      background:#111;
+      color:#fff;
+      font-weight:700;
+      font-size:15px;
+      cursor:pointer;
+      margin-bottom:0;
+      transition:opacity .2s ease;
+    }
+
+    .requestSubmitBtn:hover,
+    .primary:hover,
+    .fab:hover,
+    .authBtn.confirm:hover{ opacity:.9; }
+
+    .primary{
+      background:#111;
+      color:#fff;
+      border-color:#111;
+    }
+
+    .adminBottomRow,
+    .commonBottomRow{
+      margin-top:18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .adminBottomLeft,
+    .commonBottomLeft{
+      display:flex;
+      align-items:center;
+      gap:4px;
+      font-size:11px;
+      color:var(--muted);
+      font-weight:600;
+      min-width:0;
+    }
+
+    .stockInline{ display:inline-flex; align-items:center; gap:6px; flex-wrap:wrap; }
+
+    .stockInlineValue{
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      font-size:11px;
+      color:#667085;
+      font-weight:700;
+      cursor:pointer;
+      border:none;
+      background:transparent;
+      padding:0;
+    }
+
+    .stockInlineValue b{ font-size:13px; color:#667085; }
+    .stockInlineEdit{ display:none; align-items:center; gap:6px; flex-wrap:wrap; }
+    .stockInlineEdit.show{ display:inline-flex; }
+
+    .stockInlineInput{
+      width:88px;
+      height:38px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:0 12px;
+      font-size:12px;
+      font-weight:700;
+      outline:none;
+    }
+
+    .adminBottomRight,
+    .commonBottomRight{ display:flex; align-items:center; gap:8px; margin-left:auto; }
+
+    .dangerBox{
+      margin-top:50px;
+      border:1px dashed #e7dede;
+      background:#fff9f9;
+      border-radius:0;
+      padding:16px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .dangerText{ font-size:11px; color:#313131; font-weight:500; line-height:1.8; }
+    .dbStatusLine{ margin-top:18px; font-size:11px; color:var(--muted); }
+
+    .modal,
+    .authModal{
+      display:none;
+      position:fixed;
+      inset:0;
+      z-index:9999;
+    }
+
+    .modal.show,
+    .authModal.show{ display:block; }
+
+    .modalOverlay,
+    .authOverlay{
+      position:absolute;
+      inset:0;
+      background:rgba(17,24,39,0.45);
+    }
+
+    .sheet{
+      position:absolute;
+      left:0; right:0; bottom:0;
+      background:#fff;
+      border-top-left-radius:24px;
+      border-top-right-radius:24px;
+      box-shadow:0 -10px 30px rgba(0,0,0,0.12);
+      overflow:hidden;
+      max-height:86vh;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .sheetHead{
+      padding:18px 20px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      font-weight:700;
+    }
+
+    .sheetBody{ padding:18px 20px 8px; overflow:auto; }
+    .field{ margin-bottom:14px; }
+
+    .field label{
+      display:block;
+      font-size:11px;
+      color:var(--muted);
+      font-weight:600;
+      margin-bottom:6px;
+      letter-spacing:0.04em;
+    }
+
+    .field input, .field select, .authInput{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:13px 14px;
+      font-size:13px;
+      font-weight:600;
+      outline:none;
+      background:#fff;
+      color:#111;
+    }
+
+    .seg{ display:flex; gap:10px; }
+
+    .seg button{
+      flex:1;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px 10px;
+      background:#fff;
+      cursor:pointer;
+      font-weight:700;
+      font-size:12px;
+    }
+
+    .seg button.active.out{ border-color:var(--out); color:var(--out); background:#fff5f5; }
+    .seg button.active.in{ border-color:var(--in); color:var(--in); background:#f1f5ff; }
+
+    .sheetFoot{ padding:14px 20px 20px; border-top:1px solid var(--line); background:#fff; }
+
+    .sheetFoot .primary{
+      width:100%;
+      padding:15px 14px;
+      border-radius:999px;
+      font-size:14px;
+      font-weight:800;
+    }
+
+    .fab{
+      position:fixed;
+      right:24px;
+      bottom:24px;
+      z-index:9998;
+      padding:0 18px;
+      height:48px;
+      border:1px solid #111;
+      border-radius:999px;
+      background:#111;
+      color:#fff;
+      font-weight:700;
+      font-size:12px;
+      cursor:pointer;
+      box-shadow:0 10px 24px rgba(0,0,0,0.14);
+      user-select:none;
+      white-space:nowrap;
+    }
+
+    .fab:active{ transform:translateY(0.5px); }
+
+    .mainHome{
+      max-width:980px;
+      margin:0 auto;
+      padding:84px 0 80px;
+      text-align:center;
+    }
+
+    .mainLogoArea{
+      width:100%;
+      min-height:110px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin-bottom:36px;
+      cursor:pointer;
+    }
+
+    .mainLogoImg{ max-width:240px; max-height:90px; object-fit:contain; display:block; }
+
+    .mainLogoPlaceholder{
+      width:240px;
+      height:90px;
+      border:1px dashed #cfd8dc;
+      border-radius:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#d1d5da;
+      font-size:12px;
+      font-weight:600;
+      background:#fafafa;
+    }
+
+    .mainHomeLine{ width:100%; height:1px; background:#d9d9d9; margin:0 0 22px; }
+
+    .mainHomeTitle{
+      font-size:14px;
+      font-weight:500;
+      color:#323232;
+      margin-bottom:56px;
+      letter-spacing:-0.01em;
+      text-align:center;
+    }
+
+    .mainHomeBtns{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:18px;
+      margin-top:0;
+    }
+
+    .mainHomeBtn{
+      width:100%;
+      min-height:120px;
+      border:1px solid #d9d9d9;
+      border-radius:0;
+      background:#fff;
+      color:#222;
+      font-size:18px;
+      font-weight:700;
+      cursor:pointer;
+      padding:24px 26px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:left;
+      transition:transform .18s ease, border-color .18s ease;
+    }
+
+    .mainHomeBtn:hover{
+      transform:translateY(-2px);
+      border-color:#bcbcbc;
+    }
+
+    .mainHomeBtn.primaryHomeBtn{ background:#111; border-color:#111; color:#fff; }
+    .stockBtn{ background:#fff; border-color:#d3d3d3; color:#202020; }
+    .adminBtn{ background:#f7f7f7; border-color:#dcdcdc; color:#111; }
+
+    .listGrid{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:20px;
+    }
+
+    .stockCard{
+      border:1px solid #dcdcdc;
+      border-radius:0;
+      background:#fff;
+      padding:18px;
+      display:flex;
+      align-items:center;
+      gap:14px;
+      min-height:108px;
+      cursor:default;
+      transition:transform .18s ease, border-color .18s ease;
+    }
+
+    .stockCard:hover{ transform:translateY(-2px); border-color:#bfbfbf; }
+
+    .stockThumb{
+      width:72px;
+      height:72px;
+      flex:0 0 72px;
+      border-radius:0;
+      overflow:hidden;
+      background:#f4f4f4;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid #efefef;
+    }
+
+    .stockMeta{
+      min-width:0;
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .stockName{
+      font-size:16px;
+      font-weight:700;
+      color:#111;
+      line-height:1.25;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      letter-spacing:-0.03em;
+    }
+
+    .stockQtyBar{
+      width:100%;
+      min-height:42px;
+      padding:0 14px;
+      border-radius:0;
+      background:#f7f7f7;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:18px;
+      font-weight:800;
+      color:#111;
+      letter-spacing:-0.04em;
+      border:1px solid #ededed;
+    }
+
+    .authDialog{
+      position:absolute;
+      left:50%;
+      top:50%;
+      transform:translate(-50%, -50%);
+      width:min(92vw, 440px);
+      background:#fff;
+      border-radius:20px;
+      padding:22px 22px 18px;
+      box-shadow:0 24px 60px rgba(45, 45, 45, 0.18);
+    }
+
+    .authTitle{ font-size:18px; font-weight:700; letter-spacing:-0.03em; margin:0 0 8px; color:#111; }
+    .authDesc{ font-size:14px; color:#6d6d6d; margin:0 0 14px; line-height:1.5; }
+
+    .authInput:focus{
+      border-color:#111;
+      box-shadow:0 0 0 3px rgba(17,17,17,0.06);
+    }
+
+    .authError{ min-height:20px; margin-top:10px; font-size:12px; color:#c63e3e; font-weight:500; visibility:hidden; }
+    .authError.show{ visibility:visible; }
+
+    .authBtns{ display:flex; justify-content:flex-end; gap:10px; margin-top:0; }
+    .authBtn.confirm{ background:#111; color:#fff; border-color:#111; }
+
+    @media (max-width: 1280px){
+      .listGrid{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+      .mainHomeBtns{ grid-template-columns:1fr 1fr 1fr; }
+      .itemName{ font-size:34px; }
+    }
+
+    @media (max-width: 980px){
+      .wrap{ width:min(calc(100% - 34px), var(--content-max)); }
+      .row{ grid-template-columns:1fr; }
+      .stock{ min-height:86px; }
+      .listGrid{ grid-template-columns:1fr 1fr; }
+
+      body.mode-request .list,
+      body.mode-admin .list{
+        display:grid;
+        grid-template-columns:1fr;
+        gap:14px;
+      }
+
+      body.mode-request .row,
+      body.mode-admin .row{
+        grid-template-columns:minmax(0, 1fr) 140px;
+        gap:12px;
+        align-items:stretch;
+      }
+
+      .mainHomeBtns{ grid-template-columns:1fr; }
+      .mainHomeBtn{ min-height:88px; }
+      .itemTop{ flex-direction:column; align-items:flex-start; }
+      .statRow{ grid-template-columns:1fr 1fr; }
+    }
+
+    @media (max-width: 640px){
+      :root{ --header-h:64px; --log-cols: 88px 72px 112px 110px 86px; }
+
+      .wrap{ width:min(calc(100% - 28px), var(--content-max)); }
+
+      .topbar{
+        min-height:var(--header-h);
+        gap:12px;
+        margin-bottom:28px;
+        padding:12px 0;
+      }
+
+      .brand{ margin-left:0; }
+      h1{ font-size:16px; max-width:52vw; }
+
+      .search{ justify-content:flex-end; }
+      .search input{ width:min(140px, 100%); height:36px; padding:0 12px; font-size:12px; }
+      .pill{ height:36px; padding:0 12px; font-size:12px; }
+
+      .section{ margin-top:28px; }
+      .listGrid{ grid-template-columns:1fr; gap:14px; }
+
+      body.mode-request .list,
+      body.mode-admin .list{
+        display:grid;
+        grid-template-columns:1fr;
+        gap:14px;
+      }
+
+      body.mode-request .row,
+      body.mode-admin .row{
+        grid-template-columns:minmax(0, 1fr) 104px;
+        gap:10px;
+        align-items:stretch;
+      }
+
+      body.mode-request .card,
+      body.mode-admin .card{
+        min-height:92px;
+        padding:12px;
+        gap:12px;
+        flex-direction:row;
+        align-items:center;
+      }
+
+      body.mode-request .thumb,
+      body.mode-admin .thumb{
+        width:72px;
+        height:72px;
+        aspect-ratio:auto;
+        flex:0 0 72px;
+      }
+
+      body.mode-request .meta,
+      body.mode-admin .meta{
+        width:100%;
+        gap:6px;
+        min-width:0;
+      }
+
+      body.mode-request .meta-bot,
+      body.mode-admin .meta-bot{
+        width:100%;
+        gap:8px;
+        flex-direction:row;
+        align-items:center;
+        flex-wrap:wrap;
+      }
+
+      body.mode-request .meta-bot span,
+      body.mode-request .delta,
+      body.mode-admin .meta-bot span,
+      body.mode-admin .delta{
+        white-space:nowrap;
+      }
+
+      body.mode-request .title,
+      body.mode-admin .title{
+        font-size:14px;
+        line-height:1.35;
+        white-space:normal;
+        overflow:visible;
+        text-overflow:unset;
+        display:-webkit-box;
+        -webkit-line-clamp:2;
+        -webkit-box-orient:vertical;
+      }
+
+      body.mode-request .size,
+      body.mode-admin .size{
+        font-size:11px;
+        white-space:normal;
+      }
+
+      body.mode-request .stock,
+      body.mode-admin .stock{
+        min-height:92px;
+        padding:10px 8px;
+        font-size:16px;
+      }
+
+      body.mode-request .stock small,
+      body.mode-admin .stock small{
+        font-size:10px;
+      }
+
+      .card{ padding:14px; min-height:96px; gap:14px; }
+      .thumb{ width:78px; height:78px; }
+      .title{ font-size:18px; }
+      .size{ font-size:12px; }
+      .stock{ min-height:68px; font-size:22px; }
+
+      .paper-body{ padding:18px 16px 18px; }
+      .imgRow{ gap:12px; padding-bottom:18px; }
+      .imgBox{ width:calc(50% - 6px); }
+      .itemName{ font-size:26px; }
+      .sizePill{ font-size:12px; }
+      .statRow{ grid-template-columns:1fr; }
+      .statValue::before{ display:none; }
+      .statLabel, .statValue{ min-height:56px; }
+      .statValue{ font-size:22px; }
+
+      .logBox{ margin:0; }
+      .logHead > div, .logRow > div{ padding:0 12px; }
+
+      .adminBottomRow,
+      .commonBottomRow{ align-items:flex-start; }
+
+      .adminBottomRight,
+      .commonBottomRight{ width:100%; justify-content:flex-end; }
+
+      .dangerBox{ flex-direction:column; align-items:flex-start; }
+      .dangerBtn{ align-self:stretch; text-align:center; }
+
+      .mainHome{ padding-top:56px; text-align:center;}
+      .mainLogoArea{ min-height:96px; margin-bottom:28px; justify-content:center; }
+      .mainLogoImg{ max-width:220px; max-height:82px; }
+      .mainLogoPlaceholder{ width:220px; height:82px; font-size:13px; }
+      .mainHomeTitle{ font-size:12px; margin-bottom:36px; }
+      .mainHomeBtn{ min-height:72px; font-size:15px; padding:18px 18px; 
+      align-items:center;
+    justify-content:center;
+    text-align:center;}
+
+      .stockCard{ padding:14px; min-height:86px; gap:12px; }
+      .stockThumb{ width:58px; height:58px; flex-basis:58px; }
+      .stockName{ font-size:14px; }
+      .stockQtyBar{ font-size:15px; min-height:36px; }
+
+      .fab{ right:16px; bottom:16px; height:44px; }
+      .authDialog{ width:min(92vw, 360px); padding:20px 18px 16px; }
+      .authTitle{ font-size:17px; }
+      .authBtn{ min-width:92px; height:42px; font-size:13px; }
+    }
+</style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar" id="topbar">
+      <div class="brand">
+        <a href="#/" id="homeLink"><h1 id="topTitle">창고수량재고</h1></a>
+      </div>
+
+      <div class="search" id="searchBox">
+        <input id="q" placeholder="품목 검색" />
+        <div class="pill" id="doSearch">검색</div>
+      </div>
+    </div>
+
+    <div id="app"></div>
+  </div>
+
+  <button class="fab" id="fabAddItem" type="button">품목 추가</button>
+
+  <div class="modal" id="itemModal" aria-hidden="true">
+    <div class="modalOverlay" id="itemOverlay"></div>
+    <div class="sheet" role="dialog" aria-modal="true" aria-label="품목 추가">
+      <div class="sheetHead">
+        <div>품목 추가</div>
+        <button class="sheetClose" id="itemClose">닫기</button>
+      </div>
+
+      <div class="sheetBody">
+        <div class="field">
+          <label for="nCategory">카테고리</label>
+          <input id="nCategory" placeholder="예) 쇼핑백" />
+        </div>
+
+        <div class="field">
+          <label for="nName">품목명</label>
+          <input id="nName" placeholder="예) 신규 쇼핑백" />
+        </div>
+
+        <div class="field">
+          <label for="nSize">사이즈</label>
+          <input id="nSize" placeholder="예) 480*180*380mm" />
+        </div>
+
+        <div class="field">
+          <label for="nBase">기준재고</label>
+          <input id="nBase" inputmode="numeric" placeholder="예) 1000" />
+        </div>
+
+        <div class="field">
+          <label for="nImg">이미지 경로</label>
+          <input id="nImg" placeholder="예) large-paper-bag-front.jpg 또는 images/large-paper-bag-front.jpg" />
+        </div>
+      </div>
+
+      <div class="sheetFoot">
+        <button class="btn primary" id="createItemBtn">추가</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="authModal" id="adminAuthModal" aria-hidden="true">
+    <div class="authOverlay" id="adminAuthOverlay"></div>
+    <div class="authDialog" role="dialog" aria-modal="true" aria-label="관리자 비밀번호 입력">
+      <h3 class="authTitle">관리자 모드</h3>
+      <p class="authDesc">관리자 비밀번호를 입력해주세요.</p>
+      <input type="password" id="adminPasswordInput" class="authInput" placeholder="비밀번호 입력" />
+      <div class="authError" id="adminAuthError">비밀번호가 올바르지 않습니다.</div>
+      <div class="authBtns">
+        <button class="authBtn cancel" id="adminAuthCancel" type="button">취소</button>
+        <button class="authBtn confirm" id="adminAuthConfirm" type="button">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_9p50RVtpPdmZOG2emGTDVg_NQ3bp8U8";
+
+    let supabaseClient = null;
+
+    const DB = {
+      mode: "local",
+      lastError: ""
+    };
+
+    const ADMIN_PASSWORD = "1234";
+    const ADMIN_SESSION_KEY = "warehouse_admin_ok";
+    let pendingAdminTarget = "#/admin";
+
+    function isAdminAuthorized(){
+      return sessionStorage.getItem(ADMIN_SESSION_KEY) === "yes";
+    }
+
+    function openAdminAuthModal(targetHash = "#/admin"){
+      pendingAdminTarget = targetHash || "#/admin";
+      adminAuthError.classList.remove("show");
+      adminPasswordInput.value = "";
+      adminAuthModal.classList.add("show");
+      adminAuthModal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      setTimeout(() => adminPasswordInput.focus(), 20);
+    }
+
+    function closeAdminAuthModal(){
+      adminAuthModal.classList.remove("show");
+      adminAuthModal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      adminAuthError.classList.remove("show");
+      adminPasswordInput.value = "";
+    }
+
+    function confirmAdminAuth(){
+      const input = (adminPasswordInput.value || "").trim();
+
+      if(input === ADMIN_PASSWORD){
+        sessionStorage.setItem(ADMIN_SESSION_KEY, "yes");
+        closeAdminAuthModal();
+
+        const target = pendingAdminTarget || "#/admin";
+
+        if(location.hash === target){
+          router();
+        }else{
+          location.hash = target;
+        }
+        return;
+      }
+
+      adminAuthError.classList.add("show");
+      adminPasswordInput.focus();
+      adminPasswordInput.select();
+    }
+
+    function checkAdminAccess(targetHash = "#/admin"){
+      if(isAdminAuthorized()) return true;
+      openAdminAuthModal(targetHash);
+      return false;
+    }
+
+    function clearAdminAccess(){
+      sessionStorage.removeItem(ADMIN_SESSION_KEY);
+    }
+
+    function initSupabase(){
+      try{
+        if(window.supabase && typeof window.supabase.createClient === "function"){
+          supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+          DB.mode = "connected";
+          DB.lastError = "";
+          return true;
+        }
+      }catch(e){
+        console.error("Supabase init 실패:", e);
+        DB.mode = "error";
+        DB.lastError = String(e?.message || e);
+      }
+      supabaseClient = null;
+      DB.mode = "local";
+      return false;
+    }
+
+    function dbReady(){ return !!supabaseClient; }
+
+    function dbStatusText(){
+      if(DB.mode === "synced") return "연동됨(동기화됨)";
+      if(DB.mode === "connected") return "연결됨(동기화 대기)";
+      if(DB.mode === "error") return "DB 오류(로컬로 동작)";
+      return "로컬만(연동안됨)";
+    }
+
+    const STORAGE_KEY = "warehouse_stock_v1";
+
+    const data = [
+      {
+        category: "봉투",
+        items: [
+          {
+            id: "env-big",
+            name: "대봉투",
+            size: "210*297mm",
+            baseStock: 1720,
+            img: "large-paper-bag(Front).jpg",
+            images: ["large-paper-bag(Front).jpg","large-paper-bag(Back).jpg"],
+            logs: [
+              { d:"2026-03-17", t:"출고", dept:"아카이브팀", person:"ooo선임", qty:200 },
+              { d:"2026-03-31", t:"입고", dept:"운영팀", person:"(입력)", qty:800 },
+              { d:"2026-02-02", t:"출고", dept:"아카이브팀", person:"ooo선임", qty:200 },
+              { d:"2026-02-18", t:"입고", dept:"아카이브팀", person:"ooo선임", qty:500 },
+            ],
+          },
+          {
+            id: "env-letter",
+            name: "편지봉투",
+            size: "390*140*300mm",
+            baseStock: 1000,
+            img: "Letter-Envelope(Front).jpg",
+            images: ["Letter-Envelope(Front).jpg","Letter-envelope(back).jpg"],
+            logs: [
+              { d:"2026-02-10", t:"출고", dept:"운영팀", person:"ooo", qty:120 },
+              { d:"2026-02-18", t:"입고", dept:"운영팀", person:"ooo", qty:300 },
+            ],
+          },
+          {
+            id: "env-pvc",
+            name: "PVC봉투",
+            size: "310*95*230mm",
+            baseStock: 1000,
+            img: "PVC-bag.jpg",
+            images: ["PVC-bag.jpg", "PVC-bag-1.jpg"],
+            logs: [
+              { d:"2026-02-01", t:"입고", dept:"구매", person:"ooo", qty:200 },
+              { d:"2026-02-17", t:"출고", dept:"운영팀", person:"ooo", qty:80 },
+            ],
+          },
+          {
+            id: "env-gray",
+            name: "회색봉투",
+            size: "130*110*360mm",
+            baseStock: 1000,
+            img: "gray-hand-bag.jpg",
+            images: ["gray-hand-bag.jpg", "gray-hand-bag-1.jpg"],
+            logs: [
+              { d:"2026-02-17", t:"입고", dept:"구매", person:"ooo", qty:200 },
+            ],
+          },
+        ]
+      },
+      {
+        category: "홀더",
+        items: [
+          {
+            id: "holder-gray",
+            name: "보증서홀더(회색)",
+            size: "225*310mm",
+            baseStock: 1720,
+            img: "Warranty-Holder(Gray-Front).jpg",
+            images: ["Warranty-Holder(Gray-Front).jpg", "Warranty-Holder(Gray-in).jpg"],
+            logs: [
+              { d:"2026-02-07", t:"입고", dept:"구매", person:"ooo", qty:300 },
+              { d:"2026-02-17", t:"출고", dept:"아카이브팀", person:"ooo", qty:80 },
+            ]
+          },
+          {
+            id: "holder-navy",
+            name: "수입지홀더(남색)",
+            size: "225*310mm",
+            baseStock: 1000,
+            img: "Warranty-holder(navy).jpg",
+            images: ["Warranty-holder(navy).jpg", "Warranty-holder(navy-in).jpg"],
+            logs: [
+              { d:"2026-02-12", t:"출고", dept:"운영팀", person:"ooo", qty:90 },
+            ]
+          },
+          {
+            id: "office-holder-sky",
+            name: "사무용홀더",
+            size: "225*310mm",
+            baseStock: 1000,
+            img: "Guaranteed-Holder(in-SkyBlue-F).jpg",
+            images: ["Guaranteed-Holder(in-SkyBlue-F).jpg","Guaranteed-Holder(in-SkyBlue).jpg"],
+            logs: [
+              { d:"2026-02-12", t:"출고", dept:"운영팀", person:"ooo", qty:40 },
+            ]
+          },
+          {
+            id: "mint-delivery-bag",
+            name: "민트봉투",
+            size: "290*400mm",
+            baseStock: 1000,
+            img: "mint-delivery-bag.jpg",
+            images: ["mint-delivery-bag.jpg", null],
+            logs: [
+              { d:"2026-02-12", t:"출고", dept:"운영팀", person:"ooo", qty:50 },
+            ]
+          },
+        ]
+      },
+      {
+        category: "쇼핑백",
+        items: [
+          {
+            id: "bag-black-big",
+            name: "흑지쇼핑백(大)",
+            size: "480*180*380mm",
+            baseStock: 1720,
+            img: "Black-Shopping-Bag(L).jpg",
+            images: ["Black-Shopping-Bag(L).jpg", "Black-Shopping-Bag.jpg"],
+            logs: [
+              { d:"2026-02-05", t:"출고", dept:"전시팀", person:"ooo", qty:100 },
+            ]
+          },
+          {
+            id: "bag-black-small",
+            name: "흑지쇼핑백(小)",
+            size: "390*140*300mm",
+            baseStock: 1000,
+            img: "Black-Shopping-Bag(S).jpg",
+            images: ["Black-Shopping-Bag(S).jpg", "Black-Shopping-Bag.jpg"],
+            logs: [
+              { d:"2026-02-11", t:"출고", dept:"전시팀", person:"ooo", qty:60 },
+            ]
+          },
+          {
+            id: "blackwhite-shopping-bag",
+            name: "검흰쇼핑백",
+            size: "310*95*230mm",
+            baseStock: 1000,
+            img: "black&white-shopping-bag(1).jpg",
+            images: ["black&white-shopping-bag(1).jpg", "black&white-shopping-bag(2).jpg"],
+            logs: [
+              { d:"2/11", t:"출고", to:"전시팀 - ooo", qty:200 },
+            ]
+          },
+          {
+            id: "wine-shopping-bag",
+            name: "와인쇼핑백",
+            size: "130*110*360mm",
+            baseStock: 1000,
+            img: "wine-shopping-bag.jpg",
+            images: ["wine-shopping-bag-1.jpg", "wine-shopping-bag.jpg"],
+            logs: [
+              { d:"2/11", t:"출고", to:"전시팀 - ooo", qty:200 },
+            ]
+          },
+        ]
+      },
+      {
+        category: "기타",
+        items: [
+          { id:"etc-shirt", name:"조지물튼 티셔츠", size:"", baseStock: 1000, img:null, images:[null,null], logs:[] },
+          { id:"etc-bag", name:"SA 가방", size:"", baseStock: 1000, img:"SA-bag.jpg", images:["SA-bag.jpg", null], logs:[] },
+        ]
+      }
+    ];
+
+    const INITIAL_ITEM_IDS = new Set(
+      data.flatMap(sec => (sec.items || []).map(it => it.id))
+    );
+
+    const app = document.getElementById("app");
+    const q = document.getElementById("q");
+    const doSearch = document.getElementById("doSearch");
+    const searchBox = document.getElementById("searchBox");
+    const homeLink = document.getElementById("homeLink");
+    const topbar = document.getElementById("topbar");
+    const topTitle = document.getElementById("topTitle");
+
+    const fabAddItem = document.getElementById("fabAddItem");
+    const itemModal = document.getElementById("itemModal");
+    const itemOverlay = document.getElementById("itemOverlay");
+    const itemClose = document.getElementById("itemClose");
+    const createItemBtn = document.getElementById("createItemBtn");
+    const nCategory = document.getElementById("nCategory");
+    const nName = document.getElementById("nName");
+    const nSize = document.getElementById("nSize");
+    const nBase = document.getElementById("nBase");
+    const nImg = document.getElementById("nImg");
+
+    const adminAuthModal = document.getElementById("adminAuthModal");
+    const adminAuthOverlay = document.getElementById("adminAuthOverlay");
+    const adminPasswordInput = document.getElementById("adminPasswordInput");
+    const adminAuthError = document.getElementById("adminAuthError");
+    const adminAuthCancel = document.getElementById("adminAuthCancel");
+    const adminAuthConfirm = document.getElementById("adminAuthConfirm");
+
+    function saveAllLocal(){
+      try{
+        const payload = data.map(sec => ({
+          category: sec.category,
+          items: (sec.items||[]).map(it => ({
+            id: it.id,
+            name: it.name,
+            size: it.size,
+            img: it.img ?? null,
+            images: Array.isArray(it.images) ? it.images : [it.img ?? null, null],
+            baseStock: Number(it.baseStock||0),
+            logs: it.logs || []
+          }))
+        }));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      }catch(e){}
+    }
+
+    function loadAllLocal(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return;
+        const saved = JSON.parse(raw);
+        if(!Array.isArray(saved)) return;
+
+        const firstItem = saved?.[0]?.items?.[0];
+        const isNew = !!(firstItem && typeof firstItem === "object" && ("name" in firstItem));
+
+        if(!isNew){
+          const byId = new Map();
+          for(const sec of saved){
+            for(const it of (sec.items||[])){
+              byId.set(it.id, it);
+            }
+          }
+          for(const sec of data){
+            for(const it of sec.items){
+              const s = byId.get(it.id);
+              if(s){
+                if(typeof s.baseStock === "number") it.baseStock = s.baseStock;
+                if(Array.isArray(s.logs)) it.logs = s.logs;
+              }
+            }
+          }
+          return;
+        }
+
+        const baseIds = new Set();
+        for(const sec of data) for(const it of (sec.items||[])) baseIds.add(it.id);
+
+        const savedById = new Map();
+        for(const sec of saved){
+          for(const it of (sec.items||[])){
+            savedById.set(it.id, it);
+          }
+        }
+
+        for(const sec of data){
+          for(const it of (sec.items||[])){
+            const s = savedById.get(it.id);
+            if(s){
+              if(typeof s.baseStock === "number") it.baseStock = s.baseStock;
+              if(Array.isArray(s.logs)) it.logs = s.logs;
+              if(s.img && !it.img) it.img = s.img;
+              if(Array.isArray(s.images) && (!it.images || !it.images[0])) it.images = s.images;
+            }
+          }
+        }
+
+        for(const sSec of saved){
+          if(!sSec || !sSec.category) continue;
+          const cat = String(sSec.category);
+          let target = data.find(x => x.category === cat);
+          if(!target){
+            target = { category: cat, items: [] };
+            data.push(target);
+          }
+          for(const sIt of (sSec.items||[])){
+            if(!sIt || !sIt.id) continue;
+            if(baseIds.has(sIt.id)) continue;
+            target.items.push({
+              id: sIt.id,
+              name: sIt.name || "(신규)",
+              size: sIt.size || "",
+              baseStock: Number(sIt.baseStock||0),
+              img: sIt.img ?? null,
+              images: Array.isArray(sIt.images) ? sIt.images : [sIt.img ?? null, null],
+              logs: Array.isArray(sIt.logs) ? sIt.logs : []
+            });
+            baseIds.add(sIt.id);
+          }
+        }
+      }catch(e){}
+    }
+
+    function iconPlaceholder(){
+      return `
+        <svg class="imgPh" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M7 7h10v14H7V7Z" stroke="#cbd5e1" stroke-width="1.6"/>
+          <path d="M9 7a3 3 0 0 1 6 0" stroke="#cbd5e1" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      `;
+    }
+
+    function escapeHtml(str){
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function escapeAttr(str){
+      return escapeHtml(str);
+    }
+
+    function isAbsoluteLike(path){
+      return /^(https?:)?\/\//i.test(path) || /^data:/i.test(path) || /^blob:/i.test(path) || path.startsWith("/");
+    }
+
+    function uniq(arr){
+      return [...new Set(arr.filter(Boolean))];
+    }
+
+    function getImageCandidates(path){
+      const raw = String(path || "").trim();
+      if(!raw) return [];
+      if(isAbsoluteLike(raw)) return [raw];
+
+      const noHeadSlash = raw.replace(/^\.?\//, "");
+      return uniq([
+        raw,
+        "./" + noHeadSlash,
+        "images/" + noHeadSlash,
+        "./images/" + noHeadSlash
+      ]);
+    }
+
+    window.handleImgError = function(imgEl){
+      try{
+        const list = JSON.parse(imgEl.dataset.candidates || "[]");
+        let idx = Number(imgEl.dataset.idx || "0");
+        idx += 1;
+
+        if(idx < list.length){
+          imgEl.dataset.idx = String(idx);
+          imgEl.src = list[idx];
+          return;
+        }
+
+        const fallback = imgEl.dataset.fallback || "";
+        if(fallback){
+          imgEl.onerror = null;
+          imgEl.outerHTML = fallback;
+        }
+      }catch(e){
+        const fallback = imgEl.dataset.fallback || "";
+        if(fallback){
+          imgEl.onerror = null;
+          imgEl.outerHTML = fallback;
+        }
+      }
+    };
+
+    function renderSmartImage(path, alt="", className=""){
+      const candidates = getImageCandidates(path);
+      const fallback = iconPlaceholder();
+      if(!candidates.length) return fallback;
+
+      return `
+        <img
+          ${className ? `class="${escapeAttr(className)}"` : ""}
+          src="${escapeAttr(candidates[0])}"
+          alt="${escapeAttr(alt)}"
+          data-candidates='${escapeAttr(JSON.stringify(candidates))}'
+          data-idx="0"
+          data-fallback='${escapeAttr(fallback)}'
+          onerror="window.handleImgError(this)"
+        >
+      `;
+    }
+
+    function renderSmartLogo(path, alt=""){
+      const candidates = getImageCandidates(path);
+      if(!candidates.length){
+        return `<div class="mainLogoPlaceholder"></div>`;
+      }
+
+      return `
+        <img
+          class="mainLogoImg"
+          src="${escapeAttr(candidates[0])}"
+          alt="${escapeAttr(alt)}"
+          data-candidates='${escapeAttr(JSON.stringify(candidates))}'
+          data-idx="0"
+          data-fallback='<div class="mainLogoPlaceholder"></div>'
+          onerror="window.handleImgError(this)"
+        />
+      `;
+    }
+
+    function statusClass(s){ return s === "입고" ? "in" : "out"; }
+
+    function toISODateLike(d){
+      if(!d) return "";
+      if(/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+      const m = String(d).match(/^(\d{1,2})\/(\d{1,2})$/);
+      if(m){
+        const y = new Date().getFullYear();
+        const mm = String(m[1]).padStart(2,"0");
+        const dd = String(m[2]).padStart(2,"0");
+        return `${y}-${mm}-${dd}`;
+      }
+      return String(d);
+    }
+
+    function formatKRDate(d){
+      const iso = toISODateLike(d);
+      const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if(!m) return iso || "-";
+      return `${Number(m[2])}/${Number(m[3])}`;
+    }
+
+    function normalizeLog(r){
+      const out = { ...r };
+      out.d = toISODateLike(out.d);
+
+      if(!out.dept && out.to){
+        const parts = String(out.to).split("-").map(s=>s.trim());
+        out.dept = parts[0] || out.dept;
+        out.person = (parts[1] || "").replace(/^\(|\)$/g,"") || out.person;
+      }
+      out.t = (out.t === "입고") ? "입고" : "신청";
+      out.dept = out.dept || "-";
+      out.person = out.person || "";
+      out.qty = Number(out.qty || 0);
+      if(!out.__key) out.__key = `k_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+      return out;
+    }
+
+    function ensureLogs(it){
+      it.logs = (it.logs || []).map(normalizeLog);
+    }
+
+    function signedQty(row){
+      const qty = Number(row.qty || 0);
+      if (!qty) return 0;
+      return row.t === "입고" ? qty : -qty;
+    }
+
+    function calcStock(it){
+      ensureLogs(it);
+      const base = Number(it.baseStock || 0);
+      const sum = (it.logs || []).reduce((a, r) => a + signedQty(r), 0);
+      return base + sum;
+    }
+
+    function getLastLogInfo(it){
+      ensureLogs(it);
+      if(!it.logs || it.logs.length === 0) return { status:"-", date:"-", delta:0 };
+      const sorted = [...it.logs].sort((a,b) => (toISODateLike(b.d)||"").localeCompare(toISODateLike(a.d)||""));
+      const r = sorted[0];
+      return { status: r.t || "-", date: formatKRDate(r.d), delta: signedQty(r) };
+    }
+
+    function findItemById(id){
+      for(const section of data){
+        for(const it of section.items){
+          if(it.id === id) return { section, it };
+        }
+      }
+      return null;
+    }
+
+    function flattenItems(){
+      const arr = [];
+      for(const sec of data) for(const it of sec.items) arr.push(it);
+      return arr;
+    }
+
+    function ensureCategory(cat){
+      const name = String(cat || "").trim();
+      if(!name) return null;
+      let sec = data.find(s => s.category === name);
+      if(!sec){
+        sec = { category: name, items: [] };
+        data.push(sec);
+      }
+      return sec;
+    }
+
+    function slugifyId(s){
+      return String(s || "")
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^\w\-가-힣]/g, "")
+        .replace(/\-+/g, "-")
+        .slice(0, 50) || `item-${Date.now()}`;
+    }
+
+    function removeItemLocal(itemId){
+      for(const sec of data){
+        const before = (sec.items||[]).length;
+        sec.items = (sec.items||[]).filter(it => it.id !== itemId);
+        if(sec.items.length !== before) break;
+      }
+      saveAllLocal();
+    }
+
+    const DB_ITEMS = "warehouse_items";
+    const DB_LOGS  = "warehouse_logs";
+
+    async function loadAllFromDB_FORCE(){
+      if(!dbReady()) throw new Error("supabaseClient not ready");
+
+      const { data: itemRows, error: e1 } = await supabaseClient
+        .from(DB_ITEMS)
+        .select("id, base_stock");
+      if(e1) throw e1;
+
+      const { data: logRows, error: e2 } = await supabaseClient
+        .from(DB_LOGS)
+        .select("item_id, d, t, dept, person, qty, __key");
+      if(e2) throw e2;
+
+      const dbItemIds = new Set((itemRows || []).map(r => r.id));
+      const baseById = new Map((itemRows || []).map(r => [r.id, r.base_stock]));
+      const logsByItem = new Map();
+
+      for(const sec of data){
+        sec.items = (sec.items || []).filter(it => {
+          if(INITIAL_ITEM_IDS.has(it.id)) return true;
+          return dbItemIds.has(it.id);
+        });
+      }
+
+      for(const r of (logRows || [])){
+        if(!logsByItem.has(r.item_id)) logsByItem.set(r.item_id, []);
+        logsByItem.get(r.item_id).push(normalizeLog({
+          d: r.d,
+          t: r.t,
+          dept: r.dept,
+          person: r.person,
+          qty: r.qty,
+          __key: r.__key
+        }));
+      }
+
+      for(const it of flattenItems()){
+        if(baseById.has(it.id)) it.baseStock = Number(baseById.get(it.id) ?? 0);
+        const dbLogs = logsByItem.get(it.id);
+        if(dbLogs) it.logs = dbLogs;
+        else it.logs = it.logs || [];
+      }
+
+      saveAllLocal();
+      DB.mode = "synced";
+      DB.lastError = "";
+      return true;
+    }
+
+    async function saveBaseToDB(itemId, baseStock){
+      if(!dbReady()) return;
+      const payload = { id: itemId, base_stock: Number(baseStock||0) };
+      const { error } = await supabaseClient.from(DB_ITEMS).upsert(payload, { onConflict: "id" });
+      if(error) throw error;
+    }
+
+    async function addLogToDB(itemId, row){
+      if(!dbReady()) return;
+      const r = normalizeLog(row);
+      const payload = {
+        item_id: itemId,
+        d: toISODateLike(r.d),
+        t: r.t,
+        dept: r.dept || "-",
+        person: r.person || "",
+        qty: Number(r.qty||0),
+        __key: r.__key
+      };
+      const { error } = await supabaseClient.from(DB_LOGS).insert(payload);
+      if(error) throw error;
+    }
+
+    async function deleteLogsByKeys(itemId, keys){
+      if(!dbReady()) return;
+      const { error } = await supabaseClient
+        .from(DB_LOGS)
+        .delete()
+        .eq("item_id", itemId)
+        .in("__key", keys);
+      if(error) throw error;
+    }
+
+    async function deleteItemFromDB(itemId){
+      if(!dbReady()) return;
+
+      const { error: e1 } = await supabaseClient
+        .from(DB_LOGS)
+        .delete()
+        .eq("item_id", itemId);
+      if(e1) throw e1;
+
+      const { error: e2 } = await supabaseClient
+        .from(DB_ITEMS)
+        .delete()
+        .eq("id", itemId);
+      if(e2) throw e2;
+    }
+
+    let realtimeChannel = null;
+    let reloadTimer = null;
+
+    function scheduleDBReload(){
+      clearTimeout(reloadTimer);
+      reloadTimer = setTimeout(async ()=>{
+        try{
+          await loadAllFromDB_FORCE();
+          router();
+        }catch(e){
+          console.error("Realtime DB reload 실패:", e);
+          DB.mode = "error";
+          DB.lastError = String(e?.message || e);
+          router();
+        }
+      }, 250);
+    }
+
+    function startRealtime(){
+      if(!dbReady()) return;
+      if(realtimeChannel) return;
+
+      try{
+        realtimeChannel = supabaseClient
+          .channel("warehouse_sync")
+          .on("postgres_changes", { event:"*", schema:"public", table: DB_ITEMS }, () => scheduleDBReload())
+          .on("postgres_changes", { event:"*", schema:"public", table: DB_LOGS  }, () => scheduleDBReload())
+          .subscribe(()=>{});
+      }catch(e){
+        console.error("Realtime 시작 실패:", e);
+      }
+    }
+
+    function setTopTitleByMode(mode){
+      if(mode === "request"){
+        topTitle.textContent = "물품 신청하기";
+      }else if(mode === "list"){
+        topTitle.textContent = "물품 재고 현황";
+      }else if(mode === "admin"){
+        topTitle.textContent = "관리자 페이지";
+      }else{
+        topTitle.textContent = "창고수량재고";
+      }
+    }
+
+    function setBodyMode(mode){
+      document.body.classList.remove("mode-request", "mode-list", "mode-admin");
+      if(mode === "request"){
+        document.body.classList.add("mode-request");
+      }else if(mode === "list"){
+        document.body.classList.add("mode-list");
+      }else if(mode === "admin"){
+        document.body.classList.add("mode-admin");
+      }
+    }
+
+    function renderMainHome(){
+      topbar.style.display = "none";
+      document.body.classList.remove("mode-request", "mode-list", "mode-admin");
+
+      app.innerHTML = `
+        <div class="mainHome">
+          <div class="mainLogoArea" id="mainHomeLogoBtn">
+            ${renderSmartLogo("sa-logo_4.png", "Seoul Auction 로고")}
+          </div>
+
+          <div class="mainHomeLine"></div>
+          <div class="mainHomeTitle">서울옥션 디자인팀 창고재고관리</div>
+
+          <div class="mainHomeBtns">
+            <button class="mainHomeBtn primaryHomeBtn" id="goRequestPage" type="button">물품 신청하기</button>
+            <button class="mainHomeBtn stockBtn" id="goStockPage" type="button">물품 재고 현황</button>
+            <button class="mainHomeBtn adminBtn" id="goAdminPage" type="button">관리자 페이지</button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById("goRequestPage").addEventListener("click", ()=>{
+        location.hash = "#/request";
+      });
+
+      document.getElementById("goStockPage").addEventListener("click", ()=>{
+        location.hash = "#/list";
+      });
+
+      document.getElementById("goAdminPage").addEventListener("click", ()=>{
+        location.hash = "#/admin";
+      });
+
+      document.getElementById("mainHomeLogoBtn").addEventListener("click", ()=>{
+        window.location.href = "index.html";
+      });
+    }
+
+    function renderHome(mode = "request"){
+      topbar.style.display = "flex";
+      searchBox.style.display = "flex";
+      setTopTitleByMode(mode);
+      setBodyMode(mode);
+
+      const keyword = (q.value || "").trim().toLowerCase();
+      const isStockMode = mode === "list";
+
+      app.innerHTML = data.map(section => {
+        const filtered = (section.items||[]).filter(it => {
+          const hay = `${it.name} ${it.size}`.toLowerCase();
+          return keyword ? hay.includes(keyword) : true;
+        });
+
+        if(filtered.length === 0) return "";
+
+        return `
+          <div class="section">
+            <div class="secHead">
+              <h2>${escapeHtml(section.category)}</h2>
+            </div>
+
+            ${
+              isStockMode
+                ? `
+                  <div class="listGrid">
+                    ${filtered.map(it => {
+                      const stock = calcStock(it);
+                      return `
+                        <div class="stockCard" role="button" tabindex="0" data-open="${escapeAttr(it.id)}">
+                          <div class="stockThumb">
+                            ${it.img ? renderSmartImage(it.img, it.name) : iconPlaceholder()}
+                          </div>
+
+                          <div class="stockMeta">
+                            <div class="stockName">${escapeHtml(it.name)}</div>
+                            <div class="stockQtyBar">${Number.isFinite(stock) ? stock.toLocaleString() : "0"}개</div>
+                          </div>
+                        </div>
+                      `;
+                    }).join("")}
+                  </div>
+                `
+                : `
+                  <div class="list">
+                    ${filtered.map(it => {
+                      const stock = calcStock(it);
+                      const last = getLastLogInfo(it);
+                      return `
+                        <div class="row">
+                          <div class="card" role="button" tabindex="0" data-open="${escapeAttr(it.id)}">
+                            <div class="thumb">
+                              ${it.img ? renderSmartImage(it.img, it.name) : iconPlaceholder()}
+                            </div>
+
+                            <div class="meta">
+                              <div class="meta-top">
+                                <div class="title">${escapeHtml(it.name)}</div>
+                                <div class="size">${escapeHtml(it.size || "")}</div>
+                              </div>
+
+                              <div class="meta-bot">
+                                <div class="status ${statusClass(last.status)}">${escapeHtml(last.status)}</div>
+                                <div class="delta">
+                                  <span>${escapeHtml(last.date || "-")}</span>
+                                  <span class="qty ${last.delta >= 0 ? "in" : "out"}">${(last.delta>=0?"+":"")}${(last.delta||0).toLocaleString()}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="stock">
+                            ${Number.isFinite(stock) ? `${stock.toLocaleString()}<small>개</small>` : `-`}
+                          </div>
+                        </div>
+                      `;
+                    }).join("")}
+                  </div>
+                `
+            }
+          </div>
+        `;
+      }).join("");
+
+      app.querySelectorAll("[data-open]").forEach(el => {
+        if(mode === "list") return;
+
+        const go = () => location.hash = `#/${mode}/item/${el.dataset.open}`;
+        el.addEventListener("click", go);
+        el.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            go();
+          }
+        });
+      });
+    }
+
+    function renderDetail(id, mode = "request"){
+      topbar.style.display = "flex";
+      searchBox.style.display = "none";
+      setTopTitleByMode(mode);
+      setBodyMode(mode);
+
+      const isRequest = mode === "request";
+      const isAdmin = mode === "admin";
+      const canSelectDelete = isRequest || isAdmin;
+
+      const found = findItemById(id);
+      if(!found){
+        app.innerHTML = `
+          <div class="paper">
+            <div class="paper-head">알림</div>
+            <div class="paper-body">품목을 찾을 수 없습니다.</div>
+          </div>
+        `;
+        return;
+      }
+
+      const { section, it } = found;
+      ensureLogs(it);
+
+      let dateFilter = "";
+      let typeFilter = "전체";
+      let deptFilter = "전체";
+      let sortKey = "date";
+      let sortDir = "desc";
+
+      let selectedKeys = new Set();
+      let flashSelected = new Set();
+      const flashTimers = new Map();
+
+      function arrow(){ return sortDir === "asc" ? "↑" : "↓"; }
+
+      function toggleSort(key){
+        if(sortKey === key) sortDir = (sortDir === "asc") ? "desc" : "asc";
+        else { sortKey = key; sortDir = (key === "date") ? "desc" : "asc"; }
+        render();
+      }
+
+      function matches(r){
+        if(dateFilter && toISODateLike(r.d) !== dateFilter) return false;
+        if(typeFilter !== "전체" && r.t !== typeFilter) return false;
+        if(deptFilter !== "전체" && (r.dept||"-") !== deptFilter) return false;
+        return true;
+      }
+
+      function sortRows(rows){
+        const dir = (sortDir === "asc") ? 1 : -1;
+        return rows.sort((a,b)=>{
+          if(sortKey === "date"){
+            return (String(toISODateLike(a.d)).localeCompare(String(toISODateLike(b.d)))) * dir;
+          }
+          if(sortKey === "qty"){
+            return ((signedQty(a) - signedQty(b)) || 0) * dir;
+          }
+          return 0;
+        });
+      }
+
+      function flashRow(key){
+        flashSelected.add(key);
+        if(flashTimers.has(key)) clearTimeout(flashTimers.get(key));
+        const t = setTimeout(()=>{
+          flashSelected.delete(key);
+          flashTimers.delete(key);
+          render();
+        }, 2500);
+        flashTimers.set(key, t);
+      }
+
+      async function handleDeleteItem(){
+        const itemName = (it.name || "해당 품목");
+        const ok = confirm(`정말 "${itemName}" 품목을 삭제하시겠습니까?`);
+        if(!ok) return;
+
+        removeItemLocal(it.id);
+
+        try{
+          await deleteItemFromDB(it.id);
+        }catch(err){
+          console.error(err);
+          alert("DB에서 품목 삭제에 실패했습니다. (로컬에서는 삭제됨)\n권한/RLS 설정을 확인해주세요.");
+          DB.mode = "error";
+          DB.lastError = String(err?.message || err);
+        }
+
+        q.value = "";
+        location.hash = "#/admin";
+        router();
+      }
+
+      function getToday(){
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth()+1).padStart(2,"0");
+        const d = String(now.getDate()).padStart(2,"0");
+        return `${y}-${m}-${d}`;
+      }
+
+      function setNameTitleIfNeeded(inputEl){
+        let value = (inputEl.value || "").trim();
+        if (!value) return;
+        const titles = ["선임", "주임", "대리", "과장", "차장", "부장", "팀장", "매니저"];
+        const hasTitle = titles.some(title => value.endsWith(title));
+        if (!hasTitle) inputEl.value = value + "선임";
+      }
+
+      function render(){
+        ensureLogs(it);
+
+        const img1 = (it.images && it.images[0]) ? renderSmartImage(it.images[0], it.name) : iconPlaceholder();
+        const img2 = (it.images && it.images[1]) ? renderSmartImage(it.images[1], it.name) : iconPlaceholder();
+
+        const stockNow = calcStock(it);
+        const base = Number(it.baseStock || 0);
+
+        const allDepts = [
+          "경영기획팀","인사팀","관재팀","재무팀","서비스운영팀","아카이브팀","대외협력팀","디자인팀","영업팀","브랜드기획팀","고객관리팀","작품관리팀","VIP사업기획팀","웹서비스개발팀","인사팀","관재팀","재무팀",
+        ];
+
+        let view = (it.logs||[]).filter(matches);
+        view = sortRows(view);
+
+        app.innerHTML = `
+          <div class="paper">
+            <div class="paper-head">${escapeHtml(section.category)}</div>
+            <div class="paper-body">
+
+              <div class="imgRow">
+                <div class="imgBox">${img1}</div>
+                <div class="imgBox">${img2}</div>
+              </div>
+
+              <div class="itemHeader">
+                <div class="itemTop">
+                  <div class="itemName">${escapeHtml(it.name)}</div>
+                  <div class="sizePill">${escapeHtml(it.size || "")}</div>
+                </div>
+
+                <div class="statsGrid">
+                  <div class="statCard current">
+                    <div class="statRow">
+                      <div class="statLabel">
+                        <span class="txt">현재재고</span>
+                      </div>
+                      <div class="statValue">
+                        ${Number.isFinite(stockNow) ? `${stockNow.toLocaleString()}개` : "0개"}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="boxTitleRow" style="margin-top:0;">
+                <p class="boxTitle">신청 내역</p>
+              </div>
+
+              ${
+                isRequest
+                ? `
+                  <div class="requestActionWrap">
+                    <button class="requestSubmitBtn" id="openRequestBtn" type="button">신청하기</button>
+                  </div>
+                `
+                : ``
+              }
+
+              <div class="logBox">
+                <div class="logMinWidth">
+                  <div class="logHead">
+                    <div class="logHeadCell">
+                      <div class="hdateWrap">
+                        <div class="hbtn" id="dateBtn">날짜 <span class="arrow">${sortKey==="date"?arrow():"↕"}</span></div>
+                        <div class="hdate" id="datePop">
+                          <input type="date" id="datePick" value="${dateFilter}">
+                          <div class="row2">
+                            <button class="miniBtn" id="dateClear">해제</button>
+                            <button class="miniBtn" id="dateOk">적용</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="logHeadCell center">
+                      ${
+                        isRequest
+                        ? `<div class="logHeadLabel">구분</div>`
+                        : `
+                          <select class="hselect" id="typeSel">
+                            <option value="전체" ${typeFilter==="전체"?"selected":""}>전체</option>
+                            <option value="출고" ${typeFilter==="출고"?"selected":""}>출고</option>
+                            <option value="입고" ${typeFilter==="입고"?"selected":""}>입고</option>
+                          </select>
+                        `
+                      }
+                    </div>
+
+                    <div class="logHeadCell">
+                      ${
+                        isRequest
+                        ? `<div class="logHeadLabel">부서</div>`
+                        : `
+                          <select class="hselect" id="deptSel">
+                            <option value="전체" ${deptFilter==="전체"?"selected":""}>전체</option>
+                            ${allDepts.map(d => `<option value="${escapeAttr(d)}" ${deptFilter===d?"selected":""}>${escapeHtml(d)}</option>`).join("")}
+                          </select>
+                        `
+                      }
+                    </div>
+
+                    <div class="logHeadCell center">
+                      <div class="logHeadLabel">담당자</div>
+                    </div>
+
+                    <div class="logHeadCell right">
+                      <div class="hbtn qtySortBtn" id="qtyBtn">
+                        수량 <span class="arrow">${sortKey==="qty"?arrow():"↕"}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  ${
+                    view.length
+                      ? view.map(r => {
+                          const key = r.__key;
+                          const sel = flashSelected.has(key) ? "selected" : "";
+                          const clickable = canSelectDelete ? "clickable" : "";
+                          return `
+                            <div class="logRow ${clickable} ${sel}" data-row="${escapeAttr(key)}">
+                              <div class="logDate">${escapeHtml(formatKRDate(r.d))}</div>
+                              <div class="logType ${statusClass(r.t)}">${escapeHtml(r.t)}</div>
+                              <div class="logDept">${escapeHtml(r.dept || "-")}</div>
+                              <div class="logPerson">${escapeHtml(r.person || "")}</div>
+                              <div class="logQty ${statusClass(r.t)}">${(signedQty(r)>=0?"+":"")}${signedQty(r).toLocaleString()}</div>
+                            </div>
+                          `;
+                        }).join("")
+                      : `<div class="logRow">
+                           <div class="logDate">-</div>
+                           <div class="logType out">-</div>
+                           <div class="logDept">내역 없음</div>
+                           <div class="logPerson"></div>
+                           <div class="logQty out">-</div>
+                         </div>`
+                  }
+                </div>
+              </div>
+
+              ${
+                isAdmin ? `
+                  <div class="adminBottomRow">
+                    <div class="adminBottomLeft">
+                      <span>기존재고:</span>
+
+                      <div class="stockInline">
+                        <button type="button" class="stockInlineValue" id="baseInlineDisplay">
+                          <b>${Number.isFinite(base) ? base.toLocaleString() : "0"}개</b>
+                        </button>
+
+                        <div class="stockInlineEdit" id="baseInlineEdit">
+                          <input class="stockInlineInput" id="baseInlineInput" inputmode="numeric" value="${Number.isFinite(base) ? base : 0}" />
+                          <button type="button" class="stockInlineMini" id="baseInlineSave">저장</button>
+                          <button type="button" class="stockInlineMini" id="baseInlineCancel">취소</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="adminBottomRight">
+                      <button class="btn primary" id="openAdd">내역 추가</button>
+                      <button class="selDelBtn" id="bulkDelete">선택 삭제</button>
+                    </div>
+                  </div>
+
+                  <div class="dangerBox">
+                    <div class="dangerText">품목 삭제 시 복구가 어려우니 삭제 전 확인해 주세요.</div>
+                    <button class="dangerBtn" id="deleteItemBtn" type="button">품목 제거</button>
+                  </div>
+
+                  <div class="dbStatusLine">
+                    DB상태: <b>${dbStatusText()}</b>
+                    ${DB.mode==="error" && DB.lastError ? `<div style="margin-top:4px;">(${escapeHtml(DB.lastError)})</div>` : ``}
+                  </div>
+                ` : isRequest ? `
+                  <div class="commonBottomRow">
+                    <div class="commonBottomLeft">
+                      <span>DB상태: <b>${dbStatusText()}</b></span>
+                    </div>
+
+                    <div class="commonBottomRight">
+                      <button class="selDelBtn" id="bulkDelete" type="button">선택 삭제</button>
+                    </div>
+                  </div>
+                ` : `
+                  <div class="dbStatusLine">
+                    DB상태: <b>${dbStatusText()}</b>
+                  </div>
+                `
+              }
+
+            </div>
+          </div>
+
+          <div class="modal" id="addModal" aria-hidden="true">
+            <div class="modalOverlay" id="addOverlay"></div>
+            <div class="sheet" role="dialog" aria-modal="true" aria-label="${isRequest ? '신청하기' : '내역 추가'}">
+              <div class="sheetHead">
+                <div>${isRequest ? '신청하기' : '내역 추가'}</div>
+                <button class="sheetClose" id="addClose">닫기</button>
+              </div>
+
+              <div class="sheetBody">
+                <div class="field">
+                  <label for="aDate">날짜</label>
+                  <input type="date" id="aDate">
+                </div>
+
+                ${
+                  isRequest
+                  ? `<input type="hidden" id="aType" value="출고">`
+                  : `
+                    <div class="field">
+                      <label>구분</label>
+                      <input type="hidden" id="aType" value="출고">
+                      <div class="seg" id="aTypeSeg">
+                        <button type="button" class="active out" data-v="출고">출고</button>
+                        <button type="button" class="in" data-v="입고">입고</button>
+                      </div>
+                    </div>
+                  `
+                }
+
+                <div class="field">
+                  <label for="aDept">부서</label>
+                  <select id="aDept">
+                    ${allDepts.map(d => `<option value="${escapeAttr(d)}">${escapeHtml(d)}</option>`).join("")}
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label for="aQty">수량</label>
+                  <input id="aQty" inputmode="numeric" placeholder="예) 200" />
+                </div>
+
+                <div class="field">
+                  <label for="aPerson">담당자</label>
+                  <input id="aPerson" placeholder="000선임" />
+                </div>
+              </div>
+
+              <div class="sheetFoot">
+                <button class="btn primary" id="addBtn">${isRequest ? '신청하기' : '추가'}</button>
+              </div>
+            </div>
+          </div>
+        `;
+
+        if(isAdmin){
+          app.querySelector("#deleteItemBtn").addEventListener("click", handleDeleteItem);
+        }
+
+        const dateBtn = app.querySelector("#dateBtn");
+        const datePop = app.querySelector("#datePop");
+        const datePick = app.querySelector("#datePick");
+        const dateOk = app.querySelector("#dateOk");
+        const dateClear = app.querySelector("#dateClear");
+
+        function closeDatePop(){ datePop.style.display = "none"; }
+
+        dateBtn.addEventListener("click", ()=>{
+          datePop.style.display = (datePop.style.display === "block") ? "none" : "block";
+        });
+
+        dateOk.addEventListener("click", ()=>{
+          dateFilter = datePick.value || "";
+          closeDatePop();
+          render();
+        });
+
+        dateClear.addEventListener("click", ()=>{
+          dateFilter = "";
+          closeDatePop();
+          render();
+        });
+
+        document.addEventListener("click", (e)=>{
+          const wrap = app.querySelector(".hdateWrap");
+          if(!wrap) return;
+          if(!wrap.contains(e.target)) closeDatePop();
+        }, { once:true });
+
+        dateBtn.addEventListener("dblclick", ()=> toggleSort("date"));
+        app.querySelector("#qtyBtn").addEventListener("click", ()=> toggleSort("qty"));
+
+        const typeSelEl = app.querySelector("#typeSel");
+        const deptSelEl = app.querySelector("#deptSel");
+
+        if(typeSelEl){
+          typeSelEl.addEventListener("change", (e)=>{
+            typeFilter = e.target.value;
+            render();
+          });
+        }
+
+        if(deptSelEl){
+          deptSelEl.addEventListener("change", (e)=>{
+            deptFilter = e.target.value;
+            render();
+          });
+        }
+
+        if(canSelectDelete){
+          app.querySelectorAll("[data-row]").forEach(row=>{
+            row.addEventListener("click", ()=>{
+              const key = row.dataset.row;
+              if(selectedKeys.has(key)) selectedKeys.delete(key);
+              else selectedKeys.add(key);
+              flashRow(key);
+              render();
+            });
+          });
+        }
+
+        const bulkDeleteBtn = app.querySelector("#bulkDelete");
+        if(bulkDeleteBtn){
+          bulkDeleteBtn.addEventListener("click", async ()=>{
+            if(selectedKeys.size === 0){
+              alert("삭제할 내역을 선택해주세요.");
+              return;
+            }
+
+            const keys = Array.from(selectedKeys);
+
+            it.logs = (it.logs||[]).filter(r => !selectedKeys.has(r.__key));
+            selectedKeys.clear();
+            flashSelected.clear();
+            for(const t of flashTimers.values()) clearTimeout(t);
+            flashTimers.clear();
+            saveAllLocal();
+
+            try{
+              await deleteLogsByKeys(it.id, keys);
+            }catch(err){
+              console.error(err);
+              alert("DB에서 내역 삭제에 실패했습니다. (로컬에서는 삭제됨)");
+              DB.mode = "error";
+              DB.lastError = String(err?.message || err);
+            }
+
+            render();
+          });
+        }
+
+        const addModal = app.querySelector("#addModal");
+        const addOverlay = app.querySelector("#addOverlay");
+        const addClose = app.querySelector("#addClose");
+        const addBtn = app.querySelector("#addBtn");
+        const aPersonInput = app.querySelector("#aPerson");
+        const openAdd = app.querySelector("#openAdd");
+        const openRequestBtn = app.querySelector("#openRequestBtn");
+        const aType = app.querySelector("#aType");
+        const seg = app.querySelector("#aTypeSeg");
+
+        function openAddModal(){
+          addModal.classList.add("show");
+          document.body.style.overflow = "hidden";
+          const aDate = app.querySelector("#aDate");
+          if(!aDate.value){
+            aDate.value = getToday();
+          }
+        }
+
+        function closeAddModal(){
+          addModal.classList.remove("show");
+          document.body.style.overflow = "";
+        }
+
+        if(openAdd) openAdd.addEventListener("click", openAddModal);
+        if(openRequestBtn) openRequestBtn.addEventListener("click", openAddModal);
+
+        addOverlay.addEventListener("click", closeAddModal);
+        addClose.addEventListener("click", closeAddModal);
+
+        aPersonInput.addEventListener("blur", ()=>{
+          setNameTitleIfNeeded(aPersonInput);
+        });
+
+        if(seg && aType){
+          function setType(v){
+            aType.value = v;
+            seg.querySelectorAll("button").forEach(b=>{
+              const on = b.dataset.v === v;
+              b.classList.toggle("active", on);
+              b.classList.toggle("out", b.dataset.v === "출고");
+              b.classList.toggle("in", b.dataset.v === "입고");
+            });
+          }
+
+          seg.querySelectorAll("button").forEach(b=>{
+            b.addEventListener("click", ()=> setType(b.dataset.v));
+          });
+        }
+
+        addBtn.addEventListener("click", async ()=>{
+          const d = app.querySelector("#aDate").value;
+          const t = app.querySelector("#aType").value;
+          const dept = app.querySelector("#aDept").value;
+          const person = (app.querySelector("#aPerson").value || "").trim();
+          const qtyRaw = (app.querySelector("#aQty").value || "").trim();
+          const qty = Number(qtyRaw);
+
+          if(!d){ alert("날짜를 선택해주세요."); return; }
+          if(!Number.isFinite(qty) || qty <= 0){ alert("수량은 0보다 큰 숫자여야 합니다. (예: 200)"); return; }
+
+          const row = normalizeLog({ d, t, dept, person: person || "(입력)", qty });
+
+          it.logs = it.logs || [];
+          it.logs.push(row);
+          saveAllLocal();
+
+          try{
+            await addLogToDB(it.id, row);
+          }catch(err){
+            console.error(err);
+            alert("DB 저장에 실패했습니다. (로컬에는 저장됨)\n권한/RLS 설정을 확인해주세요.");
+            DB.mode = "error";
+            DB.lastError = String(err?.message || err);
+          }
+
+          app.querySelector("#aQty").value = "";
+          app.querySelector("#aPerson").value = "";
+          closeAddModal();
+          render();
+        });
+
+        if(isAdmin){
+          const baseInlineDisplay = app.querySelector("#baseInlineDisplay");
+          const baseInlineEdit = app.querySelector("#baseInlineEdit");
+          const baseInlineInput = app.querySelector("#baseInlineInput");
+          const baseInlineSave = app.querySelector("#baseInlineSave");
+          const baseInlineCancel = app.querySelector("#baseInlineCancel");
+
+          function openBaseInlineEdit(){
+            if(!baseInlineEdit) return;
+            baseInlineEdit.classList.add("show");
+            baseInlineDisplay.style.display = "none";
+            baseInlineInput.focus();
+            baseInlineInput.select();
+          }
+
+          function closeBaseInlineEdit(){
+            if(!baseInlineEdit) return;
+            baseInlineEdit.classList.remove("show");
+            baseInlineDisplay.style.display = "inline-flex";
+          }
+
+          async function saveBaseInlineEdit(){
+            const v = Number(String(baseInlineInput.value || "").replace(/,/g,"").trim());
+            it.baseStock = Number.isFinite(v) && v >= 0 ? v : 0;
+            saveAllLocal();
+
+            try{
+              await saveBaseToDB(it.id, it.baseStock);
+            }catch(err){
+              console.error(err);
+              alert("기존재고 DB 저장에 실패했습니다. (로컬에는 저장됨)\n권한/RLS 설정을 확인해주세요.");
+              DB.mode = "error";
+              DB.lastError = String(err?.message || err);
+            }
+
+            render();
+          }
+
+          if(baseInlineDisplay){
+            baseInlineDisplay.addEventListener("click", openBaseInlineEdit);
+          }
+
+          if(baseInlineSave){
+            baseInlineSave.addEventListener("click", saveBaseInlineEdit);
+          }
+
+          if(baseInlineCancel){
+            baseInlineCancel.addEventListener("click", closeBaseInlineEdit);
+          }
+
+          if(baseInlineInput){
+            baseInlineInput.addEventListener("keydown", async (e)=>{
+              if(e.key === "Enter"){
+                await saveBaseInlineEdit();
+              }else if(e.key === "Escape"){
+                closeBaseInlineEdit();
+              }
+            });
+          }
+        }
+      }
+
+      render();
+    }
+
+    function updateFabVisibility(){
+      const hash = location.hash || "#/";
+      const isAdminHome = hash === "#/admin" && isAdminAuthorized();
+      fabAddItem.style.display = isAdminHome ? "inline-flex" : "none";
+    }
+
+    function router(){
+      updateFabVisibility();
+
+      const hash = location.hash || "#/";
+
+      const requestItem = hash.match(/^#\/request\/item\/(.+)$/);
+      const adminItem = hash.match(/^#\/admin\/item\/(.+)$/);
+      const listItem = hash.match(/^#\/list\/item\/(.+)$/);
+
+      if(hash === "#/" || hash === ""){
+        renderMainHome();
+      }else if(hash === "#/request"){
+        renderHome("request");
+      }else if(hash === "#/list"){
+        renderHome("list");
+      }else if(hash === "#/admin"){
+        if(!checkAdminAccess("#/admin")) return;
+        renderHome("admin");
+      }else if(requestItem){
+        renderDetail(decodeURIComponent(requestItem[1]), "request");
+      }else if(adminItem){
+        if(!checkAdminAccess(hash)) return;
+        renderDetail(decodeURIComponent(adminItem[1]), "admin");
+      }else if(listItem){
+        renderDetail(decodeURIComponent(listItem[1]), "list");
+      }else{
+        renderMainHome();
+      }
+    }
+
+    function openItemModal(prefillCategory){
+      itemModal.classList.add("show");
+      document.body.style.overflow = "hidden";
+      if(prefillCategory) nCategory.value = prefillCategory;
+      if(!nBase.value) nBase.value = "1000";
+      setTimeout(()=>{ (nName.value ? nSize : nName).focus(); }, 30);
+    }
+
+    function closeItemModal(){
+      itemModal.classList.remove("show");
+      document.body.style.overflow = "";
+    }
+
+    fabAddItem.addEventListener("click", ()=> openItemModal(""));
+    itemOverlay.addEventListener("click", closeItemModal);
+    itemClose.addEventListener("click", closeItemModal);
+
+    createItemBtn.addEventListener("click", async ()=>{
+      const category = (nCategory.value || "").trim();
+      const name = (nName.value || "").trim();
+      const size = (nSize.value || "").trim();
+      const base = Number(String(nBase.value || "").replace(/,/g,""));
+      const img  = (nImg.value || "").trim();
+
+      if(!category){ alert("카테고리를 입력해주세요."); return; }
+      if(!name){ alert("품목명을 입력해주세요."); return; }
+      if(!Number.isFinite(base) || base < 0){ alert("기준재고는 0 이상 숫자여야 합니다."); return; }
+
+      const sec = ensureCategory(category);
+      if(!sec){ alert("카테고리 생성에 실패했습니다."); return; }
+
+      const baseId = slugifyId(`${category}-${name}-${size}`);
+      let id = baseId;
+      let n = 2;
+      while(findItemById(id)){
+        id = `${baseId}-${n++}`;
+      }
+
+      const newItem = {
+        id,
+        name,
+        size,
+        baseStock: base,
+        img: img || null,
+        images: [img || null, null],
+        logs: []
+      };
+
+      sec.items = sec.items || [];
+      sec.items.push(newItem);
+
+      saveAllLocal();
+
+      try{
+        await saveBaseToDB(newItem.id, newItem.baseStock);
+      }catch(err){
+        console.error(err);
+        DB.mode = "error";
+        DB.lastError = String(err?.message || err);
+        alert("품목은 추가되었지만 DB 저장에 실패했습니다. (로컬에는 저장됨)\n권한/RLS 설정을 확인해주세요.");
+      }
+
+      nCategory.value = "";
+      nName.value = "";
+      nSize.value = "";
+      nBase.value = "";
+      nImg.value = "";
+
+      closeItemModal();
+
+      q.value = "";
+      location.hash = "#/admin";
+      router();
+    });
+
+    doSearch.addEventListener("click", ()=>{
+      const hash = location.hash || "#/";
+      if(hash === "#/admin"){
+        if(!checkAdminAccess("#/admin")) return;
+        renderHome("admin");
+      }else if(hash === "#/list"){
+        renderHome("list");
+      }else{
+        renderHome("request");
+      }
+    });
+
+    q.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter"){
+        const hash = location.hash || "#/";
+        if(hash === "#/admin"){
+          if(!checkAdminAccess("#/admin")) return;
+          renderHome("admin");
+        }else if(hash === "#/list"){
+          renderHome("list");
+        }else{
+          renderHome("request");
+        }
+      }
+    });
+
+    q.addEventListener("input", ()=>{
+      const hash = location.hash || "#/";
+      if(hash === "#/admin"){
+        if(!checkAdminAccess("#/admin")) return;
+        renderHome("admin");
+      }else if(hash === "#/list"){
+        renderHome("list");
+      }else if(hash === "#/request"){
+        renderHome("request");
+      }
+    });
+
+    homeLink.addEventListener("click", (e)=>{
+      e.preventDefault();
+      q.value = "";
+      clearAdminAccess();
+      closeAdminAuthModal();
+      location.hash = "#/";
+    });
+
+    adminAuthOverlay.addEventListener("click", ()=>{
+      closeAdminAuthModal();
+      location.hash = "#/";
+    });
+
+    adminAuthCancel.addEventListener("click", ()=>{
+      closeAdminAuthModal();
+      location.hash = "#/";
+    });
+
+    adminAuthConfirm.addEventListener("click", confirmAdminAuth);
+
+    adminPasswordInput.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter"){
+        confirmAdminAuth();
+      }else if(e.key === "Escape"){
+        closeAdminAuthModal();
+        location.hash = "#/";
+      }
+    });
+
+    window.addEventListener("hashchange", router);
+
+    (async function boot(){
+      loadAllLocal();
+
+      if(!location.hash) location.hash = "#/";
+      router();
+
+      const ok = initSupabase();
+      if(!ok){
+        DB.mode = "local";
+        router();
+        return;
+      }
+
+      try{
+        await loadAllFromDB_FORCE();
+      }catch(err){
+        console.error("DB 로드 실패:", err);
+        DB.mode = "error";
+        DB.lastError = String(err?.message || err);
+      }
+
+      startRealtime();
+      router();
+    })();
+  </script>
+</body>
+</html>

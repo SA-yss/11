@@ -16,6 +16,7 @@
 </script>
 
   <style>
+    @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
     :root{
       --bg:#ffffff;
       --text:#111111;
@@ -133,7 +134,7 @@
       border-radius:999px;
       outline:none;
       font-size:12px;
-      background:#fff;
+      background:#ececec;
     }
 
     .search input:focus{
@@ -601,7 +602,7 @@
       padding:15px 16px;
       border:0;
       border-radius:0;
-      background:#111;
+      background:#292929;
       color:#fff;
       font-weight:700;
       font-size:15px;
@@ -710,11 +711,14 @@
 
     .sheet{
       position:absolute;
-      left:0; right:0; bottom:0;
+      left:50%;
+      bottom:24px;
       background:#fff;
-      border-top-left-radius:24px;
-      border-top-right-radius:24px;
-      box-shadow:0 -10px 30px rgba(0,0,0,0.12);
+      transform:translateX(-50%);
+      width:min(92vw, 980px);
+      border-top-left-radius:2px;
+      border-top-right-radius:2px;
+      box-shadow:0 -8px 13px rgba(0, 0, 0, 0.048);
       overflow:hidden;
       max-height:86vh;
       display:flex;
@@ -728,17 +732,16 @@
       align-items:center;
       justify-content:space-between;
       gap:10px;
-      font-weight:700;
+      font-weight:600;
     }
 
     .sheetBody{ padding:18px 20px 8px; overflow:auto; }
-    .field{ margin-bottom:14px; }
-
+    .field{ margin-bottom:12px; }
     .field label{
       display:block;
-      font-size:11px;
+      font-size:12px;
       color:var(--muted);
-      font-weight:600;
+      font-weight:500;
       margin-bottom:6px;
       letter-spacing:0.04em;
     }
@@ -746,13 +749,13 @@
     .field input, .field select, .authInput{
       width:100%;
       border:1px solid var(--line);
-      border-radius:16px;
-      padding:13px 14px;
-      font-size:13px;
-      font-weight:600;
+      border-radius:2px;
+      padding:12px 13px;
+      font-size:12px;
+      font-weight:400;
       outline:none;
       background:#fff;
-      color:#111;
+      color:#3e3e3e;
     }
 
     .seg{ display:flex; gap:10px; }
@@ -775,27 +778,27 @@
 
     .sheetFoot .primary{
       width:100%;
-      padding:15px 14px;
-      border-radius:999px;
+      padding:8px 14px;
+      border-radius:2px;
       font-size:14px;
-      font-weight:800;
+      font-weight:500;
     }
 
     .fab{
       position:fixed;
       right:24px;
-      bottom:24px;
+      bottom:25px;
       z-index:9998;
-      padding:0 18px;
-      height:48px;
-      border:1px solid #111;
-      border-radius:999px;
-      background:#111;
+      padding:13px 17px;
+      height:42px;
+      border:1px solid #292929;
+      border-radius:2px;
+      background:#292929;
       color:#fff;
-      font-weight:700;
+      font-weight:500;
       font-size:12px;
       cursor:pointer;
-      box-shadow:0 10px 24px rgba(0,0,0,0.14);
+      box-shadow:0 10px 10px rgba(0,0,0,0.14);
       user-select:none;
       white-space:nowrap;
     }
@@ -882,7 +885,7 @@
 
     .listGrid{
       display:grid;
-      grid-template-columns:repeat(3, minmax(0, 1fr));
+      grid-template-columns:repeat(2, minmax(0, 1fr));
       gap:16px;
     }
 
@@ -974,6 +977,124 @@
 
     .authBtns{ display:flex; justify-content:flex-end; gap:10px; margin-top:0; }
     .authBtn.confirm{ background:#111; color:#fff; border-color:#111; }
+
+
+    .loginScreen{
+      min-height:100vh;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding:120px 24px 48px;
+      background:#ffffff;
+    }
+
+    .loginWrap{
+      width:min(100%, 360px);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+    }
+
+    .loginLogoWrap{
+      width:100%;
+      margin:0 0 80px;
+    }
+
+    .loginLogoBox{
+      width:100%;
+      height:170px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .loginLogoImage{
+      max-width:240px;
+      max-height:92px;
+      width:auto;
+      height:auto;
+      display:block;
+      object-fit:contain;
+    }
+
+    .loginLogoText{
+      font-family:'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+      font-size:34px;
+      font-weight:700;
+      letter-spacing:-0.04em;
+      color:#111;
+      line-height:1;
+      display:none;
+    }
+
+    .loginForm{
+      width:100%;
+      margin-top:8px;
+    }
+
+    .loginInput{
+      width:100%;
+      height:50px;
+      border:0;
+      background:#f4f4f4;
+      padding:0 24px;
+      font-size:16px;
+      color:#111;
+      outline:none;
+      margin-bottom:10px;
+      font-family:'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+    }
+
+    .loginInput::placeholder{
+      color:#a1a1a1;
+      font-family:'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+    }
+
+    .loginSubLinks{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:14px;
+      font-size:11px;
+      color:#111;
+      font-weight:600;
+      margin:16px 0 34px;
+      font-family:'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+    }
+
+    .loginSubLinks a{
+      color:#111;
+      text-decoration:none;
+    }
+
+    .loginSubLinks span{ color:#b5b5b5; }
+
+    .loginBtn{
+      width:72%;
+      min-width:220px;
+      height:44px;
+      border:0;
+      background:#262626;
+      color:#fff;
+      font-size:16px;
+      font-weight:700;
+      cursor:pointer;
+      display:block;
+      margin:0 auto;
+      font-family:'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+    }
+
+    .loginErrorText{
+      min-height:20px;
+      margin:10px 0 0;
+      text-align:center;
+      font-size:12px;
+      color:#c63e3e;
+      visibility:hidden;
+      font-family:'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+    }
+
+    .loginErrorText.show{ visibility:visible; }
 
     @media (max-width: 1280px){
       .listGrid{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
@@ -1142,6 +1263,12 @@
       .dangerBtn{ align-self:stretch; text-align:center; }
 
       .mainHome{ padding-top:56px; text-align:center;}
+      .loginScreen{ padding:100px 18px 40px; }
+      .loginLogoBox{ height:190px; }
+      .loginLogoImage{ max-width:220px; max-height:82px; }
+      .loginLogoText{ font-size:26px; }
+      .loginInput{ height:48px; font-size:15px; }
+      .loginBtn{ width:100%; min-width:0; }
       .mainLogoArea{ min-height:96px; margin-bottom:28px; justify-content:center; }
       .mainLogoImg{ max-width:220px; max-height:82px; }
       .mainLogoPlaceholder{ width:220px; height:82px; font-size:13px; }
@@ -1161,6 +1288,158 @@
       .authTitle{ font-size:17px; }
       .authBtn{ min-width:92px; height:42px; font-size:13px; }
     }
+
+    /* home screen layout update */
+    .mainHome{
+      max-width:760px;
+      margin:0 auto;
+      padding:88px 0 64px;
+      text-align:center;
+    }
+
+    .mainLogoArea{
+      min-height:116px;
+      margin-bottom:34px;
+      justify-content:center;
+    }
+
+    .mainLogoImg{
+      max-width:220px;
+      max-height:80px;
+      object-fit:contain;
+      display:block;
+    }
+
+    .mainLogoPlaceholder{
+      width:212px;
+      height:80px;
+      border:1px dashed #cfd8dc;
+      background:#fafafa;
+    }
+
+    .mainHomeLine{
+      margin:0 0 18px;
+    }
+
+    .mainHomeTitle{
+      font-size:12px;
+      font-weight:600;
+      margin-bottom:36px;
+      text-align:center;
+    }
+
+    .mainHomeBtns{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      column-gap:16px;
+      row-gap:64px;
+      margin-top:0;
+    }
+
+    .mainHomeBtn{
+      min-height:72px;
+      padding:18px 22px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      transition:transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+
+    .mainHomeBtn:hover{
+      transform:translateY(-2px);
+      border-color:#bcbcbc;
+    }
+
+    .mainHomeBtn.primaryHomeBtn{
+      background:#efefef;
+      border-color:#d9d9d9;
+      color:#222;
+    }
+
+    .mainHomeBtn.stockBtn{
+      background:#ffffff;
+      border-color:#d9d9d9;
+      color:#222;
+    }
+
+    .mainHomeBtn.adminBtn{
+      grid-column:1 / -1;
+      background:#292929;
+      border-color:#292929;
+      color:#fff;
+    }
+
+    @media (max-width: 1280px){
+      .mainHome{
+        max-width:760px;
+      }
+    }
+
+    @media (max-width: 980px){
+      .mainHome{
+        max-width:760px;
+        padding-top:72px;
+      }
+
+      .mainHomeBtns{
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+        column-gap:16px;
+        row-gap:56px;
+      }
+
+      .mainHomeBtn{
+        min-height:70px;
+      }
+
+      .mainHomeBtn.adminBtn{
+        grid-column:1 / -1;
+      }
+    }
+
+    @media (max-width: 640px){
+      .mainHome{
+        max-width:100%;
+        padding-top:52px;
+      }
+
+      .mainLogoArea{
+        min-height:128px;
+        margin-bottom:38px;
+      }
+
+      .mainLogoImg{
+        max-width:212px;
+        max-height:78px;
+      }
+
+      .mainLogoPlaceholder{
+        width:212px;
+        height:78px;
+        font-size:13px;
+      }
+
+      .mainHomeTitle{
+        margin-bottom:30px;
+      }
+
+      .mainHomeBtns{
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+        column-gap:14px;
+        row-gap:48px;
+      }
+
+      .mainHomeBtn{
+        min-height:66px;
+        font-size:15px;
+        padding:16px 16px;
+      }
+
+      .mainHomeBtn.adminBtn{
+        grid-column:1 / -1;
+      }
+    }
+
 </style>
 </head>
 
@@ -1239,7 +1518,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
+    const SUPABASE_URL = "https://iznnctfnmeiqdjjounq.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_9p50RVtpPdmZOG2emGTDVg_NQ3bp8U8";
 
     let supabaseClient = null;
@@ -1249,9 +1528,87 @@
       lastError: ""
     };
 
+    const HOME_LOGIN_ID = "yss";
+    const HOME_LOGIN_PASSWORD = "1111";
+    const HOME_LOGIN_SESSION_KEY = "warehouse_home_login_ok";
+
     const ADMIN_PASSWORD = "1234";
     const ADMIN_SESSION_KEY = "warehouse_admin_ok";
     let pendingAdminTarget = "#/admin";
+
+    function isHomeLoggedIn(){
+      return sessionStorage.getItem(HOME_LOGIN_SESSION_KEY) === "yes";
+    }
+
+    function setHomeLoggedIn(ok){
+      if(ok){
+        sessionStorage.setItem(HOME_LOGIN_SESSION_KEY, "yes");
+      }else{
+        sessionStorage.removeItem(HOME_LOGIN_SESSION_KEY);
+      }
+    }
+
+    function renderLoginPage(){
+      topbar.style.display = "none";
+      document.body.classList.remove("mode-request", "mode-list", "mode-admin");
+      app.innerHTML = `
+        <div class="loginScreen">
+          <div class="loginWrap">
+            <div class="loginLogoWrap">
+              <div class="loginLogoBox">
+                <img class="loginLogoImage" id="loginLogoImage" src="images/sa-logo_4.png" />
+              </div>
+            </div>
+
+            <div class="loginForm">
+              <input id="homeLoginId" class="loginInput" type="text" placeholder="아이디를 입력해 주세요." autocomplete="username" />
+              <input id="homeLoginPw" class="loginInput" type="password" placeholder="비밀번호를 입력해 주세요." autocomplete="current-password" />
+
+              <div class="loginSubLinks">
+                <a href="javascript:void(0)">회원가입</a>
+                <span>|</span>
+                <a href="javascript:void(0)">아이디 찾기</a>
+                <span>|</span>
+                <a href="javascript:void(0)">비밀번호 찾기</a>
+              </div>
+
+              <button class="loginBtn" id="homeLoginBtn" type="button">로그인하기</button>
+              <div class="loginErrorText" id="homeLoginError">아이디 또는 비밀번호가 올바르지 않습니다.</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+
+      const idInput = document.getElementById("homeLoginId");
+      const pwInput = document.getElementById("homeLoginPw");
+      const loginBtn = document.getElementById("homeLoginBtn");
+      const errorBox = document.getElementById("homeLoginError");
+
+      function submitHomeLogin(){
+        const id = (idInput.value || "").trim();
+        const pw = (pwInput.value || "").trim();
+
+        if(id === HOME_LOGIN_ID && pw === HOME_LOGIN_PASSWORD){
+          setHomeLoggedIn(true);
+          errorBox.classList.remove("show");
+          location.hash = "#/";
+          return;
+        }
+
+        errorBox.classList.add("show");
+        pwInput.focus();
+        pwInput.select();
+      }
+
+      loginBtn.addEventListener("click", submitHomeLogin);
+      idInput.addEventListener("keydown", (e)=>{
+        if(e.key === "Enter") submitHomeLogin();
+      });
+      pwInput.addEventListener("keydown", (e)=>{
+        if(e.key === "Enter") submitHomeLogin();
+      });
+    }
 
     function isAdminAuthorized(){
       return sessionStorage.getItem(ADMIN_SESSION_KEY) === "yes";
@@ -2004,7 +2361,7 @@
       app.innerHTML = `
         <div class="mainHome">
           <div class="mainLogoArea" id="mainHomeLogoBtn">
-            ${renderSmartLogo("sa-logo_4.png", "Seoul Auction 로고")}
+            ${renderSmartLogo("images/sa-logo_4.png", "Seoul Auction 로고")}
           </div>
 
           <div class="mainHomeLine"></div>
@@ -2747,13 +3104,20 @@
     function router(){
       updateFabVisibility();
 
-      const hash = location.hash || "#/";
+      const hash = location.hash || "#/login";
+
+      if(!isHomeLoggedIn() && hash !== "#/login"){
+        location.hash = "#/login";
+        return;
+      }
 
       const requestItem = hash.match(/^#\/request\/item\/(.+)$/);
       const adminItem = hash.match(/^#\/admin\/item\/(.+)$/);
       const listItem = hash.match(/^#\/list\/item\/(.+)$/);
 
-      if(hash === "#/" || hash === ""){
+      if(hash === "#/login"){
+        renderLoginPage();
+      }else if(hash === "#/" || hash === ""){
         renderMainHome();
       }else if(hash === "#/request"){
         renderHome("request");
@@ -2892,7 +3256,7 @@
       q.value = "";
       clearAdminAccess();
       closeAdminAuthModal();
-      location.hash = "#/";
+      location.hash = isHomeLoggedIn() ? "#/" : "#/login";
     });
 
     adminAuthOverlay.addEventListener("click", ()=>{
@@ -2921,7 +3285,7 @@
     (async function boot(){
       loadAllLocal();
 
-      if(!location.hash) location.hash = "#/";
+      if(!location.hash) location.hash = isHomeLoggedIn() ? "#/" : "#/login";
       router();
 
       const ok = initSupabase();

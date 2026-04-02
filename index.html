@@ -803,23 +803,23 @@
     .fab:active{ transform:translateY(0.5px); }
 
     .mainHome{
-      max-width:980px;
+      width:min(100%, 360px);
       margin:0 auto;
-      padding:64px 0 64px;
+      padding:120px 0 64px;
       text-align:center;
     }
 
     .mainLogoArea{
       width:100%;
-      min-height:100px;
+      min-height:138px;
       display:flex;
       align-items:center;
       justify-content:center;
-      margin-bottom:28px;
+      margin-bottom:34px;
       cursor:pointer;
     }
 
-    .mainLogoImg{ max-width:200px; max-height:72px; object-fit:contain; display:block; }
+    .mainLogoImg{ max-width:250px; max-height:88px; object-fit:contain; display:block; }
 
     .mainLogoPlaceholder{
       width:200px;
@@ -835,14 +835,21 @@
       background:#fafafa;
     }
 
-    .mainHomeLine{ width:100%; height:1px; background:#d9d9d9; margin:0 0 22px; }
+    .mainHomeLine,
+    .authHeaderLine{
+      width:156px;
+      height:1px;
+      background:#d9d9d9;
+      margin:0 auto 14px;
+    }
 
-    .mainHomeTitle{
+    .mainHomeTitle,
+    .authHeaderTitle{
       font-size:12px;
-      font-weight:500;
-      color:#323232;
-      margin-bottom:40px;
-      letter-spacing:-0.01em;
+      font-weight:600;
+      color:#222;
+      margin-bottom:52px;
+      letter-spacing:-0.02em;
       text-align:center;
     }
 
@@ -853,32 +860,52 @@
       margin-top:0;
     }
 
+    .mainHomeBtns.oneRole{
+      grid-template-columns:1fr;
+      width:72%;
+      min-width:220px;
+      max-width:320px;
+      margin:0 auto;
+      gap:14px;
+    }
+
     .mainHomeBtn{
       width:100%;
-      min-height:100px;
-      border:1px solid #d9d9d9;
+      height:50px;
+      min-height:50px;
+      border:0;
       border-radius:0;
       background:#fff;
       color:#222;
       font-size:14px;
       font-weight:700;
       cursor:pointer;
-      padding:24px 26px;
+      padding:0 18px;
       display:flex;
       align-items:center;
       justify-content:center;
-      text-align:left;
-      transition:transform .18s ease, border-color .18s ease;
+      text-align:center;
+      transition:transform .18s ease, border-color .18s ease, background-color .18s ease, color .18s ease;
     }
 
     .mainHomeBtn:hover{
       transform:translateY(-2px);
-      border-color:#bcbcbc;
     }
 
     .mainHomeBtn.primaryHomeBtn{ background:#111; border-color:#111; color:#fff; }
-    .stockBtn{ background:#fff; border-color:#d3d3d3; color:#202020; }
-    .adminBtn{ background:#f7f7f7; border-color:#dcdcdc; color:#111; }
+    .requestDarkBtn{ background:#262626; color:#fff; }
+    .stockBtn{ background:#f3f3f3; color:#111; }
+    .adminBtn{ background:#f7f7f7; color:#111; }
+    .adminMintBtn{ background:#46c1bc; color:#fff; }
+    .logoutBtn{
+      background:transparent;
+      color:#777;
+      font-size:11px;
+      font-weight:500;
+      height:auto;
+      min-height:0;
+      padding:28px 0 0;
+    }
 
     .listGrid{
       display:grid;
@@ -993,20 +1020,20 @@
 
     .loginLogoWrap{
       width:100%;
-      margin:0 0 80px;
+      margin:0 0 0;
     }
 
     .loginLogoBox{
       width:100%;
-      height:170px;
+      height:138px;
       display:flex;
       align-items:center;
       justify-content:center;
     }
 
     .loginLogoImage{
-      max-width:240px;
-      max-height:92px;
+      max-width:250px;
+      max-height:88px;
       width:auto;
       height:auto;
       display:block;
@@ -1014,8 +1041,10 @@
     }
 
     .loginForm{
-      width:100%;
-      margin-top:8px;
+      width:72%;
+      min-width:220px;
+      max-width:320px;
+      margin-top:0;
     }
 
     .loginInput{
@@ -1041,7 +1070,7 @@
       align-items:center;
       justify-content:center;
       gap:14px;
-      font-size:11px;
+      font-size:10px;
       color:#111;
       font-weight:600;
       margin:16px 0 34px;
@@ -1160,7 +1189,8 @@
       }
 
       .mainHomeBtns{ grid-template-columns:1fr; }
-      .mainHomeBtn{ min-height:88px; }
+      .mainHomeBtns.oneRole{ max-width:320px; width:72%; }
+      .mainHomeBtn{ height:50px; min-height:50px; }
       .itemTop{ flex-direction:column; align-items:flex-start; }
       .statRow{ grid-template-columns:1fr 1fr; }
     }
@@ -1453,6 +1483,19 @@
         console.error("홈 로그인 세션 확인 실패:", err);
         setHomeLoggedIn(false);
         return false;
+      }
+    }
+
+    async function logoutHome(){
+      try{
+        if(supabaseClient){
+          await supabaseClient.auth.signOut();
+        }
+      }catch(err){
+        console.error("로그아웃 실패:", err);
+      }finally{
+        setHomeLoggedIn(false);
+        location.hash = "#/login";
       }
     }
 
@@ -2152,6 +2195,8 @@
                 <img class="loginLogoImage" src="images/sa-logo_4.png" alt="Seoul Auction 로고" />
               </div>
             </div>
+            <div class="authHeaderLine"></div>
+            <div class="authHeaderTitle">서울옥션 디자인팀 창고 재고 관리</div>
             ${innerHtml}
           </div>
         </div>
@@ -2374,9 +2419,11 @@
       attachAuthEnter(["resetPasswordEmail"], submitResetPassword);
     }
 
-    function renderMainHome(){
+    async function renderMainHome(){
       topbar.style.display = "none";
       document.body.classList.remove("mode-request", "mode-list", "mode-admin");
+
+      const isAdmin = await isAdminUser();
 
       app.innerHTML = `
         <div class="mainHome">
@@ -2387,30 +2434,33 @@
           <div class="mainHomeLine"></div>
           <div class="mainHomeTitle">서울옥션 디자인팀 창고재고관리</div>
 
-          <div class="mainHomeBtns">
-            <button class="mainHomeBtn primaryHomeBtn" id="goRequestPage" type="button">물품 신청하기</button>
+          <div class="mainHomeBtns oneRole">
+            ${
+              isAdmin
+                ? `<button class="mainHomeBtn adminMintBtn" id="goAdminPage" type="button">관리자 페이지</button>`
+                : `<button class="mainHomeBtn requestDarkBtn" id="goRequestPage" type="button">물품 신청하기</button>`
+            }
             <button class="mainHomeBtn stockBtn" id="goStockPage" type="button">물품 재고 현황</button>
-            <button class="mainHomeBtn adminBtn" id="goAdminPage" type="button">관리자 페이지</button>
+            <button class="mainHomeBtn logoutBtn" id="logoutBtn" type="button">로그아웃</button>
           </div>
         </div>
       `;
 
-      document.getElementById("goRequestPage").addEventListener("click", ()=>{
-        location.hash = "#/request";
-      });
+      if(isAdmin){
+        document.getElementById("goAdminPage").addEventListener("click", ()=>{
+          location.hash = "#/admin";
+        });
+      }else{
+        document.getElementById("goRequestPage").addEventListener("click", ()=>{
+          location.hash = "#/request";
+        });
+      }
 
       document.getElementById("goStockPage").addEventListener("click", ()=>{
         location.hash = "#/list";
       });
 
-      document.getElementById("goAdminPage").addEventListener("click", async ()=>{
-        const ok = await isAdminUser();
-        if(!ok){
-          alert("관리자 권한이 없습니다.");
-          return;
-        }
-        location.hash = "#/admin";
-      });
+      document.getElementById("logoutBtn").addEventListener("click", logoutHome);
 
       document.getElementById("mainHomeLogoBtn").addEventListener("click", ()=>{
         window.location.href = "index.html";
@@ -3150,7 +3200,7 @@
       }else if(hash === "#/reset-password"){
         renderResetPasswordPage();
       }else if(hash === "#/" || hash === ""){
-        renderMainHome();
+        await renderMainHome();
       }else if(hash === "#/request"){
         renderHome("request");
       }else if(hash === "#/list"){
@@ -3176,7 +3226,7 @@
       }else if(listItem){
         renderDetail(decodeURIComponent(listItem[1]), "list");
       }else{
-        renderMainHome();
+        await renderMainHome();
       }
     }
 

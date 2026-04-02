@@ -206,7 +206,7 @@
       font-size:12px;
       color:var(--muted);
       font-weight:500;
-      letter-spacing:0.12em;
+      letter-spacing:0em;
       text-transform:uppercase;
     }
 
@@ -425,7 +425,7 @@
     .statRow{
       width:100%;
       display:grid;
-      grid-template-columns:220px 1fr;
+      grid-template-columns:1fr 1fr;
       align-items:center;
       min-height:70px;
     }
@@ -436,8 +436,11 @@
       align-items:center;
       justify-content:center;
       min-height:70px;
+      min-width:0;
       white-space:nowrap;
       position:relative;
+      word-break:keep-all;
+      padding:0 6px;
     }
 
     .statLabel{
@@ -447,10 +450,10 @@
       letter-spacing:-0.02em;
     }
 
-    .statLabel .txt{ font-size:16px; line-height:1; white-space:nowrap; }
+    .statLabel .txt{ font-size:15px; line-height:1; white-space:nowrap;  word-break:keep-all;}
 
     .statValue{
-      font-size:22px;
+      font-size:18px;
       font-weight:800;
       color:#111;
       letter-spacing:-0.05em;
@@ -467,16 +470,16 @@
       background:#d9d9d9;
     }
 
-    .statValue .unit{ font-size:17px; font-weight:800; color:#2f2f2f; margin-left:0; }
+    .statValue .unit{ font-size:15px; font-weight:800; color:#2f2f2f; margin-left:0; white-space:nowrap;}
 
     .divider{ height:1px; background:var(--line); margin:28px 0 24px; }
 
     .boxTitleRow{ display:flex; align-items:center; justify-content:flex-start; gap:10px; padding:0 0 8px; }
 
     .boxTitle{
-      font-size:14px;
+      font-size:16px;
       font-weight:600;
-      letter-spacing:0.08em;
+      letter-spacing:0em;
       margin-bottom:5px;
       padding:0;
       color:var(--muted);
@@ -675,6 +678,7 @@
       text-transform:none;
       justify-content:flex-start;
       white-space:nowrap;
+      
     }
     .detailHeadMeta .detailHeroName{
       margin:0;
@@ -1461,9 +1465,13 @@
       .imgBox{ width:calc(50% - 6px); }
       .itemName{ font-size:26px; }
       .sizePill{ font-size:12px; }
-      .statRow{ grid-template-columns:1fr; }
-      .statValue::before{ display:none; }
-      .statLabel, .statValue{ min-height:56px; }
+      .statRow{ grid-template-columns:minmax(0, 96px) minmax(0, 1fr); }
+      .statValue::before{ display:block; height:22px; }
+      .statLabel, .statValue{ min-height:56px; padding:0 4px; }
+      .statLabel{ justify-content:center; }
+      .statLabel .txt,
+      .statValue,
+      .statValue .unit{ white-space:nowrap; }
       .statValue{ font-size:22px; }
 
       .logBox{ margin:0; }

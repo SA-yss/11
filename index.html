@@ -2918,7 +2918,7 @@ async function insertLogsBulk(rows){
                         ? (pendingCount > 0 ? `신청 ${pendingCount}건` : "대기 없음")
                         : (last.status || "-");
                       const deltaText = mode === "admin"
-                        ? (pendingCount > 0 ? : (last.date || "-"))
+                        ? (pendingCount > 0 ? "클릭해서 승인 처리" : (last.date || "-"))
                         : (last.date || "-");
                       const deltaClass = mode === "admin"
                         ? (pendingCount > 0 ? "out" : (last.delta >= 0 ? "in" : "out"))
@@ -3120,7 +3120,7 @@ async function insertLogsBulk(rows){
                   <p class="boxTitle">신청 내역</p>
                   ${(isRequest || isAdmin) ? `
                     <div class="requestAdminActions">
-                      ${isAdmin ? `<button class="selDelBtn reqApproveBtn" id="approveRequestsBtn" type="button">승인</button>
+                      ${isAdmin ? `<button class="selDelBtn reqApproveBtn" id="approveRequestsBtn" type="button">선택 승인</button>
                       <button class="selDelBtn reqRejectBtn" id="rejectRequestsBtn" type="button">반려</button>` : ``}
                       <button class="selDelBtn" id="bulkDeleteRequests" type="button">선택 삭제</button>
                     </div>

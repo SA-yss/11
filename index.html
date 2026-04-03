@@ -2089,15 +2089,29 @@
 
     function toISODateLike(d){
       if(!d) return "";
-      if(/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
-      const m = String(d).match(/^(\d{1,2})\/(\d{1,2})$/);
+      const raw = String(d).trim();
+      if(/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+
+      const isoPrefix = raw.match(/^(\d{4}-\d{2}-\d{2})[T\s]/);
+      if(isoPrefix) return isoPrefix[1];
+
+      const m = raw.match(/^(\d{1,2})\/(\d{1,2})$/);
       if(m){
         const y = new Date().getFullYear();
         const mm = String(m[1]).padStart(2,"0");
         const dd = String(m[2]).padStart(2,"0");
         return `${y}-${mm}-${dd}`;
       }
-      return String(d);
+
+      const parsed = new Date(raw);
+      if(!Number.isNaN(parsed.getTime())){
+        const y = parsed.getFullYear();
+        const mm = String(parsed.getMonth() + 1).padStart(2,"0");
+        const dd = String(parsed.getDate()).padStart(2,"0");
+        return `${y}-${mm}-${dd}`;
+      }
+
+      return raw;
     }
 
     function formatKRDate(d){

@@ -2132,6 +2132,11 @@
       it.requests = (it.requests || []).map(r => normalizeLog({ ...r, t: "신청" }));
     }
 
+    function countPendingRequests(it){
+      ensureRequests(it);
+      return (it.requests || []).filter(r => (r.status || "pending") === "pending").length;
+    }
+
 function requestStatusLabel(status){
   if(status === "approved") return "승인";
   if(status === "rejected") return "반려";
@@ -2420,6 +2425,33 @@ async function updateRequestStatusByIds(ids, status, meta = {}){
     .update(payload)
     .in("id", cleanIds);
   if(error) throw error;
+}
+
+async function decreaseStock(itemId, amount){
+  if(!dbReady()) return null;
+
+  const { data, error: readErr } = await supabaseClient
+    .from(DB_ITEMS)
+    .select("base_stock")
+    .eq("id", itemId)
+    .single();
+
+  if(readErr) throw readErr;
+
+  const current = Number(data?.base_stock || 0);
+  const next = current - Number(amount || 0);
+
+  if(next < 0){
+    throw new Error("재고가 부족합니다.");
+  }
+
+  const { error: updateErr } = await supabaseClient
+    .from(DB_ITEMS)
+    .update({ base_stock: next })
+    .eq("id", itemId);
+
+  if(updateErr) throw updateErr;
+  return next;
 }
 
 async function insertLogsBulk(rows){
@@ -2867,6 +2899,19 @@ async function insertLogsBulk(rows){
                     ${filtered.map(it => {
                       const stock = calcStock(it);
                       const last = getLastLogInfo(it);
+                      const pendingCount = countPendingRequests(it);
+                      const statusText = mode === "admin"
+                        ? (pendingCount > 0 ? `신청 ${pendingCount}건` : "대기 없음")
+                        : (last.status || "-");
+                      const deltaText = mode === "admin"
+                        ? (pendingCount > 0 ? "클릭해서 승인 처리" : (last.date || "-"))
+                        : (last.date || "-");
+                      const deltaClass = mode === "admin"
+                        ? (pendingCount > 0 ? "out" : (last.delta >= 0 ? "in" : "out"))
+                        : (last.delta >= 0 ? "in" : "out");
+                      const deltaValue = mode === "admin"
+                        ? (pendingCount > 0 ? "승인 필요" : `${(last.delta>=0?"+":"")}${(last.delta||0).toLocaleString()}`)
+                        : `${(last.delta>=0?"+":"")}${(last.delta||0).toLocaleString()}`;
                       return `
                         <div class="row">
                           <div class="card" role="button" tabindex="0" data-open="${escapeAttr(it.id)}">
@@ -2881,10 +2926,10 @@ async function insertLogsBulk(rows){
                               </div>
 
                               <div class="meta-bot">
-                                <div class="status ${statusClass(last.status)}">${escapeHtml(last.status)}</div>
+                                <div class="status ${mode === "admin" ? (pendingCount > 0 ? "out" : "in") : statusClass(last.status)}">${escapeHtml(statusText)}</div>
                                 <div class="delta">
-                                  <span>${escapeHtml(last.date || "-")}</span>
-                                  <span class="qty ${last.delta >= 0 ? "in" : "out"}">${(last.delta>=0?"+":"")}${(last.delta||0).toLocaleString()}</span>
+                                  <span>${escapeHtml(deltaText)}</span>
+                                  <span class="qty ${deltaClass}">${escapeHtml(deltaValue)}</span>
                                 </div>
                               </div>
                             </div>
@@ -3059,7 +3104,7 @@ async function insertLogsBulk(rows){
               <div class="detailSectionBlock">
                 <div class="boxTitleRow detailSectionHead">
                   <p class="boxTitle">신청 내역</p>
-                  ${isRequest ? `
+                  ${(isRequest || isAdmin) ? `
                     <div class="requestAdminActions">
                       ${isAdmin ? `<button class="selDelBtn reqApproveBtn" id="approveRequestsBtn" type="button">선택 승인</button>
                       <button class="selDelBtn reqRejectBtn" id="rejectRequestsBtn" type="button">선택 반려</button>` : ``}
@@ -3296,12 +3341,10 @@ if(approveRequestsBtn){
     const approverEmail = await getCurrentUserEmail();
     const logsToInsert = pendingRows.map(r => {
       const logKey = `reqlog_${Date.now()}_${Math.random().toString(16).slice(2)}`;
-      r.status = "approved";
-      r.approved_at = today;
-      r.approved_by = approverEmail || "";
-      r.processed_log_key = logKey;
       return {
         item_id: it.id,
+        qty: Number(r.qty || 0),
+        requestRow: r,
         row: {
           d: today,
           t: "출고",
@@ -3313,14 +3356,29 @@ if(approveRequestsBtn){
       };
     });
 
-    for(const entry of logsToInsert){
-      it.logs = it.logs || [];
-      it.logs.push(normalizeLog(entry.row));
-    }
-    saveAllLocal();
-
     try{
-      await insertLogsBulk(logsToInsert);
+      let latestStock = null;
+
+      for(const entry of logsToInsert){
+        latestStock = await decreaseStock(it.id, entry.qty);
+        entry.requestRow.status = "approved";
+        entry.requestRow.approved_at = today;
+        entry.requestRow.approved_by = approverEmail || "";
+        entry.requestRow.processed_log_key = entry.row.__key;
+      }
+
+      if(typeof latestStock === "number"){
+        it.baseStock = latestStock;
+      }
+
+      for(const entry of logsToInsert){
+        it.logs = it.logs || [];
+        it.logs.push(normalizeLog(entry.row));
+      }
+      saveAllLocal();
+
+      await insertLogsBulk(logsToInsert.map(({ item_id, row }) => ({ item_id, row })));
+
       for(const r of pendingRows){
         await updateRequestStatusByIds([r._dbid], "approved", {
           approved_at: today,
@@ -3330,7 +3388,7 @@ if(approveRequestsBtn){
       }
     }catch(err){
       console.error(err);
-      alert("요청 승인 반영에 실패했습니다. warehouse_requests / warehouse_logs 권한과 RLS를 확인해주세요.");
+      alert("요청 승인 반영 실패: " + (err?.message || err));
       DB.mode = "error";
       DB.lastError = String(err?.message || err);
     }

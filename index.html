@@ -3120,8 +3120,8 @@ async function insertLogsBulk(rows){
                   <p class="boxTitle">신청 내역</p>
                   ${(isRequest || isAdmin) ? `
                     <div class="requestAdminActions">
-                      ${isAdmin ? `<button class="selDelBtn reqApproveBtn" id="approveRequestsBtn" type="button">선택 승인</button>
-                      <button class="selDelBtn reqRejectBtn" id="rejectRequestsBtn" type="button">선택 반려</button>` : ``}
+                      ${isAdmin ? `<button class="selDelBtn reqApproveBtn" id="approveRequestsBtn" type="button">승인</button>
+                      <button class="selDelBtn reqRejectBtn" id="rejectRequestsBtn" type="button">반려</button>` : ``}
                       <button class="selDelBtn" id="bulkDeleteRequests" type="button">선택 삭제</button>
                     </div>
                   ` : ``}

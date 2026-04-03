@@ -3196,24 +3196,32 @@ async function insertLogsBulk(rows){
             const statusText = requestStatusLabel(r.status);
             const statusClassName = requestStatusClass(r.status);
             return `
-              <div class="logRow clickable ${selected ? "selected" : ""}" data-row="${escapeAttr(key)}" data-kind="${kind}">
-                <div class="logDate">${escapeHtml(formatKRDate(r.d))}</div>
-                <div class="logType"><span class="typeBadge ${typeClass}">${escapeHtml(r.t)}</span></div>
-                <div class="logDept">${escapeHtml(r.dept || "-")}</div>
-                <div class="logType"><span class="typeBadge ${statusClassName}">${escapeHtml(statusText)}</span></div>
-                <div class="logPerson">${escapeHtml(r.person || "-")}</div>
-                <div class="logQty">${Number(r.qty || 0).toLocaleString()}개</div>
-              </div>
+              <div class="logRow clickable ${selected ? "selected" : ""}" 
+     data-row="${escapeAttr(key)}" 
+     data-kind="${kind}"
+     onclick="toggleRequestSelect('${key}')">
+
+  <div class="logDate">${escapeHtml(formatKRDate(r.d))}</div>
+  <div class="logType"><span class="typeBadge ${typeClass}">${escapeHtml(r.t)}</span></div>
+  <div class="logDept">${escapeHtml(r.dept || "-")}</div>
+  <div class="logType"><span class="typeBadge ${statusClassName}">${escapeHtml(statusText)}</span></div>
+  <div class="logPerson">${escapeHtml(r.person || "-")}</div>
+  <div class="logQty">${Number(r.qty || 0).toLocaleString()}개</div>
+</div>
             `;
           }
           return `
-            <div class="logRow clickable ${selected ? "selected" : ""}" data-row="${escapeAttr(key)}" data-kind="${kind}">
-              <div class="logDate">${escapeHtml(formatKRDate(r.d))}</div>
-              <div class="logType"><span class="typeBadge ${typeClass}">${escapeHtml(r.t)}</span></div>
-              <div class="logDept">${escapeHtml(r.dept || "-")}</div>
-              <div class="logPerson">${escapeHtml(r.person || "-")}</div>
-              <div class="logQty">${Number(r.qty || 0).toLocaleString()}개</div>
-            </div>
+            <div class="logRow clickable ${selected ? "selected" : ""}" 
+     data-row="${escapeAttr(key)}" 
+     data-kind="${kind}"
+     onclick="toggleRequestSelect('${key}')">
+
+  <div class="logDate">${escapeHtml(formatKRDate(r.d))}</div>
+  <div class="logType"><span class="typeBadge ${typeClass}">${escapeHtml(r.t)}</span></div>
+  <div class="logDept">${escapeHtml(r.dept || "-")}</div>
+  <div class="logPerson">${escapeHtml(r.person || "-")}</div>
+  <div class="logQty">${Number(r.qty || 0).toLocaleString()}개</div>
+</div>
           `;
         }).join("");
       }

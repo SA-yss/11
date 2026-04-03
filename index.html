@@ -754,8 +754,8 @@
 
     .reqApproveBtn:hover{
       background:rgba(37, 99, 235, 0.22);
-      border-color:rgba(37, 99, 235, 0.45);
-      color:#1d4ed8;
+      border-color:rgba(86, 138, 248, 0.45);
+      color:#000000;
     }
 
     .reqRejectBtn{
@@ -2301,7 +2301,7 @@ document.getElementById("rejectRequestsBtn")?.addEventListener("click", () => {
 function requestStatusLabel(status){
   if(status === "approved") return "승인";
   if(status === "rejected") return "반려";
-  return "요청";
+  return "신청";
 }
 
 function requestStatusClass(status){
@@ -3266,13 +3266,13 @@ async function insertLogsBulk(rows){
 
               ${isRequest ? `
                 <div class="requestActionWrap requestActionWrapLarge">
-                  <button class="requestSubmitBtn" id="openRequestBtn" type="button">신청하기</button>
+                  <button class="requestSubmitBtn" id="openRequestBtn" type="button">출고 신청하기</button>
                 </div>
               ` : ``}
 
               <div class="detailSectionBlock">
                 <div class="boxTitleRow detailSectionHead">
-                  <p class="boxTitle">신청 내역</p>
+                  <p class="boxTitle">출고 신청 내역</p>
                   ${(isRequest || isAdmin) ? `
                     <div class="requestAdminActions">
                       ${isAdmin ? `<button class="selDelBtn reqApproveBtn" id="approveRequestsBtn" type="button">승인</button>
@@ -3297,7 +3297,7 @@ async function insertLogsBulk(rows){
                       <div class="logHeadCell">
                         <select id="reqStatusSel" class="headerFilterSelect">
                           <option value="전체" ${reqStatusFilter === "전체" ? "selected" : ""}>전체 상태</option>
-                          <option value="pending" ${reqStatusFilter === "pending" ? "selected" : ""}>요청</option>
+                          <option value="pending" ${reqStatusFilter === "pending" ? "selected" : ""}>신청</option>
                           <option value="approved" ${reqStatusFilter === "approved" ? "selected" : ""}>승인</option>
                           <option value="rejected" ${reqStatusFilter === "rejected" ? "selected" : ""}>반려</option>
                         </select>
@@ -3574,7 +3574,7 @@ if(approveRequestsBtn){
       }
     }catch(err){
       console.error(err);
-      alert("요청 승인 반영 실패: " + (err?.message || err));
+      alert("출고 신청 승인 반영 실패: " + (err?.message || err));
       DB.mode = "error";
       DB.lastError = String(err?.message || err);
     }
@@ -3590,7 +3590,7 @@ if(rejectRequestsBtn){
     const rows = (it.requests || []).filter(r => selectedRequestKeys.has(r.__key));
     const pendingRows = rows.filter(r => (r.status || "pending") === "pending");
     if(pendingRows.length === 0){
-      alert("반려할 요청 내역을 선택해주세요.");
+      alert("반려할 출고 신청 내역을 선택해주세요.");
       return;
     }
 
@@ -3611,7 +3611,7 @@ if(rejectRequestsBtn){
       });
     }catch(err){
       console.error(err);
-      alert("요청 반려 반영에 실패했습니다. warehouse_requests 권한과 RLS를 확인해주세요.");
+      alert("출고 신청 반려 반영에 실패했습니다. warehouse_requests 권한과 RLS를 확인해주세요.");
       DB.mode = "error";
       DB.lastError = String(err?.message || err);
     }
@@ -3625,7 +3625,7 @@ if(rejectRequestsBtn){
         if(bulkDeleteRequests){
           bulkDeleteRequests.addEventListener("click", async ()=>{
             if(selectedRequestKeys.size === 0){
-              alert("삭제할 신청 내역을 선택해주세요.");
+              alert("삭제할 출고 신청 내역을 선택해주세요.");
               return;
             }
             const rowsToDelete = (it.requests || []).filter(r => selectedRequestKeys.has(r.__key));

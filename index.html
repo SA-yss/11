@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>창고재고관리/title>
+  <title>창고수량재고</title>
   <link rel="apple-touch-icon" href="images/sa-icon-01.jpg">
 
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -3452,21 +3452,13 @@ if(approveRequestsBtn){
       return;
     }
 
-    const totalRequestQty = pendingRows.reduce((sum, r) => sum + Number(r.qty || 0), 0);
-    const currentStock = calcStock(it);
-    if(currentStock < totalRequestQty){
-      alert(`재고가 부족합니다.
-현재 재고: ${Number(currentStock).toLocaleString()}개
-승인 필요 수량: ${Number(totalRequestQty).toLocaleString()}개`);
-      return;
-    }
-
     const today = getToday();
     const approverEmail = await getCurrentUserEmail();
-    const logsToInsert = pendingRows.map((r, index) => {
-      const logKey = `reqlog_${Date.now()}_${index}_${Math.random().toString(16).slice(2)}`;
+    const logsToInsert = pendingRows.map(r => {
+      const logKey = `reqlog_${Date.now()}_${Math.random().toString(16).slice(2)}`;
       return {
         item_id: it.id,
+        qty: Number(r.qty || 0),
         requestRow: r,
         row: {
           d: today,
@@ -3480,26 +3472,35 @@ if(approveRequestsBtn){
     });
 
     try{
-      await insertLogsBulk(logsToInsert.map(({ item_id, row }) => ({ item_id, row })));
+      let latestStock = null;
 
-      await updateRequestStatusByIds(
-        pendingRows.map(r => r._dbid).filter(Boolean),
-        "approved",
-        {
-          approved_at: today,
-          approved_by: approverEmail || ""
-        }
-      );
-
-      it.logs = it.logs || [];
       for(const entry of logsToInsert){
+        latestStock = await decreaseStock(it.id, entry.qty);
         entry.requestRow.status = "approved";
         entry.requestRow.approved_at = today;
         entry.requestRow.approved_by = approverEmail || "";
         entry.requestRow.processed_log_key = entry.row.__key;
+      }
+
+      if(typeof latestStock === "number"){
+        it.baseStock = latestStock;
+      }
+
+      for(const entry of logsToInsert){
+        it.logs = it.logs || [];
         it.logs.push(normalizeLog(entry.row));
       }
       saveAllLocal();
+
+      await insertLogsBulk(logsToInsert.map(({ item_id, row }) => ({ item_id, row })));
+
+      for(const r of pendingRows){
+        await updateRequestStatusByIds([r._dbid], "approved", {
+          approved_at: today,
+          approved_by: approverEmail || "",
+          processed_log_key: r.processed_log_key || ""
+        });
+      }
     }catch(err){
       console.error(err);
       alert("요청 승인 반영 실패: " + (err?.message || err));

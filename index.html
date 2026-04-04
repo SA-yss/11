@@ -321,6 +321,8 @@
       color:var(--muted);
       white-space:nowrap;
       font-weight:500;
+    
+      text-transform:lowercase;
     }
 
     .status{ font-weight:600; }
@@ -1652,7 +1654,82 @@
       border-color:#2563eb;
       color:#2563eb;
     }
-  </style>
+  
+.titleRow{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  align-items:center;
+  gap:6px;
+  width:100%;
+}
+.titleRow .title{
+  text-align:left;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.titleRow .size{
+  text-align:right;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.size{
+  text-transform:lowercase;
+}
+
+
+
+@media (max-width: 768px){
+  .detailPaperHead{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    min-height:auto;
+  }
+
+  .detailHeadMeta{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    grid-column:1 / -1;
+    width:100%;
+  }
+
+  .detailHeadMeta > div{
+    min-height:64px;
+    padding:0 18px !important;
+    border-right:none !important;
+    border-bottom:1px solid #e5e5e5;
+  }
+
+  .detailHeadMeta .detailHeroName{
+    justify-content:flex-start !important;
+    border-right:1px solid #e5e5e5 !important;
+  }
+
+  .detailHeadMeta .detailHeroSize{
+    justify-content:flex-end !important;
+    text-align:right !important;
+    text-transform:lowercase !important;
+  }
+
+  .detailPaperHead > span:first-child,
+  .detailHeadLogo{
+    display:none !important;
+  }
+
+  .titleRow{
+    grid-template-columns:1fr 1fr !important;
+  }
+
+  .titleRow .title{
+    text-align:left !important;
+  }
+
+  .titleRow .size{
+    text-align:right !important;
+    text-transform:lowercase !important;
+  }
+}
+
+</style>
 </head>
 
 <body class="preboot">

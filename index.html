@@ -2253,6 +2253,36 @@ async function getCurrentUserEmail(){
   }
 }
 
+function sortByLatestDateAndKey(rows){
+  return [...(rows || [])].sort((a, b) => {
+    const ad = String(toISODateLike(a?.d) || "");
+    const bd = String(toISODateLike(b?.d) || "");
+    if (bd !== ad) return bd.localeCompare(ad);
+    const ak = String(a?.__key || "");
+    const bk = String(b?.__key || "");
+    return bk.localeCompare(ak);
+  });
+}
+
+async function maybePromptOneSignalPermission(){
+  try{
+    if(!window.OneSignalDeferred) return;
+    window.OneSignalDeferred.push(async function(OneSignal){
+      const supported = OneSignal?.Notifications && typeof OneSignal.Notifications.requestPermission === "function";
+      if(!supported) return;
+      let permission = "default";
+      try{
+        permission = await OneSignal.Notifications.permission;
+      }catch(_){}
+      if(permission === "default"){
+        await OneSignal.Notifications.requestPermission();
+      }
+    });
+  }catch(err){
+    console.warn("OneSignal 권한 요청 스킵:", err);
+  }
+}
+
     function signedQty(row){
       const qty = Number(row.qty || 0);
       if (!qty) return 0;
@@ -3127,8 +3157,12 @@ async function insertLogsBulk(rows){
         let rows = [...(it.requests || [])];
         if(reqDateFilter) rows = rows.filter(r => toISODateLike(r.d) === reqDateFilter);
         if(reqDeptFilter !== "전체") rows = rows.filter(r => (r.dept || "-") === reqDeptFilter);
-        if(reqStatusFilter !== "전체") rows = rows.filter(r => (r.status || "pending") === reqStatusFilter);
-        return rows.sort((a,b)=> String(toISODateLike(b.d)).localeCompare(String(toISODateLike(a.d))));
+        if(reqStatusFilter === "전체") {
+          rows = rows.filter(r => (r.status || "pending") !== "approved");
+        } else {
+          rows = rows.filter(r => (r.status || "pending") === reqStatusFilter);
+        }
+        return sortByLatestDateAndKey(rows);
       }
 
       function getLogRows(){
@@ -3136,7 +3170,7 @@ async function insertLogsBulk(rows){
         if(logDateFilter) rows = rows.filter(r => toISODateLike(r.d) === logDateFilter);
         if(logTypeFilter !== "전체") rows = rows.filter(r => r.t === logTypeFilter);
         if(logDeptFilter !== "전체") rows = rows.filter(r => (r.dept || "-") === logDeptFilter);
-        return rows.sort((a,b)=> String(toISODateLike(b.d)).localeCompare(String(toISODateLike(a.d))));
+        return sortByLatestDateAndKey(rows);
       }
 
       function tableRows(rows, kind){
@@ -3486,6 +3520,7 @@ if(approveRequestsBtn){
         await approveRequestByRpc(r._dbid, approverEmail || "");
       }
 
+      await maybePromptOneSignalPermission();
       await loadAllFromDB_FORCE();
       selectedRequestKeys.clear();
       render();

@@ -263,6 +263,9 @@
       flex:0 0 auto;
       overflow:hidden;
       border:1px solid #efefef;
+      color:transparent;
+      font-size:0;
+      line-height:0;
     }
 
     .thumb img,
@@ -273,6 +276,17 @@
       object-fit:cover;
       display:block;
       filter:saturate(.98);
+      opacity:0;
+      visibility:hidden;
+      transition:opacity .15s ease;
+    }
+
+    .thumb img.is-loaded,
+    .imgBox img.is-loaded,
+    .stockThumb img.is-loaded,
+    .mainLogoImg.is-loaded{
+      opacity:1;
+      visibility:visible;
     }
 
     .meta{ display:flex; flex-direction:column; align-items:flex-start; gap:10px; text-align:left; min-width:0; }
@@ -375,6 +389,9 @@
       display:flex;
       align-items:center;
       justify-content:center;
+      color:transparent;
+      font-size:0;
+      line-height:0;
     }
 
     .imgPh{ width:42px; height:42px; opacity:.55; }
@@ -733,6 +750,9 @@
       display:flex;
       align-items:center;
       justify-content:center;
+      color:transparent;
+      font-size:0;
+      line-height:0;
     }
 
     .requestImgRow .requestImgBox + .requestImgBox{ border-left:1px solid #dfdfdf; padding-left:0; margin-left:0; }
@@ -1033,7 +1053,7 @@
       cursor:pointer;
     }
 
-    .mainLogoImg{ max-width:250px; max-height:88px; object-fit:contain; display:block; }
+    .mainLogoImg{ max-width:250px; max-height:88px; object-fit:contain; display:block; opacity:0; visibility:hidden; transition:opacity .15s ease; }
 
     .mainLogoPlaceholder{
       width:200px;
@@ -1149,6 +1169,10 @@
       flex:0 0 96px;
       background:#f1f1f1;
       border:1px solid #e3e3e3;
+      color:transparent;
+      font-size:0;
+      line-height:0;
+      overflow:hidden;
     }
 
     .stockMeta{
@@ -2138,6 +2162,10 @@
       ]);
     }
 
+    window.handleImgLoad = function(imgEl){
+      imgEl.classList.add("is-loaded");
+    };
+
     window.handleImgError = function(imgEl){
       try{
         const list = JSON.parse(imgEl.dataset.candidates || "[]");
@@ -2146,6 +2174,7 @@
 
         if(idx < list.length){
           imgEl.dataset.idx = String(idx);
+          imgEl.classList.remove("is-loaded");
           imgEl.src = list[idx];
           return;
         }
@@ -2173,10 +2202,14 @@
         <img
           ${className ? `class="${escapeAttr(className)}"` : ""}
           src="${escapeAttr(candidates[0])}"
-          alt="${escapeAttr(alt)}"
+          alt=""
+          draggable="false"
+          loading="eager"
+          decoding="async"
           data-candidates='${escapeAttr(JSON.stringify(candidates))}'
           data-idx="0"
           data-fallback='${escapeAttr(fallback)}'
+          onload="window.handleImgLoad(this)"
           onerror="window.handleImgError(this)"
         >
       `;
@@ -2192,10 +2225,14 @@
         <img
           class="mainLogoImg"
           src="${escapeAttr(candidates[0])}"
-          alt="${escapeAttr(alt)}"
+          alt=""
+          draggable="false"
+          loading="eager"
+          decoding="async"
           data-candidates='${escapeAttr(JSON.stringify(candidates))}'
           data-idx="0"
           data-fallback='<div class="mainLogoPlaceholder"></div>'
+          onload="window.handleImgLoad(this)"
           onerror="window.handleImgError(this)"
         />
       `;

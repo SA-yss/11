@@ -3294,7 +3294,7 @@
                     <div class="requestAdminActions">
                       ${isAdmin ? `<button class="selDelBtn reqApproveBtn" id="approveRequestsBtn" type="button">승인</button>
                       <button class="selDelBtn reqRejectBtn" id="rejectRequestsBtn" type="button">반려</button>` : ``}
-                      <button class="selDelBtn" id="bulkDeleteRequests" type="button">선택 삭제</button>
+                      <button class="selDelBtn" id="bulkDeleteRequests" type="button">삭제</button>
                     </div>
                   ` : ``}
                 </div>
@@ -3402,8 +3402,8 @@
                       </div>
                     </div>
                     <div class="adminBottomRight">
-                      <button class="btn addLogBtn" id="openAdd" type="button">내역 추가</button>
-                      <button class="selDelBtn" id="bulkDeleteLogs" type="button">선택 삭제</button>
+                      <button class="btn addLogBtn" id="openAdd" type="button">추가</button>
+                      <button class="selDelBtn" id="bulkDeleteLogs" type="button">삭제</button>
                     </div>
                   </div>
                   <div class="dangerBox">
@@ -3423,9 +3423,9 @@
 
           <div class="modal" id="addModal" aria-hidden="true">
             <div class="modalOverlay" id="addOverlay"></div>
-            <div class="sheet" role="dialog" aria-modal="true" aria-label="${isRequest ? '출고 신청하기' : '내역 추가'}">
+            <div class="sheet" role="dialog" aria-modal="true" aria-label="${isRequest ? '출고 신청하기' : '추가'}">
               <div class="sheetHead">
-                <div>${isRequest ? '출고 신청하기' : '내역 추가'}</div>
+                <div>${isRequest ? '출고 신청하기' : '추가'}</div>
                 <button class="sheetClose" id="addClose">닫기</button>
               </div>
               <div class="sheetBody">

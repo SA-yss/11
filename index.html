@@ -1257,7 +1257,7 @@
 
     .loginLogoBox{
       width:100%;
-      height:138px;
+      height:100px;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -1265,7 +1265,7 @@
 
     .loginLogoImage{
       max-width:250px;
-      max-height:88px;
+      max-height:70px;
       width:auto;
       height:auto;
       display:block;
@@ -1275,27 +1275,36 @@
     .loginForm{
       width:72%;
       min-width:220px;
-      max-width:320px;
+      max-width:300px;
       margin-top:0;
     }
 
     .loginInput{
       width:100%;
-      height:45px;
+      height:36px;
       border:0;
-      background:#f4f4f4d7;
-      padding:0 24px;
-      font-size:13px;
-      color:#111;
+      background:#f4f4f487;
+      padding:0 17px;
+      font-size:12px;
+      color:#2e2e2e9e;
       outline:none;
       margin-bottom:10px;
       font-family:'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
     }
 
     .loginInput::placeholder{
-      color:#a1a1a1;
+      color:#a1a1a1a9;
       font-family:'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
     }
+
+    #signupPasswordConfirm,
+#findIdEmail,
+#resetPasswordEmail{
+  margin-bottom:24px;
+}
+.loginForm input:last-of-type{
+  margin-bottom:24px;
+}
 
     .loginSubLinks{
       display:flex;
@@ -1304,7 +1313,7 @@
       gap:14px;
       font-size:10px;
       color:#9b9b9b;
-      font-weight:500;
+      font-weight:400;
       margin:16px 0 34px;
       font-family:'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
       flex-wrap:wrap;
@@ -1321,11 +1330,11 @@
     .authSecondaryBtn{
       width:72%;
       min-width:220px;
-      height:40px;
+      height:39px;
       border:0;
       background:#84cdc9;;
       color:#fff;
-      font-size:15px;
+      font-size:14px;
       font-weight:500;
       cursor:pointer;
       display:block;
@@ -1335,9 +1344,9 @@
 
     .authSecondaryBtn{
       background:#fff;
-      color:#111;
+      color:#111111cc;
       border:1px solid #d9d9d9;
-      margin-top:12px;
+      margin-top:10px;
     }
 
     .loginErrorText{
@@ -1345,7 +1354,7 @@
       margin:10px 0 0;
       text-align:center;
       font-size:12px;
-      color:#c63e3e;
+      color:#d74b4b;
       visibility:hidden;
       font-family:'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
       white-space:pre-line;
@@ -1356,8 +1365,8 @@
     .authPageTitle{
       width:100%;
       margin:0 0 12px;
-      font-size:26px;
-      font-weight:700;
+      font-size:20px;
+      font-weight:400;
       letter-spacing:-0.04em;
       color:#111;
       text-align:center;
@@ -1365,10 +1374,10 @@
 
     .authPageDesc{
       width:100%;
-      margin:0 0 24px;
-      font-size:13px;
+      margin:0 0 25px;
+      font-size:11px;
       line-height:1.6;
-      color:#666;
+      color:#666666b8;
       text-align:center;
     }
 
@@ -2788,9 +2797,12 @@
       if(topbarLogo) topbarLogo.classList.remove("show");
       document.body.classList.remove("mode-request", "mode-list", "mode-admin");
 
+      const hideHeader = ["#/signup", "#/find-id", "#/reset-password"].includes(location.hash);
+
       app.innerHTML = `
         <div class="loginScreen">
           <div class="loginWrap">
+            ${hideHeader ? "" : `
             <div class="loginLogoWrap">
               <div class="loginLogoBox">
                 <img class="loginLogoImage" src="images/sa-logo_4.png" alt="Seoul Auction 로고" />
@@ -2798,6 +2810,7 @@
             </div>
             <div class="authHeaderLine"></div>
             <div class="authHeaderTitle">서울옥션 디자인팀 창고 재고 관리</div>
+            `}
             ${innerHtml}
           </div>
         </div>
@@ -2888,7 +2901,7 @@
       renderAuthShell(`
         <div class="loginForm">
           <h2 class="authPageTitle">회원가입</h2>
-          <p class="authPageDesc">서울옥션 이메일 계정으로만 가입할 수 있습니다.</p>
+          <p class="authPageDesc">서울옥션 이메일 계정으로 이용해 주세요.</p>
 
           <input id="signupEmail" class="loginInput" type="email" placeholder="이메일을 입력해 주세요." autocomplete="email" />
           <input id="signupPassword" class="loginInput" type="password" placeholder="비밀번호를 입력해 주세요." autocomplete="new-password" />
@@ -2947,13 +2960,9 @@
       renderAuthShell(`
         <div class="loginForm">
           <h2 class="authPageTitle">아이디 찾기</h2>
-          <p class="authPageDesc">홈 로그인 아이디는 서울옥션 이메일 전체 주소입니다.</p>
+          <p class="authPageDesc">아이디는 서울옥션 이메일을 사용해 주세요.</p>
 
-          <div class="authInfoBox">
-            예시<br />
-            yss → yss@seoulauction.com<br />
-            사내 사용 계정도 동일하게 회사 이메일 전체 주소를 입력하면 됩니다.
-          </div>
+        
 
           <input id="findIdLocalPart" class="loginInput" type="text" placeholder="이메일 앞부분을 입력해 주세요." autocomplete="off" />
           <button class="loginBtn" id="findIdBtn" type="button">아이디 확인</button>
@@ -2981,7 +2990,7 @@
       renderAuthShell(`
         <div class="loginForm">
           <h2 class="authPageTitle">비밀번호 찾기</h2>
-          <p class="authPageDesc">가입한 서울옥션 이메일을 입력하면 비밀번호 재설정 메일을 발송합니다.</p>
+          <p class="authPageDesc">가입한 이메일 입력 시 비밀번호 재설정 메일이 발송됩니다.</p>
 
           <input id="resetPasswordEmail" class="loginInput" type="email" placeholder="이메일을 입력해 주세요." autocomplete="email" />
           <button class="loginBtn" id="resetPasswordBtn" type="button">재설정 메일 보내기</button>

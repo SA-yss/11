@@ -3074,7 +3074,9 @@
       document.getElementById("logoutBtn").addEventListener("click", logoutHome);
 
       document.getElementById("mainHomeLogoBtn").addEventListener("click", ()=>{
-        window.location.href = "index.html";
+        q.value = "";
+        location.hash = "#/";
+        window.location.reload();
       });
     }
 

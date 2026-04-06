@@ -134,7 +134,7 @@
 
     .search input{
       width:min(200px, 100%);
-      height:3px;
+      height:34px;
       padding:0 12px;
       border:1px solid var(--line);
       border-radius:0;
@@ -200,12 +200,39 @@
     .secHead{
       display:flex;
       align-items:center;
-      justify-content:flex-start;
-      gap:7px;
+      justify-content:space-between;
+      gap:12px;
       margin:0 0 16px;
       padding-bottom:10px;
       border-bottom:1px solid rgba(0,0,0,0.08);
     }
+.secHeadTitle{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  min-width:0;
+}
+
+.secHeadAction{
+  display:flex;
+  align-items:center;
+  flex:0 0 auto;
+}
+
+.sectionAddBtn{
+  background:#84cdc9;
+  border-color:#84cdc9;
+  color:#fff;
+  min-width:auto;
+  padding:0 14px;
+}
+
+.sectionAddBtn:hover{
+  background:#73c1bc;
+  border-color:#73c1bc;
+  color:#fff;
+}
+
 
     .secHead h2{
       margin:0;
@@ -2169,7 +2196,7 @@ body{
           },
           {
             id: "env-gray",
-            name: "회색 쇼핑백",
+            name: "회색쇼핑백",
             size: "130*110*360mm",
             baseStock: 1000,
             img: "gray-hand-bag.jpg",
@@ -2183,8 +2210,8 @@ body{
       {
         category: "기타",
         items: [
-          { id:"etc-shirt", name:"조지물튼 티셔츠", size:"", baseStock: 1000, img:null, images:[null,null], logs:[] },
-          { id:"etc-bag", name:"SA 가방", size:"", baseStock: 1000, img:"SA-bag.jpg", images:["SA-bag.jpg", null], logs:[] },
+          { id:"etc-shirt", name:"조지몰튼 티셔츠(검/흰)", size:"", baseStock: 1000, img:"images/sa-GM-T.jpg", images:["images/sa-GM-T.jpg"], logs:[] },
+          { id:"etc-bag", name:"SA 가방", size:"310*200*40mm", baseStock: 1000, img:"SA-bag.jpg", images:["SA-bag.jpg", null], logs:[] },
         ]
       }
     ];
@@ -2269,7 +2296,7 @@ const navReload = document.getElementById("navReload");
         const baseIds = new Set();
         for(const sec of data) for(const it of (sec.items||[])) baseIds.add(it.id);
 
-        const savedById = new Map();
+        const savedById = new Map(); 
         for(const sec of saved){
           for(const it of (sec.items||[])){
             savedById.set(it.id, it);
@@ -3301,7 +3328,7 @@ const navReload = document.getElementById("navReload");
       const keyword = (q.value || "").trim().toLowerCase();
       const isStockMode = mode === "list";
 
-      const sectionsHtml = data.map(section => {
+      const sectionsHtml = data.map((section, sectionIndex) => {
         const filtered = (section.items||[]).filter(it => {
           const hay = `${it.name} ${it.size}`.toLowerCase();
           return keyword ? hay.includes(keyword) : true;
@@ -3312,7 +3339,14 @@ const navReload = document.getElementById("navReload");
         return `
           <div class="section">
             <div class="secHead">
-              <h2>${escapeHtml(section.category)}</h2>
+              <div class="secHeadTitle">
+                <h2>${escapeHtml(section.category)}</h2>
+              </div>
+              ${mode === "admin" && sectionIndex === 0 ? `
+                <div class="secHeadAction">
+                  <button class="btn sectionAddBtn" id="sectionAddItemBtn" type="button">품목 추가</button>
+                </div>
+              ` : ``}
             </div>
 
             ${
@@ -3396,6 +3430,15 @@ const navReload = document.getElementById("navReload");
           <div class="paper-body">등록된 품목이 없습니다.</div>
         </div>
       `;
+
+      const sectionAddItemBtn = document.getElementById("sectionAddItemBtn");
+      if(sectionAddItemBtn){
+        sectionAddItemBtn.addEventListener("click", ()=> openItemModal(""));
+      }
+
+      if(fabAddItem){
+        fabAddItem.style.display = mode === "admin" ? "none" : "";
+      }
 
       app.querySelectorAll("[data-open]").forEach(el => {
         if(mode === "list") return;

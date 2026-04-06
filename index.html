@@ -249,6 +249,7 @@
     .list{ display:flex; flex-direction:column; gap:14px; }
 
     body.mode-request .list,
+    body.mode-list .list,
     body.mode-admin .list{
       display:grid;
       grid-template-columns:repeat(2, minmax(0, 1fr));
@@ -1526,6 +1527,7 @@ body{
       .listGrid{ grid-template-columns:1fr 1fr; }
 
       body.mode-request .list,
+      body.mode-list .list,
       body.mode-admin .list{
         display:grid;
         grid-template-columns:1fr;
@@ -1533,6 +1535,7 @@ body{
       }
 
       body.mode-request .row,
+      body.mode-list .row,
       body.mode-admin .row{
         grid-template-columns:minmax(0, 1fr) 140px;
         gap:0px;
@@ -1569,6 +1572,7 @@ body{
       .listGrid{ grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; }
 
       body.mode-request .list,
+      body.mode-list .list,
       body.mode-admin .list{
         display:grid;
         grid-template-columns:1fr;
@@ -1576,6 +1580,7 @@ body{
       }
 
       body.mode-request .row,
+      body.mode-list .row,
       body.mode-admin .row{
         grid-template-columns:minmax(0, 1fr) 104px;
         gap:0px;
@@ -1583,6 +1588,7 @@ body{
       }
 
       body.mode-request .card,
+      body.mode-list .card,
       body.mode-admin .card{
         min-height:92px;
         padding:12px;
@@ -1592,6 +1598,7 @@ body{
       }
 
       body.mode-request .thumb,
+      body.mode-list .thumb,
       body.mode-admin .thumb{
         width:62px;
         height:62px;
@@ -1600,6 +1607,7 @@ body{
       }
 
       body.mode-request .meta,
+      body.mode-list .meta,
       body.mode-admin .meta{
         width:100%;
         gap:6px;
@@ -1607,6 +1615,7 @@ body{
       }
 
       body.mode-request .meta-bot,
+      body.mode-list .meta-bot,
       body.mode-admin .meta-bot{
         width:100%;
         gap:8px;
@@ -1617,12 +1626,15 @@ body{
 
       body.mode-request .meta-bot span,
       body.mode-request .delta,
+      body.mode-list .meta-bot span,
+      body.mode-list .delta,
       body.mode-admin .meta-bot span,
       body.mode-admin .delta{
         white-space:nowrap;
       }
 
       body.mode-request .title,
+      body.mode-list .title,
       body.mode-admin .title{
         font-size:14px;
         line-height:1.35;
@@ -1635,12 +1647,14 @@ body{
       }
 
       body.mode-request .size,
+      body.mode-list .size,
       body.mode-admin .size{
         font-size:11px;
         white-space:normal;
       }
 
       body.mode-request .stock,
+      body.mode-list .stock,
       body.mode-admin .stock{
         min-height:92px;
         padding:10px 8px;
@@ -1648,6 +1662,7 @@ body{
       }
 
       body.mode-request .stock small,
+      body.mode-list .stock small,
       body.mode-admin .stock small{
         font-size:10px;
       }
@@ -3413,18 +3428,26 @@ const navReload = document.getElementById("navReload");
             ${
               isStockMode
                 ? `
-                  <div class="listGrid">
+                  <div class="list">
                     ${filtered.map(it => {
                       const stock = calcStock(it);
                       return `
-                        <div class="stockCard" role="button" tabindex="0" data-open="${escapeAttr(it.id)}">
-                          <div class="stockThumb">
-                            ${it.img ? renderSmartImage(it.img, it.name) : iconPlaceholder()}
+                        <div class="row">
+                          <div class="card" role="button" tabindex="0" data-open="${escapeAttr(it.id)}">
+                            <div class="thumb">
+                              ${it.img ? renderSmartImage(it.img, it.name) : iconPlaceholder()}
+                            </div>
+
+                            <div class="meta">
+                              <div class="meta-top">
+                                <div class="title">${escapeHtml(it.name)}</div>
+                                <div class="size">${escapeHtml(it.size || "")}</div>
+                              </div>
+                            </div>
                           </div>
 
-                          <div class="stockMeta">
-                            <div class="stockName">${escapeHtml(it.name)}</div>
-                            <div class="stockQtyBar">${Number.isFinite(stock) ? stock.toLocaleString() : "0"}개</div>
+                          <div class="stock">
+                            ${Number.isFinite(stock) ? `${stock.toLocaleString()}<small>개</small>` : `-`}
                           </div>
                         </div>
                       `;

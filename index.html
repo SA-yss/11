@@ -134,7 +134,7 @@
 
     .search input{
       width:min(200px, 100%);
-      height:34px;
+      height:3px;
       padding:0 12px;
       border:1px solid var(--line);
       border-radius:0;
@@ -1149,29 +1149,29 @@
     .listGrid{
       display:grid;
       grid-template-columns:repeat(2, minmax(0, 1fr));
-      gap:20px 22px;
+      gap:20px 32px;
       align-items:stretch;
     }
 
     .stockCard{
       border:1px solid #dcdcdc;
       border-radius:0;
-      background:#ffffff;
-      padding:5px 15px;
+      background:#f6f6f6;
+      padding:22px 26px;
       display:grid;
       grid-template-columns:96px minmax(0, 1fr);
       align-items:center;
-      column-gap:18px;
-      min-height:125px;
+      column-gap:22px;
+      min-height:140px;
     }
 
     .stockCard:hover{ transform:translateY(-2px); border-color:#bfbfbf; }
 
     .stockThumb{
-      width:100px;
-      height:100px;
+      width:96px;
+      height:96px;
       flex:0 0 96px;
-      background:rgba(211, 211, 211, 0.037);
+      background:#f1f1f1;
       border:1px solid #e3e3e3;
       color:transparent;
       font-size:0;
@@ -1192,8 +1192,8 @@
     .stockName{
       width:100%;
       text-align:center;
-      font-size:18px;
-      font-weight:600;
+      font-size:22px;
+      font-weight:800;
       line-height:1.2;
       white-space:nowrap;
       overflow:hidden;
@@ -1202,14 +1202,14 @@
 
     .stockQtyBar{
       width:100%;
-      min-height:4px;
+      min-height:54px;
       padding:0 18px;
-      background:rgba(132, 205, 201, 0.074);
+      background:#efefef;
       display:flex;
       align-items:center;
       justify-content:center;
-      font-size:17px;
-      border:1px solid rgba(132, 205, 201, 0.074);
+      font-size:20px;
+      border:1px solid #d8d8d8;
     }
 
     .authDialog{
@@ -1243,7 +1243,7 @@
       display:flex;
       align-items:flex-start;
       justify-content:center;
-      padding:120px 24px 48px;
+      padding:120px 16px 48px;
       background:#ffffff;
     }
 
@@ -1277,25 +1277,25 @@
     }
 
     .loginForm{
-      width:72%;
+      width:82%;
       min-width:220px;
-      max-width:300px;
+      max-width:320px;
       margin-top:0;
     }
 
     .findIdForm,
     .resetPwForm,
     .signupForm{
-      margin-top:px;
+      margin-top:120px;
     }
 
     .loginInput{
       width:100%;
-      height:36px;
+      height:38px;
       border:0;
       background:#f4f4f487;
       padding:0 17px;
-      font-size:12px;
+      font-size:13px;
       color:#2e2e2e9e;
       outline:none;
       margin-bottom:10px;
@@ -1320,11 +1320,11 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      gap:14px;
-      font-size:10px;
+      gap:12px;
+      font-size:11px;
       color:#9b9b9b;
       font-weight:400;
-      margin:16px 0 34px;
+      margin:14px 0 30px;
       font-family:'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
       flex-wrap:wrap;
     }
@@ -1338,13 +1338,13 @@
 
     .loginBtn,
     .authSecondaryBtn{
-      width:72%;
-      min-width:220px;
+      width:62%;
+      min-width:200px;
       height:39px;
       border:0;
       background:#84cdc9;;
       color:#fff;
-      font-size:13px;
+      font-size:14px;
       font-weight:500;
       cursor:pointer;
       display:block;
@@ -1364,7 +1364,7 @@
       margin:15px 0 0;
       text-align:center;
       font-size:11px;
-      color:#567bcfbc;
+      color:#d66068bc;
       visibility:hidden;
       font-family:'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
       white-space:pre-line;

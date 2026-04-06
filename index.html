@@ -497,16 +497,19 @@
 
     .divider{ height:1px; background:var(--line); margin:28px 0 24px; }
 
-    .boxTitleRow{ display:flex; align-items:center; justify-content:flex-start; gap:10px; padding:0 0 8px; }
+    .boxTitleRow{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:0; margin-bottom:8px; flex-wrap:nowrap; }
 
     .boxTitle{
       font-size:16px;
       font-weight:600;
       letter-spacing:0em;
-      margin-bottom:5px;
+      margin:0;
       padding:0;
       color:var(--muted);
       text-transform:uppercase;
+      white-space:nowrap;
+      word-break:keep-all;
+      line-height:1.2;
     }
 
     .selDelBtn,
@@ -705,7 +708,7 @@
     .detailHeadMeta .detailHeroName{
       margin:0;
       font-size:20px;
-      font-weight:800;
+      font-weight:600;
       letter-spacing:-0.04em;
       line-height:1;
       word-break:keep-all;
@@ -713,13 +716,14 @@
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
+      color:#111;
     }
 
     .detailHeadMeta .detailHeroSize{
       margin:0;
-      font-size:14px;
-      font-weight:600;
-      color:#222;
+      font-size:13px;
+      font-weight:500;
+      color:#414141d6;
       justify-content:center;
       white-space:nowrap;
     }
@@ -1564,7 +1568,7 @@
       .logBox{ margin:0; }
       .logHead > div, .logRow > div{ padding:0 12px; }
       .detailBrand{ font-size:20px; }
-      .detailPaperHead{ grid-template-columns:72px minmax(0, 1fr) 140px; }
+      .detailPaperHead{ grid-template-columns:72px minmax(1fr) 100px; }
       .detailHeadMeta{ grid-template-columns:72px minmax(0, 1fr) 112px; }
       .detailHeadMeta > div{ min-height:46px; padding:0 12px; }
       .detailHeroName{ font-size:16px; }
@@ -1616,11 +1620,47 @@
         font-size:11px;
       }
 
+      .logActionBtns{
+        display:flex;
+        align-items:center;
+        justify-content:flex-end;
+        gap:4px;
+        margin-left:auto;
+        flex:0 0 auto;
+        white-space:nowrap;
+      }
+
+      .logActionBtns .btn,
+      .logActionBtns .dangerBtn,
+      .logActionBtns .selDelBtn{
+        min-width:52px;
+        height:28px;
+        padding:0 8px;
+        font-size:11px;
+      }
+
       .adminBottomRow,
       .commonBottomRow{ align-items:flex-start; }
 
       .adminBottomRight,
-      .commonBottomRight{ width:100%; justify-content:flex-end; }
+      .commonBottomRight{
+        width:100%;
+        justify-content:flex-end;
+        gap:4px;
+        flex-wrap:nowrap;
+      }
+
+      .adminBottomRight .btn,
+      .adminBottomRight .dangerBtn,
+      .adminBottomRight .selDelBtn,
+      .commonBottomRight .btn,
+      .commonBottomRight .dangerBtn,
+      .commonBottomRight .selDelBtn{
+        min-width:52px;
+        height:28px;
+        padding:0 8px;
+        font-size:11px;
+      }
 
       .dangerBox{ flex-direction:column; align-items:flex-start; }
       .dangerBtn{ align-self:stretch; text-align:center; }
@@ -2726,6 +2766,29 @@
       return next;
     }
 
+    async function updateItemBaseStock(itemId, next){
+      const numericNext = Number(next);
+      if(!Number.isFinite(numericNext) || numericNext < 0){
+        throw new Error("기존재고는 0 이상의 숫자만 입력할 수 있습니다.");
+      }
+
+      const found = findItemById(itemId);
+      if(found?.it){
+        found.it.baseStock = numericNext;
+        saveAllLocal();
+      }
+
+      if(!dbReady()) return numericNext;
+
+      const { error } = await supabaseClient
+        .from(DB_ITEMS)
+        .update({ base_stock: numericNext })
+        .eq("id", itemId);
+
+      if(error) throw error;
+      return numericNext;
+    }
+
     async function insertLogsBulk(rows){
       if(!dbReady() || !rows?.length) return;
       const payload = rows.map(({ item_id, row }) => {
@@ -3450,8 +3513,14 @@
                 </div>
               ` : `
                 <div class="divider"></div>
-                <div class="boxTitleRow" style="margin-top:0; justify-content:space-between;">
+                <div class="boxTitleRow detailSectionHead" style="margin-top:0;">
                   <p class="boxTitle">입출고 내역</p>
+                  ${isAdmin ? `
+                    <div class="logActionBtns">
+                      <button class="btn addLogBtn" id="openAdd" type="button">추가</button>
+                      <button class="selDelBtn" id="bulkDeleteLogs" type="button">삭제</button>
+                    </div>
+                  ` : ``}
                 </div>
                 <div class="logBox">
                   <div class="logMinWidth">
@@ -3491,10 +3560,7 @@
                         </div>
                       </div>
                     </div>
-                    <div class="adminBottomRight">
-                      <button class="btn addLogBtn" id="openAdd" type="button">추가</button>
-                      <button class="selDelBtn" id="bulkDeleteLogs" type="button">삭제</button>
-                    </div>
+                    <div class="adminBottomRight"></div>
                   </div>
                   <div class="dangerBox">
                     <div class="dangerText">품목 삭제 시 복구가 어려우니 삭제 전 확인해 주세요.</div>
@@ -3729,6 +3795,82 @@
         if(isAdmin){
           const deleteItemBtn = app.querySelector("#deleteItemBtn");
           if(deleteItemBtn) deleteItemBtn.addEventListener("click", handleDeleteItem);
+
+          const editBaseStockBtn = app.querySelector("#editBaseStockBtn");
+          const baseStockEditRow = app.querySelector("#baseStockEditRow");
+          const baseStockInput = app.querySelector("#baseStockInput");
+          const saveBaseStockBtn = app.querySelector("#saveBaseStockBtn");
+          const cancelBaseStockBtn = app.querySelector("#cancelBaseStockBtn");
+
+          function openBaseStockEditor(){
+            if(!baseStockEditRow || !baseStockInput) return;
+            baseStockEditRow.classList.add("show");
+            baseStockInput.value = String(Number(it.baseStock || 0));
+            requestAnimationFrame(()=>{
+              baseStockInput.focus();
+              baseStockInput.select();
+            });
+          }
+
+          function closeBaseStockEditor(){
+            if(!baseStockEditRow || !baseStockInput) return;
+            baseStockEditRow.classList.remove("show");
+            baseStockInput.value = String(Number(it.baseStock || 0));
+          }
+
+          if(editBaseStockBtn){
+            editBaseStockBtn.addEventListener("click", (e)=>{
+              e.preventDefault();
+              e.stopPropagation();
+              openBaseStockEditor();
+            });
+          }
+
+          if(cancelBaseStockBtn){
+            cancelBaseStockBtn.addEventListener("click", (e)=>{
+              e.preventDefault();
+              e.stopPropagation();
+              closeBaseStockEditor();
+            });
+          }
+
+          if(saveBaseStockBtn){
+            saveBaseStockBtn.addEventListener("click", async (e)=>{
+              e.preventDefault();
+              e.stopPropagation();
+
+              const next = Number((baseStockInput?.value || "").trim());
+              if(!Number.isFinite(next) || next < 0){
+                alert("기존재고는 0 이상의 숫자만 입력해주세요.");
+                return;
+              }
+
+              try{
+                await updateItemBaseStock(it.id, next);
+                await loadAllFromDB_FORCE();
+                closeBaseStockEditor();
+                render();
+              }catch(err){
+                console.error(err);
+                alert("기존재고 저장 실패: " + (err?.message || err));
+                DB.mode = "error";
+                DB.lastError = String(err?.message || err);
+              }
+            });
+          }
+
+          if(baseStockInput){
+            baseStockInput.addEventListener("keydown", async (e)=>{
+              if(e.key === "Enter"){
+                e.preventDefault();
+                saveBaseStockBtn?.click();
+              }
+              if(e.key === "Escape"){
+                e.preventDefault();
+                closeBaseStockEditor();
+              }
+            });
+          }
         }
 
         function openAddModal(){

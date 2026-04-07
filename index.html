@@ -239,7 +239,7 @@
   border-color:#84cdc9 !important;
   color:#84cdc9 !important;
 }
-
+}
     .secHead h2{
       margin:0;
       font-size:12px;
@@ -4448,9 +4448,12 @@ navReload?.addEventListener("click", ()=>{
     window.addEventListener("hashchange", router);
 
     (async function boot(){
-      loadAllLocal();
+      if(!location.hash){
+        location.replace(`${location.origin}${location.pathname}#/login`);
+        return;
+      }
 
-      if(!location.hash) location.hash = "#/login";
+      loadAllLocal();
 
       renderLoginPage(); 
       document.body.classList.remove("preboot");

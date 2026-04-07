@@ -371,7 +371,7 @@
       border:1px solid var(--line);
       border-left:1px solid var(--line);
       border-radius:0 var(--radius) var(--radius) 0;
-      background:rgba(185, 185, 185, 0.088);
+      background:rgba(132, 205, 201, 0.088);
       display:flex;
       align-items:center;
       justify-content:center;
@@ -1083,7 +1083,7 @@
   bottom:0;
   z-index:9997;
   height:60px;
-  background:#f9f9f9;
+  background:#f3f3f58f;
   border-top:0.2px solid #d9d9d9;
   display:grid;
   grid-template-columns:repeat(4, 1fr);
@@ -1239,7 +1239,7 @@ body{
     .requestDarkBtn{ background:#262626; color:#fff; }
     .stockBtn{ background:#f3f3f3; color:#111; }
     .adminBtn{ background:#f7f7f7; color:#111; }
-    .adminMintBtn{ background:#84cdc9; color:#fff; }
+    .adminMintBtn{ background:#46c1bc; color:#fff; }
 
     .logoutBtn{
       background:transparent;
@@ -2283,7 +2283,7 @@ body{
       {
         category: "기타",
         items: [
-          { id:"etc-shirt", name:"조지몰튼 티셔츠(검/흰)", size:"", baseStock: 1000, img:"images/sa-GM-T.jpg", images:["images/sa-GM-T.jpg"], logs:[] },
+          { id:"etc-shirt", name:"조지몰튼 티셔츠(검/흰)", size:"", baseStock: 1000, img:["images/sa-GM-T-black.jpg","images/sa-GM-T-white.jpg"] images:["images/sa-GM-T.jpg","images/sa-GM-T-white.jpg"], logs:[] },
           { id:"etc-bag", name:"SA 가방", size:"310*200*40mm", baseStock: 1000, img:"SA-bag.jpg", images:["SA-bag.jpg", null], logs:[] },
         ]
       }
@@ -4448,9 +4448,12 @@ navReload?.addEventListener("click", ()=>{
     window.addEventListener("hashchange", router);
 
     (async function boot(){
-      loadAllLocal();
+      if(!location.hash){
+        location.replace(`${location.origin}${location.pathname}#/login`);
+        return;
+      }
 
-      if(!location.hash) location.hash = "#/login";
+      loadAllLocal();
 
       renderLoginPage(); 
       document.body.classList.remove("preboot");

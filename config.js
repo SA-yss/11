@@ -1,0 +1,2 @@
+// config placeholder
+const CONFIG = {};

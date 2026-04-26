@@ -1,1 +1,1 @@
-// 기존 config.js 유지하세요. 이 파일 덮어쓰지 마세요
+const CONFIG = {};

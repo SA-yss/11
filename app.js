@@ -1925,7 +1925,7 @@ if(item.img && (!item.images || !item.images[0])){
       }
 
       app.querySelectorAll("[data-open]").forEach(el => {
-        if(mode === "list") return;
+        
 
         const go = () => location.hash = `#/${mode}/item/${el.dataset.open}`;
         el.addEventListener("click", go);

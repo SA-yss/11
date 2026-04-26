@@ -1,4 +1,11 @@
-/* app.js - 메인 기능 코드 */
+/* app.js - 기존 내부 script 전체 */
+
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.init({
+        appId: "ef0e8e78-9ec6-4e92-8bed-9f1eff07b903",
+      });
+    });
 
 const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_9p50RVtpPdmZOG2emGTDVg_NQ3bp8U8";
@@ -159,12 +166,12 @@ const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
     title: "도록 | Major Auction",
     yearPlaceholder: "연도",
     galleryImages: [
-      "images/2601_189.jpg",
-      "images/2602_190.jpg",
-      "images/sa-d-1.jpg",
-      "images/sa-d-2.jpg",
-      "images/sa-d-3.jpg",
-      "images/sa-d-4.jpg"
+      "images/sa-ca-01.png",
+      "images/sa-ca-01.png",
+      "images/sa-ca-01.png",
+      "images/sa-ca-01.png",
+      "images/sa-ca-01.png",
+      "images/sa-ca-01.png"
     ],
     data: {
       "2031": [],
@@ -189,12 +196,9 @@ const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
       "images/sa-ca-02.png"
     ],
     data: {
-      "2031": [],
-      "2030": [],
-      "2029": [],
-      "2028": [],
-      "2027": [],
-      "2026": ["3월 컨템", "6월 컨템"]
+      "2026": ["3월"],
+      "2025": ["3월", "5월", "7월", "11월"],
+      "2024": ["3월", "5월", "7월", "11월"]
     },
     currentStock: 0
   },
@@ -211,12 +215,9 @@ const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
       "images/sa-ca-03.png"
     ],
     data: {
-      "2031": [],
-      "2030": [],
-      "2029": [],
-      "2028": [],
-      "2027": [],
-      "2026": ["5월 화성"]
+      "2026": ["5월 화성"],
+      "2025": ["5월 화성"],
+      "2024": ["5월 화성"]
     },
     currentStock: 0
   }
@@ -257,21 +258,17 @@ const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
     }
 
     function getUnifiedCatalogConfig(catalogId){
-  const id = String(catalogId || "offline-auction");
-
-  const base = CATALOG_PAGE_CONFIG[id] || CATALOG_PAGE_CONFIG["offline-auction"];
-
-  return {
-    ...base,
-    id: id,
-    title: getCatalogDisplayTitle(id),
-    typeLabel: getCatalogTypeLabel(id),
-    typeOptions: getUnifiedCatalogOptions(),
-    galleryImages: Array.isArray(base.galleryImages) ? [...base.galleryImages] : [],
-    data: base.data || {},
-    currentStock: Number(base.currentStock || 0)
-  };
-}
+      const base = CATALOG_PAGE_CONFIG["offline-auction"] || {};
+      const galleryImages = Array.isArray(base.galleryImages) ? [...base.galleryImages].reverse() : [];
+      return {
+        ...base,
+        id: catalogId,
+        title: getCatalogDisplayTitle(catalogId),
+        typeLabel: getCatalogTypeLabel(catalogId),
+        typeOptions: getUnifiedCatalogOptions(),
+        galleryImages
+      };
+    }
 
 
     const data = [
@@ -463,7 +460,7 @@ const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
             size:"",
             baseStock:1000,
             img:"images/sa-GM-T-black.jpg",
-            images:["images/sa-GM-T-black.jpg"],
+            images:["images/sa-GM-T-black.jpg", null],
             logs:[],
             price:"35,700원"
           },
@@ -473,7 +470,7 @@ const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
             size:"",
             baseStock:1000,
             img:"images/sa-GM-T-white.jpg",
-            images:["images/sa-GM-T-white.jpg"],
+            images:["images/sa-GM-T-white.jpg", null],
             logs:[],
             price:"35,700원"
           },
@@ -483,7 +480,7 @@ const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
             size:"310*200*40mm",
             baseStock:1000,
             img:"SA-bag.jpg",
-            images:["SA-bag.jpg"],
+            images:["SA-bag.jpg", null],
             logs:[],
             price:"24,000원"
           }
@@ -602,9 +599,7 @@ const navReload = document.getElementById("navReload");
               if(Array.isArray(s.logs)) it.logs = s.logs;
               if(Array.isArray(s.requests)) it.requests = s.requests;
               if(s.img && !it.img) it.img = s.img;
-              if(Array.isArray(s.images) && s.images.filter(Boolean).length > 0){
-  it.images = s.images.filter(Boolean);
-}
+              if(Array.isArray(s.images) && (!it.images || !it.images[0])) it.images = s.images;
             }
           }
         }
@@ -1099,9 +1094,7 @@ function calcStock(it){
             size: row.size || "",
             baseStock: Number(row.base_stock || 0),
             img: row.img || null,
-            images: Array.isArray(row.images)
-  ? row.images.filter(Boolean)
-  : [row.img].filter(Boolean),
+            images: Array.isArray(row.images) ? row.images : [row.img || null, null],
             logs: [],
             requests: []
           };
@@ -1116,13 +1109,8 @@ function calcStock(it){
         item.size = row.size || item.size || "";
         item.baseStock = Number(row.base_stock || 0);
         item.img = row.img || item.img || null;
-        item.images = Array.isArray(row.images)
-  ? row.images.filter(Boolean)
-  : (item.images || [item.img]).filter(Boolean);
-
-if(item.img && (!item.images || !item.images[0])){
-  item.images = [item.img].filter(Boolean);
-}
+        item.images = Array.isArray(row.images) ? row.images : (item.images || [item.img || null, null]);
+        if(item.img && (!item.images || !item.images[0])) item.images = [item.img, null];
       }
 
       for(const r of (logRows || [])){
@@ -1441,22 +1429,16 @@ if(item.img && (!item.images || !item.images[0])){
     }
 
     function setTopTitleByMode(mode){
-  const hash = location.hash || "";
-
-  if(mode === "request"){
-    if(hash.includes("/catalog/")){
-      topTitle.textContent = "도록 신청하기";
-    }else{
-      topTitle.textContent = "물품 신청하기";
+      if(mode === "request"){
+        topTitle.textContent = "물품 신청하기";
+      }else if(mode === "list"){
+        topTitle.textContent = "물품 재고 현황";
+      }else if(mode === "admin"){
+        topTitle.textContent = "관리자 페이지";
+      }else{
+        topTitle.textContent = "창고수량재고";
+      }
     }
-  }else if(mode === "list"){
-    topTitle.textContent = "물품 재고 현황";
-  }else if(mode === "admin"){
-    topTitle.textContent = "관리자 페이지";
-  }else{
-    topTitle.textContent = "창고수량재고";
-  }
-}
 
     function setBodyMode(mode){
       document.body.classList.remove("mode-request", "mode-list", "mode-admin", "auth-page");
@@ -1734,7 +1716,7 @@ if(item.img && (!item.images || !item.images[0])){
             ${
               isAdmin
                 ? `<button class="mainHomeBtn adminMintBtn" id="goAdminPage" type="button">관리자 페이지</button>`
-                : `<button class="mainHomeBtn requestDarkBtn" id="goRequestPage" type="button"> 신청하기</button>`
+                : `<button class="mainHomeBtn requestDarkBtn" id="goRequestPage" type="button">물품 신청하기</button>`
             }
             <button class="mainHomeBtn stockBtn" id="goStockPage" type="button">물품 재고현황</button>
             <button class="mainHomeBtn logoutBtn" id="logoutBtn" type="button">로그아웃</button>
@@ -1925,7 +1907,7 @@ if(item.img && (!item.images || !item.images[0])){
       }
 
       app.querySelectorAll("[data-open]").forEach(el => {
-        
+        if(mode === "list") return;
 
         const go = () => location.hash = `#/${mode}/item/${el.dataset.open}`;
         el.addEventListener("click", go);
@@ -1937,10 +1919,18 @@ if(item.img && (!item.images || !item.images[0])){
         });
       });
 
-      app.querySelectorAll("[data-catalog-open]").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const id = btn.dataset.catalogOpen;
-          location.hash = `#/request/catalog/${id}`;
+      app.querySelectorAll("[data-catalog-open]").forEach(el => {
+        const go = () => {
+          const catalogId = el.getAttribute("data-catalog-open") || "";
+          if(!catalogId) return;
+          location.hash = `#/request/catalog/${encodeURIComponent(catalogId)}`;
+        };
+        el.addEventListener("click", go);
+        el.addEventListener("keydown", (e) => {
+          if(e.key === "Enter" || e.key === " "){
+            e.preventDefault();
+            go();
+          }
         });
       });
     }
@@ -2557,15 +2547,8 @@ function renderCatalogApplyPage(catalogId){
         ensureLogs(it);
         ensureRequests(it);
 
-        const detailImages = Array.isArray(it.images)
-  ? it.images.filter(Boolean)
-  : [it.img].filter(Boolean);
-
-const detailImagesHtml = detailImages.length
-  ? detailImages.map(img => `
-      <div class="imgBox requestImgBox">${renderSmartImage(img, it.name)}</div>
-    `).join("")
-  : `<div class="imgBox requestImgBox">${iconPlaceholder()}</div>`;
+        const img1 = (it.images && it.images[0]) ? renderSmartImage(it.images[0], it.name) : iconPlaceholder();
+        const img2 = (it.images && it.images[1]) ? renderSmartImage(it.images[1], it.name) : iconPlaceholder();
         const stockNow = calcStock(it);
         const requestRows = getRequestRows();
         const logRows = getLogRows();
@@ -2579,10 +2562,11 @@ const detailImagesHtml = detailImages.length
                   <p class="detailAdminSize">${escapeHtml(it.size || "")}</p>
                 </div>
                 <div class="detailImageFrame">
-  <div class="imgRow requestImgRow ${detailImages.length === 1 ? "oneImage" : ""}">
-    ${detailImagesHtml}
-  </div>
-</div>
+                  <div class="imgRow requestImgRow">
+                    <div class="imgBox requestImgBox">${img1}</div>
+                    <div class="imgBox requestImgBox">${img2}</div>
+                  </div>
+                </div>
               </div>
 
               <div class="statsGrid requestStatsGrid">

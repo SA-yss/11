@@ -1,1 +1,84 @@
-body{font-family:sans-serif;}
+/* style.css - 기본 표시용. 기존 style.css가 있으면 기존 파일을 유지해도 됩니다. */
+:root{
+  --bg:#ffffff;
+  --text:#111111;
+  --muted:#666666;
+  --line:#dddddd;
+  --soft:#f7f7f7;
+  --saMint:#84cdc9;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Noto Sans KR",Arial,sans-serif;
+  background:#fff;
+  color:#111;
+}
+.wrap{
+  width:min(calc(100% - 64px),1040px);
+  margin:0 auto;
+  padding-bottom:80px;
+}
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:10;
+  min-height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  padding:16px 0;
+  background:#fff;
+  border-bottom:1px solid rgba(0,0,0,.06);
+}
+.brand a{color:inherit;text-decoration:none}
+h1{font-size:15px;margin:0;font-weight:500}
+.search{display:flex;gap:8px;margin-left:auto}
+.search input{height:34px;padding:0 12px;border:1px solid #ddd}
+.pill,.btn,.sheetClose{
+  height:34px;
+  padding:0 14px;
+  border:1px solid #ddd;
+  background:#fff;
+  cursor:pointer;
+}
+.section{margin-top:34px}
+.secHead{display:flex;justify-content:space-between;border-bottom:1px solid rgba(0,0,0,.08);margin-bottom:18px}
+.list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) 150px}
+.card{border:1px solid #ddd;background:#fff;padding:14px;display:flex;gap:14px;align-items:center;min-height:100px;cursor:pointer}
+.thumb{width:82px;height:82px;border:1px solid #eee;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.stock{border:1px solid #ddd;background:#f8f8f8;display:flex;align-items:center;justify-content:center;font-weight:800}
+.shopSection,.catalogMenuSection{
+  position:relative;
+  left:50%;
+  width:100vw;
+  margin-left:-50vw;
+  margin-bottom:20px;
+  padding:40px 0;
+  background:#eeeeee95;
+}
+.shopSection{background:#d7e4e4}
+.shopSection>*,
+.catalogMenuSection>*{width:min(calc(100% - 64px),1040px);margin:0 auto}
+.shopHead,.catalogMenuHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.shopGrid,.catalogMenuGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+.shopCard,.catalogMenuCard{border:0;background:transparent;cursor:pointer;text-align:center}
+.shopThumb,.catalogMenuThumb{aspect-ratio:3/4;display:flex;align-items:center;justify-content:center}
+.shopThumb img,.catalogMenuThumb img{max-width:100%;max-height:100%;object-fit:contain}
+.bottomNav{
+  position:fixed;left:50%;bottom:16px;transform:translateX(-50%);
+  display:flex;gap:8px;background:#fff;border:1px solid #ddd;padding:8px;z-index:30;
+}
+.bottomNavBtn{width:38px;height:38px;border:1px solid #ddd;background:#fff}
+.bottomNavBtn svg{width:20px;height:20px;fill:none;stroke:#111;stroke-width:1.8}
+.modal{display:none}
+.modal.is-open{display:block}
+@media(max-width:768px){
+  .wrap{width:min(calc(100% - 28px),800px)}
+  .list{grid-template-columns:1fr}
+  .row{grid-template-columns:1fr 96px}
+  .shopGrid,.catalogMenuGrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+}

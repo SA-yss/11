@@ -1,0 +1,12 @@
+{
+  "app.js": {
+    "returncode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "config.js": {
+    "returncode": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+}

@@ -1,11 +1,4 @@
-/* app.js - 기존 내부 script 전체 */
-
-window.OneSignalDeferred = window.OneSignalDeferred || [];
-    OneSignalDeferred.push(async function(OneSignal) {
-      await OneSignal.init({
-        appId: "ef0e8e78-9ec6-4e92-8bed-9f1eff07b903",
-      });
-    });
+/* app.js - 메인 기능 코드 */
 
 const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_9p50RVtpPdmZOG2emGTDVg_NQ3bp8U8";
@@ -166,10 +159,10 @@ const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
     title: "도록 | Major Auction",
     yearPlaceholder: "연도",
     galleryImages: [
-      "images/sa-ca-01.png",
-      "images/sa-ca-01.png",
-      "images/sa-ca-01.png",
-      "images/sa-ca-01.png",
+      "images/2601_189.jpg",
+      "images/2601_189.jpg",
+      "images/2601_189.jpg",
+      "images/2601_189.jpg",
       "images/sa-ca-01.png",
       "images/sa-ca-01.png"
     ],
@@ -196,9 +189,12 @@ const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
       "images/sa-ca-02.png"
     ],
     data: {
-      "2026": ["3월"],
-      "2025": ["3월", "5월", "7월", "11월"],
-      "2024": ["3월", "5월", "7월", "11월"]
+      "2031": [],
+      "2030": [],
+      "2029": [],
+      "2028": [],
+      "2027": [],
+      "2026": ["3월 컨템", "6월 컨템"]
     },
     currentStock: 0
   },
@@ -215,9 +211,12 @@ const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
       "images/sa-ca-03.png"
     ],
     data: {
-      "2026": ["5월 화성"],
-      "2025": ["5월 화성"],
-      "2024": ["5월 화성"]
+      "2031": [],
+      "2030": [],
+      "2029": [],
+      "2028": [],
+      "2027": [],
+      "2026": ["5월 화성"]
     },
     currentStock: 0
   }
@@ -258,17 +257,22 @@ const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
     }
 
     function getUnifiedCatalogConfig(catalogId){
-      const base = CATALOG_PAGE_CONFIG["offline-auction"] || {};
-      const galleryImages = Array.isArray(base.galleryImages) ? [...base.galleryImages].reverse() : [];
-      return {
-        ...base,
-        id: catalogId,
-        title: getCatalogDisplayTitle(catalogId),
-        typeLabel: getCatalogTypeLabel(catalogId),
-        typeOptions: getUnifiedCatalogOptions(),
-        galleryImages
-      };
-    }
+  const id = String(catalogId || "offline-auction");
+  const base = CATALOG_PAGE_CONFIG[id] || CATALOG_PAGE_CONFIG["offline-auction"] || {};
+
+  const galleryImages = Array.isArray(base.galleryImages)
+    ? [...base.galleryImages]
+    : [];
+
+  return {
+    ...base,
+    id,
+    title: getCatalogDisplayTitle(id),
+    typeLabel: getCatalogTypeLabel(id),
+    typeOptions: getUnifiedCatalogOptions(),
+    galleryImages
+  };
+}
 
 
     const data = [
@@ -302,7 +306,7 @@ const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
             ],
           },
           {
-            id: "mint-delivery-bag",
+            id: "mint-delivery-bag-big",
             name: "민트봉투(大)",
             size: "290*400mm",
             baseStock: 6500,
@@ -313,7 +317,7 @@ const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
             ]
           },
           {
-            id: "mint-delivery-bag",
+            id: "mint-delivery-bag-small",
             name: "민트봉투(小)",
             size: "290*400mm",
             baseStock: 1000,
@@ -341,17 +345,6 @@ const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
             ]
           },
           {
-            id: "holder-purple",
-            name: "수입지홀더(보라색)",
-            size: "225*310mm",
-            baseStock: 1000,
-            img: "Warranty-holder(purple).jpg",
-            images: ["Warranty-holder(purple).jpg", "Warranty-holder(purple-in).jpg"],
-            logs: [
-              { d:"2026-02-12", t:"출고", dept:"운영팀", person:"ooo", qty:90 },
-            ]
-          },
-          {
             id: "office-holder-sky",
             name: "사무용홀더",
             size: "225*310mm",
@@ -362,6 +355,27 @@ const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
               { d:"2026-02-12", t:"출고", dept:"운영팀", person:"ooo", qty:40 },
             ]
           },
+          {
+            id: "holder-navy",
+            name: "수입지홀더(남색)",
+            size: "225*310mm",
+            baseStock: 100,
+            img: "Warranty-holder(navy).jpg",
+            images: ["Warranty-holder(navy).jpg", null],
+            logs: []
+          },
+          {
+            id: "holder-purple",
+            name: "수입지홀더(보라색)",
+            size: "225*310mm",
+            baseStock: 1000,
+            img: "Warranty-holder(purple).jpg",
+            images: ["Warranty-holder(purple).jpg", "Warranty-holder.jpg"],
+            logs: [
+              { d:"2026-02-12", t:"출고", dept:"운영팀", person:"ooo", qty:90 },
+            ]
+          },
+        
         ]
       },
       {
@@ -460,7 +474,7 @@ const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
             size:"",
             baseStock:1000,
             img:"images/sa-GM-T-black.jpg",
-            images:["images/sa-GM-T-black.jpg", null],
+            images:["images/sa-GM-T-black.jpg"],
             logs:[],
             price:"35,700원"
           },
@@ -470,7 +484,7 @@ const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
             size:"",
             baseStock:1000,
             img:"images/sa-GM-T-white.jpg",
-            images:["images/sa-GM-T-white.jpg", null],
+            images:["images/sa-GM-T-white.jpg"],
             logs:[],
             price:"35,700원"
           },
@@ -480,7 +494,7 @@ const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
             size:"310*200*40mm",
             baseStock:1000,
             img:"SA-bag.jpg",
-            images:["SA-bag.jpg", null],
+            images:["SA-bag.jpg"],
             logs:[],
             price:"24,000원"
           }
@@ -504,6 +518,23 @@ const navReload = document.getElementById("navReload");
     const homeLink = document.getElementById("homeLink");
     const topbar = document.getElementById("topbar");
     const topTitle = document.getElementById("topTitle");
+
+    const TOPBAR_TITLE_LOGO_HTML = `<img src="images/sa-logo-5.jpg" class="topLogo" alt="SeoulAuction">`;
+    const TOPBAR_RIGHT_LOGO_HTML = `<img src="images/sa-logo-5.jpg" alt="SeoulAuction">`;
+    const TOPBAR_CATALOG_SEARCH_HTML = `<input id="catalogSearch" class="catalogTopSearch" type="text" placeholder="" aria-label="검색">`;
+
+    function setTopbarTitleLogo(){
+      if(topTitle) topTitle.innerHTML = TOPBAR_TITLE_LOGO_HTML;
+    }
+
+    function setTopbarRightLogo(){
+      if(topbarLogo) topbarLogo.innerHTML = TOPBAR_RIGHT_LOGO_HTML;
+    }
+
+    function setTopbarRightSearch(){
+      if(!topbarLogo) return;
+      topbarLogo.innerHTML = TOPBAR_CATALOG_SEARCH_HTML;
+    }
 
     const itemModal = document.getElementById("itemModal");
     const itemOverlay = document.getElementById("itemOverlay");
@@ -599,7 +630,9 @@ const navReload = document.getElementById("navReload");
               if(Array.isArray(s.logs)) it.logs = s.logs;
               if(Array.isArray(s.requests)) it.requests = s.requests;
               if(s.img && !it.img) it.img = s.img;
-              if(Array.isArray(s.images) && (!it.images || !it.images[0])) it.images = s.images;
+              if(Array.isArray(s.images) && s.images.filter(Boolean).length > 0){
+  it.images = s.images.filter(Boolean);
+}
             }
           }
         }
@@ -819,6 +852,50 @@ function renderCatalogMenuImage(item){
         console.error("catalog request save 실패:", err);
       }
     }
+    async function addCatalogRequestToDB(catalogId, row){
+  if(!dbReady()) return null;
+async function getCatalogStockFromDB(catalogId, year, round){
+  if(!dbReady()) return 0;
+
+  const { data, error } = await supabaseClient
+    .from("catalog_stocks")
+    .select("current_stock")
+    .eq("catalog_id", catalogId)
+    .eq("catalog_year", String(year))
+    .eq("catalog_round", String(round))
+    .maybeSingle();
+
+  if(error){
+    console.error("재고 조회 실패:", error);
+    return 0;
+  }
+
+  return Number(data?.current_stock || 0);
+}
+  const email = await getCurrentUserEmail();
+
+  const payload = {
+    catalog_id: catalogId,
+    catalog_title: getCatalogDisplayTitle(catalogId),
+    catalog_year: String(row.year || ""),
+    catalog_round: String(row.round || ""),
+    qty: Number(row.qty || 0),
+    department: row.dept || "-",
+    requester_name: row.person || "",
+    requester_email: email || "",
+    status: "pending",
+    current_stock: Number(row.currentStock || 0)
+  };
+
+  const { data, error } = await supabaseClient
+    .from(DB_CATALOG_REQUESTS)
+    .insert(payload)
+    .select("*")
+    .single();
+
+  if(error) throw error;
+  return data;
+}
 
     function saveCatalogApplySelection(catalogId, payload){
       try{
@@ -1014,6 +1091,27 @@ function calcStock(it){
       return arr;
     }
 
+    function applyCustomItemOrder(){
+      const holderOrderIds = ["holder-gray", "office-holder-sky", "holder-navy", "holder-purple"];
+      const holderOrderNames = ["보증서홀더(회색)", "사무용홀더", "수입지홀더(남색)", "수입지홀더(보라색)"];
+      const holderSection = data.find(sec => sec.category === "홀더");
+      if(!holderSection || !Array.isArray(holderSection.items)) return;
+
+      holderSection.items.sort((a, b) => {
+        const ai = holderOrderIds.indexOf(String(a?.id || ""));
+        const bi = holderOrderIds.indexOf(String(b?.id || ""));
+        const an = holderOrderNames.indexOf(String(a?.name || ""));
+        const bn = holderOrderNames.indexOf(String(b?.name || ""));
+
+        const av = ai >= 0 ? ai : (an >= 0 ? an : 999);
+        const bv = bi >= 0 ? bi : (bn >= 0 ? bn : 999);
+
+        if(av !== bv) return av - bv;
+        return String(a?.name || "").localeCompare(String(b?.name || ""), "ko");
+      });
+    }
+
+
     function ensureCategory(cat){
       const name = String(cat || "").trim();
       if(!name) return null;
@@ -1047,6 +1145,8 @@ function calcStock(it){
     const DB_ITEMS = "warehouse_items";
     const DB_LOGS  = "warehouse_logs";
     const DB_REQUESTS = "warehouse_requests";
+    const DB_CATALOG_REQUESTS = "catalog_requests";
+    const DB_CATALOG_STOCKS = "catalog_stocks";
 
     async function loadAllFromDB_FORCE(){
       if(!dbReady()) throw new Error("supabaseClient not ready");
@@ -1094,7 +1194,9 @@ function calcStock(it){
             size: row.size || "",
             baseStock: Number(row.base_stock || 0),
             img: row.img || null,
-            images: Array.isArray(row.images) ? row.images : [row.img || null, null],
+            images: Array.isArray(row.images)
+  ? row.images.filter(Boolean)
+  : [row.img].filter(Boolean),
             logs: [],
             requests: []
           };
@@ -1109,8 +1211,13 @@ function calcStock(it){
         item.size = row.size || item.size || "";
         item.baseStock = Number(row.base_stock || 0);
         item.img = row.img || item.img || null;
-        item.images = Array.isArray(row.images) ? row.images : (item.images || [item.img || null, null]);
-        if(item.img && (!item.images || !item.images[0])) item.images = [item.img, null];
+        item.images = Array.isArray(row.images)
+  ? row.images.filter(Boolean)
+  : (item.images || [item.img]).filter(Boolean);
+
+if(item.img && (!item.images || !item.images[0])){
+  item.images = [item.img].filter(Boolean);
+}
       }
 
       for(const r of (logRows || [])){
@@ -1429,19 +1536,11 @@ function calcStock(it){
     }
 
     function setTopTitleByMode(mode){
-      if(mode === "request"){
-        topTitle.textContent = "물품 신청하기";
-      }else if(mode === "list"){
-        topTitle.textContent = "물품 재고 현황";
-      }else if(mode === "admin"){
-        topTitle.textContent = "관리자 페이지";
-      }else{
-        topTitle.textContent = "창고수량재고";
-      }
+      setTopbarTitleLogo();
     }
 
     function setBodyMode(mode){
-      document.body.classList.remove("mode-request", "mode-list", "mode-admin", "auth-page");
+      document.body.classList.remove("mode-request", "mode-list", "mode-admin", "mode-shop", "auth-page");
       document.documentElement.classList.remove("auth-page");
       if(mode === "request"){
         document.body.classList.add("mode-request");
@@ -1454,6 +1553,7 @@ function calcStock(it){
 
     function renderAuthShell(innerHtml){
       topbar.style.display = "none";
+      setTopbarRightLogo();
       if(topbarLogo) topbarLogo.classList.remove("show");
       document.body.classList.remove("mode-request", "mode-list", "mode-admin");
       document.body.classList.add("auth-page");
@@ -1553,7 +1653,7 @@ function calcStock(it){
         location.hash = "#/";
       }
 
-      document.getElementById("homeLoginBtn").addEventListener("click", submitHomeLogin);
+      document.getElementById("homeLoginBtn")?.addEventListener("click", submitHomeLogin);
       attachAuthEnter(["homeLoginId", "homeLoginPw"], submitHomeLogin);
     }
 
@@ -1611,8 +1711,8 @@ function calcStock(it){
         setAuthError("회원가입이 완료되었습니다.\n로그인 화면에서 로그인해주세요.");
       }
 
-      document.getElementById("signupSubmitBtn").addEventListener("click", submitSignup);
-      document.getElementById("signupBackBtn").addEventListener("click", ()=>{ location.hash = "#/login"; });
+      document.getElementById("signupSubmitBtn")?.addEventListener("click", submitSignup);
+      document.getElementById("signupBackBtn")?.addEventListener("click", ()=>{ location.hash = "#/login"; });
       attachAuthEnter(["signupEmail", "signupPassword", "signupPasswordConfirm"], submitSignup);
     }
 
@@ -1687,8 +1787,8 @@ function calcStock(it){
     }
   }
 
-  document.getElementById("resetPasswordBtn").addEventListener("click", submitResetPassword);
-  document.getElementById("resetPasswordBackBtn").addEventListener("click", ()=>{
+  document.getElementById("resetPasswordBtn")?.addEventListener("click", submitResetPassword);
+  document.getElementById("resetPasswordBackBtn")?.addEventListener("click", ()=>{
     location.hash = "#/login";
   });
 
@@ -1697,6 +1797,7 @@ function calcStock(it){
 
     async function renderMainHome(){
       topbar.style.display = "none";
+      setTopbarRightLogo();
       if(topbarLogo) topbarLogo.classList.remove("show");
       document.body.classList.remove("mode-request", "mode-list", "mode-admin", "auth-page");
       document.documentElement.classList.remove("auth-page");
@@ -1716,37 +1817,95 @@ function calcStock(it){
             ${
               isAdmin
                 ? `<button class="mainHomeBtn adminMintBtn" id="goAdminPage" type="button">관리자 페이지</button>`
-                : `<button class="mainHomeBtn requestDarkBtn" id="goRequestPage" type="button">물품 신청하기</button>`
+                : `<button class="mainHomeBtn requestDarkBtn" id="goRequestPage" type="button"> 신청하기</button>`
             }
             <button class="mainHomeBtn stockBtn" id="goStockPage" type="button">물품 재고현황</button>
+            <button class="mainHomeBtn shopHomeBtn" id="goShopPage" type="button">제품 구매하기</button>
             <button class="mainHomeBtn logoutBtn" id="logoutBtn" type="button">로그아웃</button>
           </div>
         </div>
       `;
 
       if(isAdmin){
-        document.getElementById("goAdminPage").addEventListener("click", ()=>{
+        document.getElementById("goAdminPage")?.addEventListener("click", ()=>{
           location.hash = "#/admin";
         });
       }else{
-        document.getElementById("goRequestPage").addEventListener("click", ()=>{
+        document.getElementById("goRequestPage")?.addEventListener("click", ()=>{
           location.hash = "#/request";
         });
       }
 
-      document.getElementById("goStockPage").addEventListener("click", ()=>{
+      document.getElementById("goStockPage")?.addEventListener("click", ()=>{
         location.hash = "#/list";
       });
 
-      document.getElementById("logoutBtn").addEventListener("click", logoutHome);
+      document.getElementById("goShopPage")?.addEventListener("click", ()=>{
+        location.hash = "#/shop";
+      });
 
-      document.getElementById("mainHomeLogoBtn").addEventListener("click", ()=>{
-        q.value = "";
+      document.getElementById("logoutBtn")?.addEventListener("click", logoutHome);
+
+      document.getElementById("mainHomeLogoBtn")?.addEventListener("click", ()=>{
+        if(q) q.value = "";
         location.hash = "#/";
         window.location.reload();
       });
     }
 
+
+    function getShopItems(){
+      const section = data.find(sec => sec.category === "기타");
+      return section ? (section.items || []) : [];
+    }
+
+    function getShopItemById(id){
+      return getShopItems().find(it => String(it.id) === String(id)) || null;
+    }
+
+    const SHOP_CART_KEY = "sa_shop_cart_v1";
+
+    function getShopCart(){
+      try{
+        const parsed = JSON.parse(localStorage.getItem(SHOP_CART_KEY) || "[]");
+        return Array.isArray(parsed) ? parsed : [];
+      }catch(e){
+        return [];
+      }
+    }
+
+    function saveShopCart(cart){
+      localStorage.setItem(SHOP_CART_KEY, JSON.stringify(cart || []));
+    }
+
+    function parsePrice(v){
+      return Number(String(v || "0").replace(/[^0-9]/g, "")) || 0;
+    }
+
+    function formatPrice(v){
+      return `${Number(v || 0).toLocaleString()}`;
+    }
+
+    function getShopColorLabel(it){
+      const n = String(it?.name || "");
+      if(n.includes("(B)") || n.includes("Black") || n.includes("블랙")) return "Black";
+      if(n.includes("(W)") || n.includes("White") || n.includes("화이트")) return "White";
+      if(n.includes("가방")) return "Black";
+      return "-";
+    }
+
+    function addShopCart(itemId, qty=1){
+      const item = getShopItemById(itemId);
+      if(!item) return;
+      const cart = getShopCart();
+      const found = cart.find(row => row.id === itemId);
+      if(found){
+        found.qty = Number(found.qty || 0) + qty;
+      }else{
+        cart.push({ id:itemId, qty });
+      }
+      saveShopCart(cart);
+    }
 
     function renderShopSection(section){
       return `
@@ -1754,11 +1913,11 @@ function calcStock(it){
           <div class="shopInner">
             <div class="shopHead">
               <h2 class="shopTitle">SHOP</h2>
-              <a class="shopLink" href="javascript:void(0)">구매하기 <span>▶</span></a>
+              <button class="shopLink" type="button" data-go-shop>제품 구매하기 <span>▶</span></button>
             </div>
             <div class="shopGrid">
             ${(section.items || []).map(it => `
-              <button class="shopCard" type="button" data-open="${escapeAttr(it.id)}" data-name="${escapeAttr(it.name || '')}">
+              <button class="shopCard" type="button" data-shop-open="${escapeAttr(it.id)}" data-name="${escapeAttr(it.name || '')}">
                 <div class="shopThumb">
                   ${it.img ? renderSmartImage(it.img, it.name) : iconPlaceholder()}
                 </div>
@@ -1774,9 +1933,183 @@ function calcStock(it){
       `;
     }
 
-    function renderHome(mode = "request"){
+    function prepareShopPage(title="제품 구매하기"){
       topbar.style.display = "flex";
       searchBox.style.display = "flex";
+      setTopbarRightLogo();
+      if(topbarLogo) topbarLogo.classList.remove("show");
+      topbar.classList.remove("no-search");
+      setBodyMode("request");
+      document.body.classList.add("mode-shop");
+      setTopbarTitleLogo();
+    }
+
+    function renderShopPageHeader(title="제품 | Product", active="list"){
+      const cartCount = getShopCart().reduce((sum, row)=>sum + Number(row.qty || 0), 0);
+      return `
+        <div class="shopPageHead">
+          <div class="shopPageTitle"><strong>제품</strong><span>|</span><em>Product</em></div>
+          <div class="shopPageIcons">
+            <button class="shopIconBtn" type="button" data-shop-home title="제품 목록" aria-label="제품 목록">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12.2c2.25 0 4.05-1.86 4.05-4.15C16.05 5.78 14.25 4 12 4S7.95 5.78 7.95 8.05c0 2.29 1.8 4.15 4.05 4.15Z"/><path d="M5.8 21c.62-3.72 2.98-5.8 6.2-5.8s5.58 2.08 6.2 5.8"/></svg>
+            </button>
+            <button class="shopIconBtn ${active === 'cart' ? 'active' : ''}" type="button" data-shop-cart title="장바구니" aria-label="장바구니">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 8.5h9.6l.9 11H6.3l.9-11Z"/><path d="M9.2 8.5V7.1A2.8 2.8 0 0 1 12 4.3a2.8 2.8 0 0 1 2.8 2.8v1.4"/></svg>${cartCount ? `<span>${cartCount}</span>` : ``}
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderShopListPage(){
+      prepareShopPage("제품 구매하기");
+      const items = getShopItems();
+      app.innerHTML = `
+        <div class="shopPage">
+          ${renderShopPageHeader("제품 | Product", "list")}
+          <div class="shopProductGrid">
+            ${items.map((it, idx) => `
+              <button class="shopProductCard ${idx === 3 ? 'is-ready' : ''}" type="button" data-shop-open="${escapeAttr(it.id)}">
+                <div class="shopProductThumb">
+                  ${idx === 3 ? `<div class="shopReadyIcon">▢</div>` : (it.img ? renderSmartImage(it.img, it.name) : iconPlaceholder())}
+                </div>
+                <div class="shopProductInfo">
+                  <div class="shopProductName">${idx === 3 ? '상품 준비중' : escapeHtml(String(it.name || '').replace('(B)','').replace('(W)',''))}</div>
+                  <div class="shopProductColor">${idx === 3 ? '-' : escapeHtml(getShopColorLabel(it))}</div>
+                  <div class="shopProductPrice">${idx === 3 ? '-' : escapeHtml(formatPrice(parsePrice(it.price)))}</div>
+                </div>
+              </button>
+            `).join("")}
+          </div>
+        </div>
+      `;
+      bindShopCommonEvents();
+    }
+
+    function renderShopDetailPage(itemId){
+      const it = getShopItemById(itemId);
+      prepareShopPage("제품 구매하기");
+      if(!it){
+        app.innerHTML = `<div class="paper"><div class="paper-body">제품을 찾을 수 없습니다.</div></div>`;
+        return;
+      }
+      app.innerHTML = `
+        <div class="shopPage shopDetailPage">
+          ${renderShopPageHeader("제품 | Product", "detail")}
+          <div class="shopDetailHero">
+            <div class="shopDetailImg">${it.img ? renderSmartImage(it.img, it.name) : iconPlaceholder()}</div>
+            <div class="shopDetailInfo">
+              <div>
+                <div class="shopDetailName">${escapeHtml(String(it.name || '').replace('(B)','').replace('(W)',''))}</div>
+                <div class="shopDetailColor">${escapeHtml(getShopColorLabel(it))}</div>
+              </div>
+              <div class="shopDetailPrice">${escapeHtml(formatPrice(parsePrice(it.price)))}</div>
+            </div>
+            <select class="shopOptionSelect" id="shopColorOption">
+              <option>${escapeHtml(getShopColorLabel(it))}</option>
+            </select>
+            <div class="shopDetailActions">
+              <button class="shopBuyBtn" type="button" id="shopBuyNow">BUY NOW</button>
+              <button class="shopCartBtn" type="button" id="shopAddCart">+ CART</button>
+            </div>
+            <div class="shopDetailsBlock">
+              <div class="shopDetailsTitle">DETAILS</div>
+              <div class="shopDetailsText">${escapeHtml(getShopColorLabel(it))}</div>
+            </div>
+          </div>
+        </div>
+      `;
+      bindShopCommonEvents();
+      document.getElementById("shopAddCart")?.addEventListener("click", ()=>{
+        addShopCart(it.id, 1);
+        alert("장바구니에 담았습니다.");
+        renderShopDetailPage(it.id);
+      });
+      document.getElementById("shopBuyNow")?.addEventListener("click", ()=>{
+        addShopCart(it.id, 1);
+        location.hash = "#/shop/cart";
+      });
+    }
+
+    function renderShopCartPage(){
+      prepareShopPage("제품 구매하기");
+      const cart = getShopCart();
+      const rows = cart.map(row => ({ ...row, item:getShopItemById(row.id) })).filter(row => row.item);
+      const total = rows.reduce((sum,row)=>sum + parsePrice(row.item.price) * Number(row.qty || 0), 0);
+      app.innerHTML = `
+        <div class="shopPage shopCartPage">
+          ${renderShopPageHeader("장바구니", "cart")}
+          <div class="shopCartList">
+            ${rows.length ? rows.map(row => {
+              const it = row.item;
+              const qty = Number(row.qty || 0);
+              const lineTotal = parsePrice(it.price) * qty;
+              return `
+                <div class="shopCartRow" data-cart-id="${escapeAttr(it.id)}">
+                  <button class="shopCartRemove" type="button" data-cart-remove="${escapeAttr(it.id)}">×</button>
+                  <div class="shopCartThumb">${it.img ? renderSmartImage(it.img, it.name) : iconPlaceholder()}</div>
+                  <div class="shopCartInfo">
+                    <div class="shopCartName">${escapeHtml(String(it.name || '').replace('(B)','').replace('(W)',''))}</div>
+                    <div class="shopCartColor">${escapeHtml(getShopColorLabel(it))}</div>
+                    <div class="shopQtyControl">
+                      <button type="button" data-cart-minus="${escapeAttr(it.id)}">-</button>
+                      <span>${qty}</span>
+                      <button type="button" data-cart-plus="${escapeAttr(it.id)}">+</button>
+                    </div>
+                    <div class="shopCartUnit">${escapeHtml(formatPrice(parsePrice(it.price)))}</div>
+                  </div>
+                  <div class="shopCartPrice">${escapeHtml(formatPrice(lineTotal))}</div>
+                </div>
+              `;
+            }).join("") : `<div class="shopCartEmpty">장바구니가 비어 있습니다.</div>`}
+          </div>
+          ${rows.length ? `<button class="shopOrderBtn" type="button" id="shopOrderBtn">ORDER</button>` : ``}
+        </div>
+      `;
+      bindShopCommonEvents();
+      app.querySelectorAll("[data-cart-remove]").forEach(btn => btn.addEventListener("click", ()=>{
+        saveShopCart(getShopCart().filter(row => row.id !== btn.dataset.cartRemove));
+        renderShopCartPage();
+      }));
+      app.querySelectorAll("[data-cart-minus]").forEach(btn => btn.addEventListener("click", ()=>{
+        const cart = getShopCart();
+        const row = cart.find(r => r.id === btn.dataset.cartMinus);
+        if(row) row.qty = Math.max(1, Number(row.qty || 1) - 1);
+        saveShopCart(cart);
+        renderShopCartPage();
+      }));
+      app.querySelectorAll("[data-cart-plus]").forEach(btn => btn.addEventListener("click", ()=>{
+        const cart = getShopCart();
+        const row = cart.find(r => r.id === btn.dataset.cartPlus);
+        if(row) row.qty = Number(row.qty || 1) + 1;
+        saveShopCart(cart);
+        renderShopCartPage();
+      }));
+      document.getElementById("shopOrderBtn")?.addEventListener("click", ()=>{
+        alert("주문 기능은 다음 단계에서 연결하면 됩니다.");
+      });
+    }
+
+    function bindShopCommonEvents(){
+      app.querySelectorAll("[data-shop-open]").forEach(btn => {
+        btn.addEventListener("click", ()=>{
+          if(btn.classList.contains("is-ready")) return;
+          location.hash = `#/shop/item/${btn.dataset.shopOpen}`;
+        });
+      });
+      app.querySelectorAll("[data-go-shop], [data-shop-home]").forEach(btn => {
+        btn.addEventListener("click", ()=>{ location.hash = "#/shop"; });
+      });
+      app.querySelectorAll("[data-shop-cart]").forEach(btn => {
+        btn.addEventListener("click", ()=>{ location.hash = "#/shop/cart"; });
+      });
+    }
+
+    function renderHome(mode = "request"){
+      applyCustomItemOrder();
+      topbar.style.display = "flex";
+      searchBox.style.display = "flex";
+      setTopbarRightLogo();
       if(topbarLogo) topbarLogo.classList.remove("show");
       updateTopbarLogo();
       setTopTitleByMode(mode);
@@ -1901,6 +2234,8 @@ function calcStock(it){
         </div>
       `;
 
+      bindShopCommonEvents();
+
       const sectionAddItemBtn = document.getElementById("sectionAddItemBtn");
       if(sectionAddItemBtn){
         sectionAddItemBtn.addEventListener("click", ()=> openItemModal(""));
@@ -1919,18 +2254,10 @@ function calcStock(it){
         });
       });
 
-      app.querySelectorAll("[data-catalog-open]").forEach(el => {
-        const go = () => {
-          const catalogId = el.getAttribute("data-catalog-open") || "";
-          if(!catalogId) return;
-          location.hash = `#/request/catalog/${encodeURIComponent(catalogId)}`;
-        };
-        el.addEventListener("click", go);
-        el.addEventListener("keydown", (e) => {
-          if(e.key === "Enter" || e.key === " "){
-            e.preventDefault();
-            go();
-          }
+      app.querySelectorAll("[data-catalog-open]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.dataset.catalogOpen;
+          location.hash = `#/request/catalog/${id}`;
         });
       });
     }
@@ -1940,7 +2267,8 @@ function calcStock(it){
 function renderCatalogDetail(catalogId){
       topbar.style.display = "flex";
       searchBox.style.display = "none";
-      if(topbarLogo) topbarLogo.classList.remove("show");
+      setTopbarRightSearch();
+      if(topbarLogo) topbarLogo.classList.add("show");
       updateTopbarLogo();
       setTopTitleByMode("request");
       setBodyMode("request");
@@ -2040,7 +2368,11 @@ function renderCatalogDetail(catalogId){
             <div class="paper-body detailPaperBody">
               <div class="catalogDetailPage">
                 <div class="catalogDetailTop">
-                  <h2 class="catalogDetailTitle">${escapeHtml(config.title || "")}</h2>
+                  <h2 class="catalogDetailTitle">
+  <span class="catalogTitleKr">도록</span>
+  <span class="catalogTitleDivider">|</span>
+  <span class="catalogTitleEn">${escapeHtml(getCatalogTypeLabel(catalogId))}</span>
+</h2>
                 </div>
 
               
@@ -2214,7 +2546,7 @@ function renderCatalogDetail(catalogId){
         }
 
         if(submitBtn){
-          submitBtn.addEventListener("click", ()=>{
+          submitBtn.addEventListener("click", async ()=>{
             const year = yearSelect?.value || "";
             const round = roundSelect?.value || activeRound || "";
             if(!year){
@@ -2234,7 +2566,7 @@ function renderCatalogDetail(catalogId){
         if(catalogAddClose) catalogAddClose.addEventListener("click", closeCatalogRequestModal);
 
         if(catalogAddBtn){
-          catalogAddBtn.addEventListener("click", ()=>{
+          catalogAddBtn.addEventListener("click", async ()=>{
             const selectedInfo = getCatalogApplySelection(catalogId);
             const date = app.querySelector("#catalogAddDate")?.value || "";
             const dept = app.querySelector("#catalogAddDept")?.value || "";
@@ -2269,11 +2601,21 @@ function renderCatalogDetail(catalogId){
               round,
               currentStock: stockValue
             });
-            rows.push(row);
-            saveCatalogRequests(catalogId, rows);
-            closeCatalogRequestModal();
-            render();
-            alert("출고 신청이 접수되었습니다.");
+
+            try{
+              await addCatalogRequestToDB(catalogId, row);
+
+              rows.push(row);
+              saveCatalogRequests(catalogId, rows);
+
+              closeCatalogRequestModal();
+              render();
+              alert("출고 신청이 접수되었습니다.");
+            }catch(err){
+              console.error("도록 신청 DB 저장 실패:", err);
+              alert("DB 저장 중 오류가 발생했습니다.");
+              return;
+            }
           });
         }
 
@@ -2332,7 +2674,8 @@ function renderCatalogDetail(catalogId){
 function renderCatalogApplyPage(catalogId){
       topbar.style.display = "flex";
       searchBox.style.display = "none";
-      if(topbarLogo) topbarLogo.classList.remove("show");
+      setTopbarRightSearch();
+      if(topbarLogo) topbarLogo.classList.add("show");
       updateTopbarLogo();
       setTopTitleByMode("request");
       setBodyMode("request");
@@ -2410,7 +2753,7 @@ function renderCatalogApplyPage(catalogId){
 
       const submitBtn = app.querySelector("#catalogApplySubmitBtn");
       if(submitBtn){
-        submitBtn.addEventListener("click", ()=>{
+        submitBtn.addEventListener("click", async ()=>{
           const date = app.querySelector("#catalogApplyDate")?.value || "";
           const dept = app.querySelector("#catalogApplyDept")?.value || "";
           const qty = Number(app.querySelector("#catalogApplyQty")?.value || 0);
@@ -2442,10 +2785,20 @@ function renderCatalogApplyPage(catalogId){
             round: selectedRound,
             currentStock
           });
-          rows.push(row);
-          saveCatalogRequests(catalogId, rows);
-          alert("출고 신청이 접수되었습니다.");
-          location.hash = `#/request/catalog/${encodeURIComponent(catalogId)}`;
+
+          try{
+            await addCatalogRequestToDB(catalogId, row);
+
+            rows.push(row);
+            saveCatalogRequests(catalogId, rows);
+
+            alert("출고 신청이 접수되었습니다.");
+            location.hash = `#/request/catalog/${encodeURIComponent(catalogId)}`;
+          }catch(err){
+            console.error("도록 신청 DB 저장 실패:", err);
+            alert("DB 저장 중 오류가 발생했습니다.");
+            return;
+          }
         });
       }
     }
@@ -2453,6 +2806,7 @@ function renderCatalogApplyPage(catalogId){
     function renderDetail(id, mode = "request"){
       topbar.style.display = "flex";
       searchBox.style.display = "none";
+      setTopbarRightLogo();
       if(topbarLogo) topbarLogo.classList.toggle("show", mode === "admin");
       updateTopbarLogo();
       setTopTitleByMode(mode);
@@ -2472,6 +2826,9 @@ function renderCatalogApplyPage(catalogId){
       }
 
       const { section, it } = found;
+      if(isRequest && section?.category === "기타"){
+        setTopbarTitleLogo();
+      }
       ensureLogs(it);
       ensureRequests(it);
 
@@ -2547,13 +2904,31 @@ function renderCatalogApplyPage(catalogId){
         ensureLogs(it);
         ensureRequests(it);
 
-        const img1 = (it.images && it.images[0]) ? renderSmartImage(it.images[0], it.name) : iconPlaceholder();
-        const img2 = (it.images && it.images[1]) ? renderSmartImage(it.images[1], it.name) : iconPlaceholder();
+        const detailImages = Array.isArray(it.images)
+  ? it.images.filter(Boolean)
+  : [it.img].filter(Boolean);
+
+const detailImagesHtml = detailImages.length
+  ? detailImages.map(img => `
+      <div class="imgBox requestImgBox">${renderSmartImage(img, it.name)}</div>
+    `).join("")
+  : `<div class="imgBox requestImgBox">${iconPlaceholder()}</div>`;
         const stockNow = calcStock(it);
         const requestRows = getRequestRows();
         const logRows = getLogRows();
 
         app.innerHTML = `
+          <style>
+            @media (max-width: 768px){
+              .requestImgRow.oneImage{
+                justify-content: flex-end !important;
+              }
+              .requestImgRow.oneImage .requestImgBox{
+                margin-left: auto !important;
+                margin-right: 0 !important;
+              }
+            }
+          </style>
           <div class="paper detailPaper ${isRequest ? "requestDetailPaper" : ""}">
             <div class="paper-body detailPaperBody">
               <div class="detailAdminHero">
@@ -2562,11 +2937,10 @@ function renderCatalogApplyPage(catalogId){
                   <p class="detailAdminSize">${escapeHtml(it.size || "")}</p>
                 </div>
                 <div class="detailImageFrame">
-                  <div class="imgRow requestImgRow">
-                    <div class="imgBox requestImgBox">${img1}</div>
-                    <div class="imgBox requestImgBox">${img2}</div>
-                  </div>
-                </div>
+  <div class="imgRow requestImgRow ${detailImages.length === 1 ? "oneImage" : ""}">
+    ${detailImagesHtml}
+  </div>
+</div>
               </div>
 
               <div class="statsGrid requestStatsGrid">
@@ -3028,8 +3402,8 @@ function renderCatalogApplyPage(catalogId){
         }
 
         if(openRequestBtn) openRequestBtn.addEventListener("click", openAddModal);
-        addOverlay.addEventListener("click", closeAddModal);
-        addClose.addEventListener("click", closeAddModal);
+        addOverlay?.addEventListener("click", closeAddModal);
+        addClose?.addEventListener("click", closeAddModal);
 
         if(aPersonInput){
           aPersonInput.addEventListener("blur", ()=> setNameTitleIfNeeded(aPersonInput));
@@ -3048,7 +3422,7 @@ function renderCatalogApplyPage(catalogId){
           seg.querySelectorAll("button").forEach(b => b.addEventListener("click", ()=> setType(b.dataset.v)));
         }
 
-        addBtn.addEventListener("click", async ()=>{
+        addBtn?.addEventListener("click", async ()=>{
           const d = app.querySelector("#aDate").value;
           const dept = app.querySelector("#aDept").value;
           const person = (app.querySelector("#aPerson").value || "").trim();
@@ -3110,7 +3484,7 @@ function renderCatalogApplyPage(catalogId){
           DB.lastError = String(err?.message || err);
         }
 
-        q.value = "";
+        if(q) q.value = "";
         location.hash = "#/admin";
         router();
       }
@@ -3124,7 +3498,9 @@ function renderCatalogApplyPage(catalogId){
         || hash === "#/admin"
         || /^#\/admin\//.test(hash)
         || hash === "#/list"
-        || /^#\/list\//.test(hash);
+        || /^#\/list\//.test(hash)
+        || hash === "#/shop"
+        || /^#\/shop\//.test(hash);
 
     }
 
@@ -3139,6 +3515,7 @@ function renderCatalogApplyPage(catalogId){
         return;
       }
 
+      const shopItem = hash.match(/^#\/shop\/item\/(.+)$/);
       const requestItem = hash.match(/^#\/request\/item\/(.+)$/);
       const requestCatalogApply = hash.match(/^#\/request\/catalog\/([^/]+)\/apply$/);
       const requestCatalog = hash.match(/^#\/request\/catalog\/([^/]+)$/);
@@ -3153,6 +3530,12 @@ function renderCatalogApplyPage(catalogId){
         renderResetPasswordPage();
       }else if(hash === "#/" || hash === ""){
         await renderMainHome();
+      }else if(hash === "#/shop"){
+        renderShopListPage();
+      }else if(hash === "#/shop/cart"){
+        renderShopCartPage();
+      }else if(shopItem){
+        renderShopDetailPage(decodeURIComponent(shopItem[1]));
       }else if(hash === "#/request"){
         renderHome("request");
       }else if(requestCatalogApply){
@@ -3187,15 +3570,15 @@ function renderCatalogApplyPage(catalogId){
     }
 
     function openItemModal(prefillCategory){
-      itemModal.classList.add("show");
+      itemModal?.classList.add("show");
       document.body.style.overflow = "hidden";
-      if(prefillCategory) nCategory.value = prefillCategory;
-      if(!nBase.value) nBase.value = "1000";
-      setTimeout(()=>{ (nName.value ? nSize : nName).focus(); }, 30);
+      if(prefillCategory && nCategory) nCategory.value = prefillCategory;
+      if(nBase && !nBase.value) nBase.value = "1000";
+      setTimeout(()=>{ (nName?.value ? nSize : nName)?.focus?.(); }, 30);
     }
 
     function closeItemModal(){
-      itemModal.classList.remove("show");
+      itemModal?.classList.remove("show");
       document.body.style.overflow = "";
     }
 
@@ -3212,14 +3595,14 @@ function renderCatalogApplyPage(catalogId){
       input.value = (input.value || "").trim();
     }
 
-    itemOverlay.addEventListener("click", closeItemModal);
-    itemClose.addEventListener("click", closeItemModal);
+    itemOverlay?.addEventListener("click", closeItemModal);
+    itemClose?.addEventListener("click", closeItemModal);
 
-    createItemBtn.addEventListener("click", async ()=>{
-      const category = (nCategory.value || "").trim();
-      const name = (nName.value || "").trim();
-      const size = (nSize.value || "").trim();
-      const base = Number(String(nBase.value || "").replace(/,/g,""));
+    createItemBtn?.addEventListener("click", async ()=>{
+      const category = (nCategory?.value || "").trim();
+      const name = (nName?.value || "").trim();
+      const size = (nSize?.value || "").trim();
+      const base = Number(String(nBase?.value || "").replace(/,/g,""));
       const imageFile = nImgFile?.files?.[0] || null;
 
       if(!category){ alert("카테고리를 입력해주세요."); return; }
@@ -3284,12 +3667,12 @@ function renderCatalogApplyPage(catalogId){
 
       closeItemModal();
 
-      q.value = "";
+      if(q) q.value = "";
       location.hash = "#/admin";
       router();
     });
 
-    doSearch.addEventListener("click", async ()=>{
+    doSearch?.addEventListener("click", async ()=>{
       const hash = location.hash || "#/";
       if(hash === "#/admin"){
         const ok = await isAdminUser();
@@ -3306,7 +3689,7 @@ function renderCatalogApplyPage(catalogId){
       }
     });
 
-    q.addEventListener("keydown", async (e)=>{
+    q?.addEventListener("keydown", async (e)=>{
       if(e.key === "Enter"){
         const hash = location.hash || "#/";
         if(hash === "#/admin"){
@@ -3325,7 +3708,7 @@ function renderCatalogApplyPage(catalogId){
       }
     });
 
-    q.addEventListener("input", async ()=>{
+    q?.addEventListener("input", async ()=>{
       const hash = location.hash || "#/";
       if(hash === "#/admin"){
         const ok = await isAdminUser();
@@ -3336,18 +3719,36 @@ function renderCatalogApplyPage(catalogId){
         renderHome("admin");
       }else if(hash === "#/list"){
         renderHome("list");
+      }else if(hash === "#/shop"){
+        renderShopListPage();
+      }else if(hash === "#/shop/cart"){
+        renderShopCartPage();
+      }else if(shopItem){
+        renderShopDetailPage(decodeURIComponent(shopItem[1]));
       }else if(hash === "#/request"){
         renderHome("request");
       }
     });
 
-    homeLink.addEventListener("click", (e)=>{
-      e.preventDefault();
-      q.value = "";
-      location.hash = "#/";
+    homeLink?.addEventListener("click", (e)=>{
+      const hash = location.hash || "";
+
+      if(hash.startsWith("#/request") || hash.startsWith("#/shop")){
+        e.preventDefault();
+        if(q) q.value = "";
+        location.hash = "#/request";
+      }
     });
     
     navBack?.addEventListener("click", ()=>{
+  const hash = location.hash || "";
+
+  if(hash.startsWith("#/request/catalog/")){
+    if(q) q.value = "";
+    location.hash = "#/request";
+    return;
+  }
+
   history.back();
 });
 
@@ -3356,7 +3757,7 @@ navForward?.addEventListener("click", ()=>{
 });
 
 navHome?.addEventListener("click", ()=>{
-  q.value = "";
+  if(q) q.value = "";
   location.hash = "#/";
 });
 
@@ -3407,3 +3808,8 @@ if(!ok){
       startRealtime();
       router();
     })();
+
+
+window.addEventListener("error", function(e){
+  console.error("JS 에러:", e.message, e.filename, e.lineno, e.colno);
+});

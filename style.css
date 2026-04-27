@@ -3719,3 +3719,279 @@ body.mode-request .topbarLogo:has(.catalogTopSearch) img{
     max-width:205px;
   }
 }
+
+/* ===== 도록 신청 페이지 최종 시안 보정 ===== */
+.catalogMockPage{
+  border:none !important;
+  background:#fff !important;
+}
+
+.catalogMockPage .detailPaperBody{
+  padding:26px 0 24px !important;
+}
+
+.catalogMockPage .catalogDetailPage,
+.catalogMockPage .detailSectionBlock{
+  max-width:1040px;
+  width:100%;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+.catalogMockPage .catalogDetailTop{
+  margin:0 0 24px !important;
+}
+
+.catalogMockPage .catalogDetailTitle{
+  display:flex !important;
+  align-items:center !important;
+  gap:14px !important;
+  margin:0 !important;
+  line-height:1 !important;
+}
+
+.catalogMockPage .catalogTitleKr{
+  font-size:24px !important;
+  font-weight:800 !important;
+  color:#111 !important;
+}
+
+.catalogMockPage .catalogTitleDivider{
+  font-size:20px !important;
+  font-weight:700 !important;
+  color:#111 !important;
+}
+
+.catalogMockPage .catalogTitleEn{
+  font-size:14px !important;
+  font-weight:400 !important;
+  color:#111 !important;
+}
+
+.catalogMockPage .catalogControlLabel{
+  margin:0 0 8px !important;
+  font-size:13px !important;
+  color:#111 !important;
+}
+
+.catalogMockPage .catalogDetailControlRow{
+  display:grid !important;
+  grid-template-columns:145px 145px 145px 132px !important;
+  gap:14px !important;
+  justify-content:flex-start !important;
+  align-items:center !important;
+  margin-bottom:30px !important;
+}
+
+.catalogMockPage .catalogSelect{
+  height:38px !important;
+  border:1px solid #cfcfcf !important;
+  padding:0 36px 0 18px !important;
+  font-size:14px !important;
+  font-weight:400 !important;
+  color:#111 !important;
+  background:#fff !important;
+}
+
+.catalogMockPage .catalogSelectArrow{
+  right:12px !important;
+  font-size:16px !important;
+  color:#555 !important;
+}
+
+.catalogMockPage .catalogDetailSubmit{
+  height:38px !important;
+  background:#3b3b3b !important;
+  font-size:14px !important;
+  font-weight:500 !important;
+}
+
+.catalogMockPage .catalogGalleryTitle{
+  margin:0 0 8px !important;
+  font-size:10px !important;
+  font-weight:600 !important;
+  color:#555 !important;
+}
+
+.catalogMockPage .catalogGalleryGrid{
+  display:grid !important;
+  grid-template-columns:repeat(5, 100px) !important;
+  gap:24px 28px !important;
+  justify-content:flex-start !important;
+  align-items:start !important;
+  margin:0 !important;
+}
+
+.catalogMockPage .catalogGalleryItem{
+  width:100px !important;
+  height:134px !important;
+  aspect-ratio:auto !important;
+  background:#f5f5f5 !important;
+  border:1px solid #e5e5e5 !important;
+}
+
+.catalogMockPage .catalogGalleryItem img{
+  width:100% !important;
+  height:100% !important;
+  object-fit:cover !important;
+}
+
+.catalogMockPage .catalogSearchResult{
+  display:grid !important;
+  grid-template-columns:180px 1fr 182px !important;
+  gap:34px !important;
+  align-items:end !important;
+  margin:34px 0 38px !important;
+}
+
+.catalogMockPage .catalogResultVisual{
+  width:180px !important;
+  height:242px !important;
+  background:#f5f5f5 !important;
+  overflow:hidden !important;
+}
+
+.catalogMockPage .catalogResultVisual img,
+.catalogMockPage .catalogResultImg{
+  width:100% !important;
+  height:100% !important;
+  object-fit:cover !important;
+  display:block !important;
+}
+
+.catalogMockPage .catalogResultInfo{
+  align-self:end !important;
+  padding-bottom:0 !important;
+}
+
+.catalogMockPage .catalogResultYear{
+  font-size:16px !important;
+  font-weight:400 !important;
+  color:#111 !important;
+  margin-bottom:2px !important;
+}
+
+.catalogMockPage .catalogResultTitle{
+  font-size:16px !important;
+  font-weight:500 !important;
+  line-height:1.5 !important;
+  color:#111 !important;
+  margin-bottom:16px !important;
+}
+
+.catalogMockPage .catalogResultStock{
+  width:205px !important;
+  height:38px !important;
+  border:0 !important;
+  background:#f7f7f7 !important;
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  align-items:center !important;
+  cursor:pointer !important;
+}
+
+.catalogMockPage .catalogResultStock span{
+  min-height:38px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  font-size:13px !important;
+  font-weight:400 !important;
+  color:#111 !important;
+  position:relative !important;
+}
+
+.catalogMockPage .catalogResultStock span + span::before{
+  content:"" !important;
+  position:absolute !important;
+  left:0 !important;
+  top:50% !important;
+  transform:translateY(-50%) !important;
+  width:1px !important;
+  height:20px !important;
+  background:#cfcfcf !important;
+}
+
+.catalogMockPage .catalogResultAction{
+  align-self:end !important;
+}
+
+.catalogMockPage .catalogApplyBtn{
+  width:182px !important;
+  height:54px !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:#84cdc9 !important;
+  color:#fff !important;
+  font-size:16px !important;
+  font-weight:500 !important;
+  font-family:inherit !important;
+  cursor:pointer !important;
+}
+
+.catalogMockPage .catalogApplyBtn:hover{
+  background:#73c1bc !important;
+}
+
+.catalogMockPage .catalogResultTableBlock{
+  margin-top:0 !important;
+}
+
+.catalogMockPage .boxTitle{
+  font-size:14px !important;
+  font-weight:600 !important;
+  color:#777 !important;
+  text-transform:none !important;
+}
+
+.catalogMockPage .selDelBtn{
+  height:28px !important;
+  min-width:68px !important;
+  font-size:11px !important;
+}
+
+.catalogMockPage .requestTable .logHead,
+.catalogMockPage .requestTable .logRow{
+  grid-template-columns:minmax(120px,1.1fr) minmax(100px,.8fr) minmax(140px,1.1fr) minmax(120px,.95fr) minmax(140px,1fr) minmax(110px,.8fr) !important;
+}
+
+.catalogMockPage .headerFilterDate,
+.catalogMockPage .headerFilterSelect{
+  border:1px solid #e1e1e1 !important;
+  background:#fff !important;
+  border-radius:0 !important;
+  height:28px !important;
+  font-size:11px !important;
+  padding:0 10px !important;
+}
+
+@media (max-width:760px){
+  .catalogMockPage .catalogDetailControlRow{
+    grid-template-columns:1fr !important;
+    gap:10px !important;
+  }
+  .catalogMockPage .catalogGalleryGrid{
+    grid-template-columns:repeat(3, minmax(0, 1fr)) !important;
+    gap:18px !important;
+  }
+  .catalogMockPage .catalogGalleryItem{
+    width:100% !important;
+    height:auto !important;
+    aspect-ratio:3 / 4 !important;
+  }
+  .catalogMockPage .catalogSearchResult{
+    grid-template-columns:128px 1fr !important;
+    gap:22px !important;
+  }
+  .catalogMockPage .catalogResultVisual{
+    width:128px !important;
+    height:172px !important;
+  }
+  .catalogMockPage .catalogResultAction{
+    grid-column:1 / -1 !important;
+  }
+  .catalogMockPage .catalogApplyBtn{
+    width:100% !important;
+    height:44px !important;
+  }
+}

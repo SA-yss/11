@@ -2347,6 +2347,11 @@ function renderCatalogDetail(catalogId){
         const fallbackYear = currentYear || yearList[0] || "";
         const roundList = Array.isArray(config.data?.[fallbackYear]) ? config.data[fallbackYear] : [];
         const activeRound = roundList.includes(currentRound) ? currentRound : (roundList[0] || "");
+        const catalogViewKey = `catalog_view_mode_${catalogId}`;
+        const isDetailMode = sessionStorage.getItem(catalogViewKey) === "detail";
+        const detailImagePath = galleryImages[0] || "";
+        const roundNumberText = String(activeRound || currentRound || "").replace(/회$/g, "");
+        const detailTitleText = roundNumberText ? `제${roundNumberText}회 미술품 경매 도록` : "미술품 경매 도록";
 
         const yearOptions = [
           `<option value="">${escapeHtml(config.yearPlaceholder || "연도")}</option>`,
@@ -2398,23 +2403,47 @@ function renderCatalogDetail(catalogId){
                     <span class="catalogSelectArrow">▼</span>
                   </div>
                   <div class="catalogDetailAction">
-                    <button class="catalogDetailSubmit" id="catalogRequestSubmitBtn" type="button">출고 신청하기</button>
+                    <button class="catalogDetailSubmit" id="catalogRequestSubmitBtn" type="button">${isDetailMode ? "신청하기" : "검색하기"}</button>
                   </div>
                 </div>
 
-                <div class="catalogStockCaption">현재 재고</div>
-                <div class="catalogStockBox">
-                  <div class="catalogStockRow">
-                    <div class="catalogStockLabel">현재 재고</div>
-                    <div class="catalogStockValue">${currentStock.toLocaleString()}개</div>
+                ${isDetailMode ? `
+                  <div class="catalogSelectedDetail">
+                    <div class="catalogSelectedImage">
+                      ${detailImagePath ? renderSmartImage(detailImagePath, detailTitleText) : `<div class="catalogGalleryPlaceholder">IMAGE</div>`}
+                    </div>
+                    <div class="catalogSelectedInfo">
+                      <div class="catalogSelectedYear">${escapeHtml(fallbackYear || currentYear || "")}</div>
+                      <div class="catalogSelectedTitle">${escapeHtml(detailTitleText)}</div>
+                      <button class="catalogSelectedStock" id="catalogStockOpenBtn" type="button">
+                        <span>재고</span>
+                        <span>${currentStock.toLocaleString()}개</span>
+                      </button>
+                    </div>
                   </div>
-                </div>
-
-                <div class="catalogGalleryTitle">도록</div>
-                <div class="catalogGalleryGrid">${galleryHtml}</div>
+                ` : `
+                  <div class="catalogGalleryTitle">도록</div>
+                  <div class="catalogGalleryGrid">${galleryHtml}</div>
+                `}
               </div>
 
-              <div class="detailSectionBlock">
+              ${isDetailMode ? `
+              <div class="detailSectionBlock">}
+raise 'main block not found' unless s.include?(old)
+s=s.sub(old,new)
+old=%Q{                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal" id="catalogAddModal" aria-hidden="true">}
+new=%Q{                </div>
+              </div>
+              ` : ""}
+            </div>
+          </div>
+
+          <div class="modal" id="catalogAddModal" aria-hidden="true">
                 <div class="boxTitleRow detailSectionHead">
                   <p class="boxTitle">출고 신청 내역</p>
                   <div class="requestAdminActions">
@@ -2491,6 +2520,7 @@ function renderCatalogDetail(catalogId){
         const yearSelect = app.querySelector("#catalogYearSelect");
         const roundSelect = app.querySelector("#catalogRoundSelect");
         const submitBtn = app.querySelector("#catalogRequestSubmitBtn");
+        const stockOpenBtn = app.querySelector("#catalogStockOpenBtn");
         const catalogAddModal = app.querySelector("#catalogAddModal");
         const catalogAddOverlay = app.querySelector("#catalogAddOverlay");
         const catalogAddClose = app.querySelector("#catalogAddClose");
@@ -2515,6 +2545,7 @@ function renderCatalogDetail(catalogId){
         if(typeSelect){
           typeSelect.addEventListener("change", ()=>{
             const nextType = typeSelect.value || "offline-auction";
+            sessionStorage.removeItem(`catalog_view_mode_${nextType}`);
             location.hash = `#/request/catalog/${encodeURIComponent(nextType)}`;
           });
         }
@@ -2558,8 +2589,17 @@ function renderCatalogDetail(catalogId){
               round,
               currentStock
             });
+            if(!isDetailMode){
+              sessionStorage.setItem(catalogViewKey, "detail");
+              render();
+              return;
+            }
             openCatalogRequestModal();
           });
+        }
+
+        if(stockOpenBtn){
+          stockOpenBtn.addEventListener("click", openCatalogRequestModal);
         }
 
         if(catalogAddOverlay) catalogAddOverlay.addEventListener("click", closeCatalogRequestModal);

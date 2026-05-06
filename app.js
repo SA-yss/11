@@ -133,24 +133,32 @@ const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
 
     const STORAGE_KEY = "warehouse_stock_v1";
 
+    // 홈 화면 도록 메뉴 전용 고정 이미지
+    // 내부 상세페이지 galleryImages와 완전히 분리해서 사용함
+    const CATALOG_HOME_FIXED_IMAGES = {
+      "offline-auction": "images/sa-ca-01.png",
+      "contemporary-art-auction": "images/sa-ca-02.png",
+      "zero-base": "images/sa-ca-03.png"
+    };
+
     const CATALOG_MENU = [
       {
         id: "offline-auction",
-        label: "Major\nAuction",
+        label: "Major\\nAuction",
         theme: "light",
-        iconImg: "images/2601_189.jpg"
+        iconImg: CATALOG_HOME_FIXED_IMAGES["offline-auction"]
       },
       {
         id: "contemporary-art-auction",
-        label: "Contemporary\nArt Sale",
+        label: "Contemporary\\nArt Sale",
         theme: "mint",
-        iconImg: "images/2603_contem.jpg"
+        iconImg: CATALOG_HOME_FIXED_IMAGES["contemporary-art-auction"]
       },
       {
         id: "zero-base",
-        label: "Zero\nBase",
+        label: "Zero\\nBase",
         theme: "light",
-        iconImg: "images/2604_191.jpg"
+        iconImg: CATALOG_HOME_FIXED_IMAGES["zero-base"]
       }
     ];
 
@@ -159,10 +167,10 @@ const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
     title: "도록 | Major Auction",
     yearPlaceholder: "연도",
     galleryImages: [
-      "images/2601_189.jpg",
-      "images/2601_189.jpg",
-      "images/2601_189.jpg",
-      "images/2601_189.jpg",
+      "images/1/2601_189.jpg",
+      "images/1/2602_190.jpg",
+      "images/1/2603_contem.jpg",
+      "images/1/sa-d-1.jpg",
       "images/sa-ca-01.png",
       "images/sa-ca-01.png"
     ],
@@ -174,7 +182,7 @@ const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
       "2027": [],
       "2026": ["191회", "190회", "189회"]
     },
-    currentStock: 10
+  
   },
 
   "contemporary-art-auction": {
@@ -196,7 +204,7 @@ const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
       "2027": [],
       "2026": ["3월 컨템", "6월 컨템"]
     },
-    currentStock: 0
+  
   },
 
   "zero-base": {
@@ -218,7 +226,7 @@ const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
       "2027": [],
       "2026": ["5월 화성"]
     },
-    currentStock: 0
+  
   }
 };
 
@@ -761,23 +769,16 @@ const navReload = document.getElementById("navReload");
       `;
     }
 
-    
-    const CATALOG_HOME_IMAGES = {
-      "offline-auction": [],
-      "contemporary-art-auction": [],
-      "zero-base": []
-    };
 
-    function getLatestCatalogHomeImage(catalogId){
-      const list = CATALOG_HOME_IMAGES[String(catalogId || "")];
-      if(!Array.isArray(list) || !list.length) return "";
-      return list[list.length - 1] || "";
+    function getCatalogHomeFixedImage(catalogId){
+      return CATALOG_HOME_FIXED_IMAGES[String(catalogId || "")] || "";
     }
 
 function renderCatalogMenuImage(item){
-      const latestImg = getLatestCatalogHomeImage(item && item.id);
-      if(latestImg){
-        return `<img src="${escapeAttr(latestImg)}" alt="${escapeAttr(item?.label || "")}" class="catalogMenuThumbImg">`;
+      const id = String(item?.id || "");
+      const img = getCatalogHomeFixedImage(id);
+      if(img){
+        return `<img src="${escapeAttr(img)}" alt="${escapeAttr(item?.label || "")}" class="catalogMenuThumbImg">`;
       }
       return `<div class="catalogMenuThumbPlaceholder">IMAGE</div>`;
     }
@@ -796,29 +797,57 @@ function renderCatalogMenuImage(item){
             </div>
 
             <div class="catalogMenuGrid">
+              ${getUnifiedCatalogOptions().map(item => `
+                <button class="catalogMenuCard" type="button" data-catalog-open="${escapeAttr(item.id)}">
+                  <div class="catalogMenuThumb">${renderCatalogMenuImage(item)}</div>
+                  <div class="catalogMenuLabel">${escapeHtml(item.id === "zero-base" ? "ZEROBASE" : item.label)}</div>
+                </button>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+      `;
+    }
 
-  <button class="catalogMenuCard" type="button" data-catalog-open="offline-auction">
-    <div class="catalogMenuThumb">
-      <img src="images/2601_189.jpg" alt="Major Auction">
-    </div>
-    <div class="catalogMenuLabel">Major Auction</div>
-  </button>
 
-  <button class="catalogMenuCard" type="button" data-catalog-open="contemporary-art-auction">
-    <div class="catalogMenuThumb">
-      <img src="images/2603_contem.jpg" alt="Contemporary Art Sale">
-    </div>
-    <div class="catalogMenuLabel">Contemporary Art Sale</div>
-  </button>
 
-  <button class="catalogMenuCard" type="button" data-catalog-open="zero-base">
-    <div class="catalogMenuThumb">
-      <img src="images/2602_190.jpg" alt="ZEROBASE">
-    </div>
-    <div class="catalogMenuLabel">ZEROBASE</div>
-  </button>
+    function getCatalogPrimaryYearRound(catalogId){
+      const config = getUnifiedCatalogConfig(catalogId);
+      const years = Object.keys(config?.data || {}).sort((a, b) => String(b).localeCompare(String(a)));
+      const year = years.find(y => Array.isArray(config.data?.[y]) && config.data[y].length) || years[0] || "";
+      const round = (Array.isArray(config?.data?.[year]) ? config.data[year][0] : "") || "";
+      return { year, round };
+    }
 
-</div>
+    function getCatalogPendingQty(catalogId){
+      const rows = getCatalogRequests(catalogId);
+      return rows
+        .filter(r => (r.status || "pending") === "pending")
+        .reduce((sum, r) => sum + Number(r.qty || 0), 0);
+    }
+
+    function renderAdminCatalogSummary(){
+      const items = getUnifiedCatalogOptions();
+      return `
+        <div class="adminCatalogHomeSection">
+          <div class="adminCatalogHomeTitle">도록</div>
+          <div class="adminCatalogHomeList">
+            ${items.map(item => {
+              const meta = getCatalogPrimaryYearRound(item.id);
+              const pendingQty = getCatalogPendingQty(item.id);
+              const qtyText = pendingQty > 0 ? `-${pendingQty.toLocaleString()}개` : `0개`;
+              const label = item.id === "zero-base" ? "ZERO BASE" : item.label;
+              return `
+                <button class="adminCatalogHomeRow" type="button" data-catalog-open="${escapeAttr(item.id)}">
+                  <span class="adminCatalogHomeMain">
+                    <strong>${escapeHtml(label)}</strong>
+                    <em>${escapeHtml(meta.year || "-")} ${escapeHtml(meta.round || "")}</em>
+                  </span>
+                  <span class="adminCatalogHomeStatus">출고신청</span>
+                  <span class="adminCatalogHomeQty">${escapeHtml(qtyText)}</span>
+                </button>
+              `;
+            }).join("")}
           </div>
         </div>
       `;
@@ -852,50 +881,107 @@ function renderCatalogMenuImage(item){
         console.error("catalog request save 실패:", err);
       }
     }
+    async function getCatalogStockFromDB(catalogId, year, round){
+      if(!dbReady()) return 0;
+
+      const { data, error } = await supabaseClient
+        .from(DB_CATALOG_STOCKS)
+        .select("current_stock")
+        .eq("catalog_id", catalogId)
+        .eq("catalog_year", String(year || ""))
+        .eq("catalog_round", String(round || ""))
+        .maybeSingle();
+
+      if(error){
+        console.error("도록 재고 조회 실패:", error);
+        return 0;
+      }
+
+      return Number(data?.current_stock || 0);
+    }
+
+    async function loadCatalogRequestsFromDB(catalogId){
+      if(!dbReady()) return null;
+
+      const { data, error } = await supabaseClient
+        .from(DB_CATALOG_REQUESTS)
+        .select("id, catalog_id, catalog_title, catalog_year, catalog_round, qty, department, requester_name, requester_email, status, current_stock, created_at, approved_at, approved_by, rejected_at, rejected_by")
+        .eq("catalog_id", catalogId)
+        .order("created_at", { ascending:false });
+
+      if(error){
+        console.error("도록 신청내역 조회 실패:", error);
+        return null;
+      }
+
+      return (data || []).map(r => normalizeLog({
+        d: r.created_at,
+        t: "신청",
+        dept: r.department || "-",
+        person: r.requester_name || "",
+        qty: Number(r.qty || 0),
+        __key: `catalog_req_${r.id}`,
+        _dbid: r.id,
+        email: r.requester_email || "",
+        status: r.status || "pending",
+        year: r.catalog_year || "",
+        round: r.catalog_round || "",
+        currentStock: Number(r.current_stock || 0),
+        approved_at: r.approved_at || "",
+        approved_by: r.approved_by || "",
+        rejected_at: r.rejected_at || "",
+        rejected_by: r.rejected_by || ""
+      }));
+    }
+
+    async function syncCatalogRequestsFromDB(catalogId){
+      const rows = await loadCatalogRequestsFromDB(catalogId);
+      if(!rows) return false;
+      saveCatalogRequests(catalogId, rows);
+      return true;
+    }
+
     async function addCatalogRequestToDB(catalogId, row){
-  if(!dbReady()) return null;
-async function getCatalogStockFromDB(catalogId, year, round){
-  if(!dbReady()) return 0;
+      if(!dbReady()) return null;
 
-  const { data, error } = await supabaseClient
-    .from("catalog_stocks")
-    .select("current_stock")
-    .eq("catalog_id", catalogId)
-    .eq("catalog_year", String(year))
-    .eq("catalog_round", String(round))
-    .maybeSingle();
+      const email = await getCurrentUserEmail();
 
-  if(error){
-    console.error("재고 조회 실패:", error);
-    return 0;
-  }
+      const payload = {
+        catalog_id: catalogId,
+        catalog_title: getCatalogDisplayTitle(catalogId),
+        catalog_year: String(row.year || ""),
+        catalog_round: String(row.round || ""),
+        qty: Number(row.qty || 0),
+        department: row.dept || "-",
+        requester_name: row.person || "",
+        requester_email: email || "",
+        status: "pending",
 
-  return Number(data?.current_stock || 0);
-}
-  const email = await getCurrentUserEmail();
+      };
 
-  const payload = {
-    catalog_id: catalogId,
-    catalog_title: getCatalogDisplayTitle(catalogId),
-    catalog_year: String(row.year || ""),
-    catalog_round: String(row.round || ""),
-    qty: Number(row.qty || 0),
-    department: row.dept || "-",
-    requester_name: row.person || "",
-    requester_email: email || "",
-    status: "pending",
-    current_stock: Number(row.currentStock || 0)
-  };
+      const { data, error } = await supabaseClient
+        .from(DB_CATALOG_REQUESTS)
+        .insert(payload)
+        .select("*")
+        .single();
 
-  const { data, error } = await supabaseClient
-    .from(DB_CATALOG_REQUESTS)
-    .insert(payload)
-    .select("*")
-    .single();
+      if(error) throw error;
+      return data;
+    }
 
-  if(error) throw error;
-  return data;
-}
+    async function deleteCatalogRequestsByKeys(catalogId, rows){
+      if(!dbReady()) return;
+      const ids = (rows || []).map(r => r?._dbid).filter(Boolean);
+      if(!ids.length) return;
+
+      const { error } = await supabaseClient
+        .from(DB_CATALOG_REQUESTS)
+        .delete()
+        .eq("catalog_id", catalogId)
+        .in("id", ids);
+
+      if(error) throw error;
+    }
 
     function saveCatalogApplySelection(catalogId, payload){
       try{
@@ -1147,6 +1233,94 @@ function calcStock(it){
     const DB_REQUESTS = "warehouse_requests";
     const DB_CATALOG_REQUESTS = "catalog_requests";
     const DB_CATALOG_STOCKS = "catalog_stocks";
+
+
+    function buildDefaultItemPayloads(){
+      const rows = [];
+
+      for(const sec of data){
+        for(const it of (sec.items || [])){
+          if(!it || !it.id) continue;
+
+          const images = Array.isArray(it.images)
+            ? it.images.filter(Boolean)
+            : [it.img].filter(Boolean);
+
+          rows.push({
+            id: it.id,
+            base_stock: Number(it.baseStock || 0),
+            category: sec.category || it.category || null,
+            name: it.name || it.id,
+            size: it.size || null,
+            img: it.img || (images[0] || null),
+            images
+          });
+        }
+      }
+
+      return rows;
+    }
+
+    async function syncDefaultItemsToDB(){
+      if(!dbReady()) return false;
+
+      const defaultRows = buildDefaultItemPayloads();
+      if(!defaultRows.length) return true;
+
+      let existingRows = [];
+      try{
+        const { data: rows, error } = await supabaseClient
+          .from(DB_ITEMS)
+          .select("id, base_stock, category, name, size, img, images");
+
+        if(error) throw error;
+        existingRows = rows || [];
+      }catch(err){
+        console.warn("기본 품목 DB 확인 실패:", err);
+        return false;
+      }
+
+      const existingById = new Map(existingRows.map(row => [String(row.id), row]));
+      const missingRows = defaultRows.filter(row => !existingById.has(String(row.id)));
+
+      if(missingRows.length){
+        const { error } = await supabaseClient
+          .from(DB_ITEMS)
+          .insert(missingRows);
+
+        if(error){
+          console.warn("누락 기본 품목 자동 생성 실패:", error);
+          return false;
+        }
+      }
+
+      for(const row of defaultRows){
+        const existing = existingById.get(String(row.id));
+        if(!existing) continue;
+
+        const patch = {};
+        if(!existing.category && row.category) patch.category = row.category;
+        if(!existing.name && row.name) patch.name = row.name;
+        if(!existing.size && row.size) patch.size = row.size;
+        if(!existing.img && row.img) patch.img = row.img;
+        if((!Array.isArray(existing.images) || existing.images.filter(Boolean).length === 0) && row.images && row.images.length){
+          patch.images = row.images;
+        }
+
+        if(Object.keys(patch).length){
+          const { error } = await supabaseClient
+            .from(DB_ITEMS)
+            .update(patch)
+            .eq("id", row.id);
+
+          if(error){
+            console.warn('기본 품목 메타데이터 보정 실패(' + row.id + '):', error);
+          }
+        }
+      }
+
+      return true;
+    }
 
     async function loadAllFromDB_FORCE(){
       if(!dbReady()) throw new Error("supabaseClient not ready");
@@ -1529,6 +1703,8 @@ if(item.img && (!item.images || !item.images[0])){
           .on("postgres_changes", { event:"*", schema:"public", table: DB_ITEMS }, () => scheduleDBReload())
           .on("postgres_changes", { event:"*", schema:"public", table: DB_LOGS  }, () => scheduleDBReload())
           .on("postgres_changes", { event:"*", schema:"public", table: DB_REQUESTS }, () => scheduleDBReload())
+          .on("postgres_changes", { event:"*", schema:"public", table: DB_CATALOG_REQUESTS }, () => scheduleDBReload())
+          .on("postgres_changes", { event:"*", schema:"public", table: DB_CATALOG_STOCKS }, () => scheduleDBReload())
           .subscribe(()=>{});
       }catch(e){
         console.error("Realtime 시작 실패:", e);
@@ -1754,26 +1930,38 @@ if(item.img && (!item.images || !item.images[0])){
       return;
     }
 
+    const resetBtn = document.getElementById("resetPasswordBtn");
+    if(resetBtn) resetBtn.disabled = true;
+    setAuthError("처리 중입니다.");
+
     try{
       const res = await fetch(
-  "https://iznnctfnmeiqdjljounq.supabase.co/functions/v1/admin-reset-password",
-  {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-reset-secret": "sa-reset-2026-abc123"
-    },
-    body: JSON.stringify({
-      email,
-      new_password: newPassword
-    })
-  }
-);
+        "https://iznnctfnmeiqdjljounq.supabase.co/functions/v1/admin-reset-password",
+        {
+          method: "POST",
+          mode: "cors",
+          cache: "no-store",
+          headers: {
+            "Content-Type": "application/json",
+            "x-reset-secret": "sa-reset-2026-abc123"
+          },
+          body: JSON.stringify({
+            email,
+            new_password: newPassword
+          })
+        }
+      );
 
-      const result = await res.json().catch(() => ({}));
+      const text = await res.text();
+      let result = {};
+      try{
+        result = text ? JSON.parse(text) : {};
+      }catch(parseErr){
+        console.error("[reset] JSON 파싱 실패:", parseErr, text);
+      }
 
       if(!res.ok || !result?.success){
-        setAuthError(result?.message || "비밀번호 재설정에 실패했습니다.");
+        setAuthError(result?.message || `비밀번호 재설정에 실패했습니다. (${res.status})`);
         return;
       }
 
@@ -1783,7 +1971,9 @@ if(item.img && (!item.images || !item.images[0])){
       }, 1000);
     }catch(err){
       console.error("[reset] 예외 발생:", err);
-      setAuthError(err?.message || "비밀번호 재설정 중 오류가 발생했습니다.");
+      setAuthError("서버 연결에 실패했습니다. Edge Function CORS/배포/Secrets 설정을 확인해주세요.");
+    }finally{
+      if(resetBtn) resetBtn.disabled = false;
     }
   }
 
@@ -1907,6 +2097,106 @@ if(item.img && (!item.images || !item.images[0])){
       saveShopCart(cart);
     }
 
+
+
+    const SHOP_ORDER_KEY = "sa_shop_order_history_v1";
+
+    function getShopOrderHistory(){
+      try{
+        const parsed = JSON.parse(localStorage.getItem(SHOP_ORDER_KEY) || "[]");
+        return Array.isArray(parsed) ? parsed : [];
+      }catch(e){
+        return [];
+      }
+    }
+
+    function saveShopOrderHistory(rows){
+      localStorage.setItem(SHOP_ORDER_KEY, JSON.stringify(rows || []));
+    }
+
+    function getShopDisplayName(it){
+      return String(it?.name || "").replace('(B)','').replace('(W)','');
+    }
+
+    function makeShopOrderNo(){
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth()+1).padStart(2,'0');
+      const day = String(d.getDate()).padStart(2,'0');
+      const key = `${y}${m}${day}`;
+      const count = getShopOrderHistory().filter(o => String(o.orderNo || '').includes(key)).length + 1;
+      return `${key.slice(0,4)}-${m}-${day} (${key}-${String(count).padStart(5,'0')})`;
+    }
+
+    async function submitShopOrder(rows){
+      if(!rows || !rows.length) return null;
+      const orderNo = makeShopOrderNo();
+      const createdAt = new Date().toISOString();
+      const requesterEmail = await getCurrentUserEmail();
+      const localRows = [];
+
+      for(const row of rows){
+        const it = row.item || getShopItemById(row.id);
+        if(!it) continue;
+        const qty = Number(row.qty || 1);
+        const reqRow = normalizeLog({
+          d: createdAt,
+          t: "신청",
+          dept: "SHOP",
+          person: requesterEmail || "제품 구매",
+          qty,
+          status: "pending"
+        });
+        try{
+          const inserted = await addRequestToDB(it, reqRow);
+          if(inserted?.id){
+            reqRow._dbid = inserted.id;
+            reqRow.__key = `req_${inserted.id}`;
+            reqRow.d = inserted.created_at || createdAt;
+          }
+        }catch(err){
+          console.error("SHOP 구매 신청 DB 저장 실패:", err);
+          throw err;
+        }
+        it.requests = it.requests || [];
+        it.requests.push(reqRow);
+        localRows.push({
+          orderNo,
+          createdAt,
+          id: it.id,
+          name: it.name,
+          color: getShopColorLabel(it),
+          img: it.img,
+          price: parsePrice(it.price),
+          qty,
+          status: "pending",
+          requestDbId: reqRow._dbid || null
+        });
+      }
+
+      const history = getShopOrderHistory();
+      history.unshift({ orderNo, createdAt, rows: localRows });
+      saveShopOrderHistory(history);
+      saveAllLocal();
+      return orderNo;
+    }
+
+    function getShopRequestRows(){
+      return getShopItems().flatMap(it => (it.requests || []).map(r => ({ ...r, item: it })));
+    }
+
+    function getShopRequestBadgeText(row){
+      const status = row.status || "pending";
+      if(status === "approved") return "승인 완료";
+      if(status === "rejected") return "반려";
+      return "승인 필요";
+    }
+
+    function getShopRequestCountText(item){
+      const count = (item.requests || []).filter(r => (r.status || "pending") === "pending").length;
+      return count > 0 ? `신청 ${count}건` : "신청 0건";
+    }
+
     function renderShopSection(section){
       return `
         <section class="shopSection">
@@ -1950,7 +2240,7 @@ if(item.img && (!item.images || !item.images[0])){
         <div class="shopPageHead">
           <div class="shopPageTitle"><strong>제품</strong><span>|</span><em>Product</em></div>
           <div class="shopPageIcons">
-            <button class="shopIconBtn" type="button" data-shop-home title="제품 목록" aria-label="제품 목록">
+            <button class="shopIconBtn ${active === 'account' ? 'active' : ''}" type="button" data-shop-account title="마이페이지" aria-label="마이페이지">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12.2c2.25 0 4.05-1.86 4.05-4.15C16.05 5.78 14.25 4 12 4S7.95 5.78 7.95 8.05c0 2.29 1.8 4.15 4.05 4.15Z"/><path d="M5.8 21c.62-3.72 2.98-5.8 6.2-5.8s5.58 2.08 6.2 5.8"/></svg>
             </button>
             <button class="shopIconBtn ${active === 'cart' ? 'active' : ''}" type="button" data-shop-cart title="장바구니" aria-label="장바구니">
@@ -1963,12 +2253,17 @@ if(item.img && (!item.images || !item.images[0])){
 
     function renderShopListPage(){
       prepareShopPage("제품 구매하기");
-      const items = getShopItems();
+      const shopKeyword = String(q?.value || "").trim().toLowerCase();
+      const items = getShopItems().filter(it => {
+        if(!shopKeyword) return true;
+        const target = `${it.name || ""} ${it.price || ""} ${getShopColorLabel(it) || ""}`.toLowerCase();
+        return target.includes(shopKeyword);
+      });
       app.innerHTML = `
         <div class="shopPage">
           ${renderShopPageHeader("제품 | Product", "list")}
           <div class="shopProductGrid">
-            ${items.map((it, idx) => `
+            ${items.length ? items.map((it, idx) => `
               <button class="shopProductCard ${idx === 3 ? 'is-ready' : ''}" type="button" data-shop-open="${escapeAttr(it.id)}">
                 <div class="shopProductThumb">
                   ${idx === 3 ? `<div class="shopReadyIcon">▢</div>` : (it.img ? renderSmartImage(it.img, it.name) : iconPlaceholder())}
@@ -1979,7 +2274,29 @@ if(item.img && (!item.images || !item.images[0])){
                   <div class="shopProductPrice">${idx === 3 ? '-' : escapeHtml(formatPrice(parsePrice(it.price)))}</div>
                 </div>
               </button>
-            `).join("")}
+            `).join("") : `<div class="shopEmptyResult">검색 결과가 없습니다.</div>`}
+          </div>
+        </div>
+      `;
+      bindShopCommonEvents();
+    }
+
+    function renderShopAccountPage(){
+      prepareShopPage("마이페이지");
+      app.innerHTML = `
+        <div class="shopPage shopAccountPage">
+          ${renderShopPageHeader("제품 | Product", "account")}
+          <div class="shopAccountPanel">
+            <div class="shopAccountIcon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 12.2c2.25 0 4.05-1.86 4.05-4.15C16.05 5.78 14.25 4 12 4S7.95 5.78 7.95 8.05c0 2.29 1.8 4.15 4.05 4.15Z"/><path d="M5.8 21c.62-3.72 2.98-5.8 6.2-5.8s5.58 2.08 6.2 5.8"/></svg>
+            </div>
+            <div class="shopAccountTitle">MY PAGE</div>
+            <div class="shopAccountSub">제품 구매 내역과 장바구니를 확인할 수 있습니다.</div>
+            <div class="shopAccountMenu">
+              <button type="button" data-shop-orders>주문조회</button>
+              <button type="button" data-shop-cart>장바구니</button>
+              <button type="button" data-shop-home>제품 목록</button>
+            </div>
           </div>
         </div>
       `;
@@ -2035,10 +2352,10 @@ if(item.img && (!item.images || !item.images[0])){
       prepareShopPage("제품 구매하기");
       const cart = getShopCart();
       const rows = cart.map(row => ({ ...row, item:getShopItemById(row.id) })).filter(row => row.item);
-      const total = rows.reduce((sum,row)=>sum + parsePrice(row.item.price) * Number(row.qty || 0), 0);
       app.innerHTML = `
         <div class="shopPage shopCartPage">
           ${renderShopPageHeader("장바구니", "cart")}
+          <h2 class="shopSubTitle">장바구니</h2>
           <div class="shopCartList">
             ${rows.length ? rows.map(row => {
               const it = row.item;
@@ -2049,12 +2366,12 @@ if(item.img && (!item.images || !item.images[0])){
                   <button class="shopCartRemove" type="button" data-cart-remove="${escapeAttr(it.id)}">×</button>
                   <div class="shopCartThumb">${it.img ? renderSmartImage(it.img, it.name) : iconPlaceholder()}</div>
                   <div class="shopCartInfo">
-                    <div class="shopCartName">${escapeHtml(String(it.name || '').replace('(B)','').replace('(W)',''))}</div>
+                    <div class="shopCartName">${escapeHtml(getShopDisplayName(it))}</div>
                     <div class="shopCartColor">${escapeHtml(getShopColorLabel(it))}</div>
                     <div class="shopQtyControl">
-                      <button type="button" data-cart-minus="${escapeAttr(it.id)}">-</button>
                       <span>${qty}</span>
                       <button type="button" data-cart-plus="${escapeAttr(it.id)}">+</button>
+                      <button type="button" data-cart-minus="${escapeAttr(it.id)}">-</button>
                     </div>
                     <div class="shopCartUnit">${escapeHtml(formatPrice(parsePrice(it.price)))}</div>
                   </div>
@@ -2085,8 +2402,184 @@ if(item.img && (!item.images || !item.images[0])){
         saveShopCart(cart);
         renderShopCartPage();
       }));
-      document.getElementById("shopOrderBtn")?.addEventListener("click", ()=>{
-        alert("주문 기능은 다음 단계에서 연결하면 됩니다.");
+      document.getElementById("shopOrderBtn")?.addEventListener("click", async ()=>{
+        try{
+          await submitShopOrder(rows);
+          saveShopCart([]);
+          await loadAllFromDB_FORCE().catch(()=>{});
+          location.hash = "#/shop/orders";
+        }catch(err){
+          alert("구매 신청 등록 실패: " + (err?.message || err));
+        }
+      });
+    }
+
+    function renderShopOrdersPage(){
+      prepareShopPage("주문조회");
+      const history = getShopOrderHistory();
+      const total = history.reduce((sum, order)=> sum + (order.rows || []).reduce((s,r)=>s + Number(r.price || 0) * Number(r.qty || 0), 0), 0);
+      app.innerHTML = `
+        <div class="shopPage shopOrdersPage">
+          ${renderShopPageHeader("주문조회", "account")}
+          <h2 class="shopSubTitle">주문조회</h2>
+          <div class="shopOrderHistoryList">
+            ${history.length ? history.map(order => `
+              <div class="shopOrderGroup">
+                <div class="shopOrderNo">${escapeHtml(order.orderNo || "주문번호")}</div>
+                ${(order.rows || []).map(row => {
+                  const lineTotal = Number(row.price || 0) * Number(row.qty || 0);
+                  return `
+                    <div class="shopOrderRow">
+                      <div class="shopOrderThumb">${row.img ? renderSmartImage(row.img, row.name) : iconPlaceholder()}</div>
+                      <div class="shopOrderInfo">
+                        <div class="shopOrderName">${escapeHtml(getShopDisplayName(row))}</div>
+                        <div class="shopOrderColor">${escapeHtml(row.color || "-")}</div>
+                        <div class="shopOrderLine"></div>
+                        <div class="shopOrderMeta"><span>${Number(row.qty || 0)}개</span><em>${escapeHtml(formatPrice(row.price || 0))} KRW</em></div>
+                        <div class="shopOrderTotal">${escapeHtml(formatPrice(lineTotal))} KRW</div>
+                      </div>
+                    </div>
+                  `;
+                }).join("")}
+              </div>
+            `).join("") : `<div class="shopCartEmpty">주문 신청 내역이 없습니다.</div>`}
+          </div>
+          ${history.length ? `<div class="shopGrandTotal"><span>총 주문 금액</span><strong>${escapeHtml(formatPrice(total))} KRW</strong></div>` : ``}
+        </div>
+      `;
+      bindShopCommonEvents();
+    }
+
+    async function renderShopAdminRequestsPage(){
+      prepareShopPage("구매 신청내역");
+      await loadAllFromDB_FORCE().catch(()=>{});
+      const rows = getShopRequestRows().filter(r => (r.status || "pending") === "pending");
+      app.innerHTML = `
+        <div class="shopPage shopAdminRequestsPage">
+          ${renderShopPageHeader("구매 신청내역", "cart")}
+          <h2 class="shopSubTitle">구매 신청내역</h2>
+          <div class="shopAdminRequestList">
+            ${rows.length ? rows.map(r => {
+              const it = r.item;
+              return `
+                <button class="shopAdminRequestCard" type="button" data-admin-shop-open="${escapeAttr(it.id)}">
+                  <div class="shopAdminRequestThumb">${it.img ? renderSmartImage(it.img, it.name) : iconPlaceholder()}</div>
+                  <div class="shopAdminRequestInfo">
+                    <div class="shopAdminRequestName">${escapeHtml(getShopDisplayName(it))}</div>
+                    <div class="shopAdminRequestColor">${escapeHtml(getShopColorLabel(it))}</div>
+                    <div class="shopAdminRequestLine"></div>
+                    <div class="shopAdminRequestStatus"><span>${escapeHtml(getShopRequestCountText(it))}</span><em>${escapeHtml(getShopRequestBadgeText(r))}</em></div>
+                    <div class="shopAdminRequestBottom"><strong>${Number(r.qty || 0)}개</strong><b>${escapeHtml(formatPrice(parsePrice(it.price)))}원</b></div>
+                  </div>
+                </button>
+              `;
+            }).join("") : `<div class="shopCartEmpty">구매 신청내역이 없습니다.</div>`}
+          </div>
+        </div>
+      `;
+      bindShopCommonEvents();
+      app.querySelectorAll("[data-admin-shop-open]").forEach(btn => {
+        btn.addEventListener("click", ()=>{ location.hash = `#/admin/shop/item/${btn.dataset.adminShopOpen}`; });
+      });
+    }
+
+    async function renderShopAdminDetailPage(itemId){
+      prepareShopPage("구매 신청내역");
+      await loadAllFromDB_FORCE().catch(()=>{});
+      const it = getShopItemById(itemId);
+      if(!it){
+        app.innerHTML = `<div class="paper"><div class="paper-body">제품을 찾을 수 없습니다.</div></div>`;
+        return;
+      }
+      const requestRows = (it.requests || []).filter(r => {
+  const status = r.status || "pending";
+  return status === "pending" || status === "rejected";
+});
+      const logRows = (it.logs || []).filter(r => r.dept === "SHOP" || r.person === "SHOP" || String(r.person || '').includes('@'));
+      app.innerHTML = `
+        <div class="shopPage shopAdminDetailPage">
+          ${renderShopPageHeader("구매 신청내역", "cart")}
+          <h2 class="shopSubTitle">구매 신청내역</h2>
+          <div class="shopAdminDetailHero">
+            <div class="shopAdminDetailImg">${it.img ? renderSmartImage(it.img, it.name) : iconPlaceholder()}</div>
+            <div class="shopAdminDetailInfo">
+              <div class="shopAdminDetailName">${escapeHtml(getShopDisplayName(it))}</div>
+              <div class="shopAdminDetailColor">${escapeHtml(getShopColorLabel(it))}</div>
+              <div class="shopAdminDetailLine"></div>
+              <div class="shopAdminStock"><span>현재 재고</span><strong>${Number(calcStock(it) || 0).toLocaleString()}개</strong></div>
+            </div>
+          </div>
+          <div class="shopAdminTableTitleRow">
+            <h3>신청 내역</h3>
+            <div class="shopAdminActions">
+              <button type="button" id="shopApproveBtn">승인</button>
+              <button type="button" id="shopRejectBtn">반려</button>
+              <button type="button" id="shopDeleteBtn">삭제</button>
+            </div>
+          </div>
+          <div class="shopAdminMiniTable">
+            <div class="shopAdminMiniHead"><span>연도. 월. 일.</span><span>구분</span><span>전채 부서</span><span>전채 상태</span></div>
+            ${requestRows.length ? requestRows.map(r => `
+              <label class="shopAdminMiniRow">
+                <input type="checkbox" data-shop-req="${escapeAttr(r.__key)}" checked>
+                <span>${escapeHtml(formatKRDate(r.d))}</span><span>신청</span><span>${escapeHtml(r.dept || '-')}</span><span>${escapeHtml(getShopRequestBadgeText(r))}</span>
+              </label>
+            `).join("") : `<div class="shopAdminMiniEmpty"></div><div class="shopAdminMiniEmpty"></div>`}
+          </div>
+          <div class="shopAdminTableTitleRow shopAdminLogTitleRow">
+            <h3>입출고 내역</h3>
+            <div class="shopAdminActions"><button type="button">삭제</button></div>
+          </div>
+          <div class="shopAdminMiniTable">
+            <div class="shopAdminMiniHead"><span>연도. 월. 일.</span><span>구분</span><span>전채 부서</span><span>전채 상태</span></div>
+            ${logRows.length ? logRows.map(r => `
+              <div class="shopAdminMiniRow noCheck"><span>${escapeHtml(formatKRDate(r.d))}</span><span>${escapeHtml(r.t || '-')}</span><span>${escapeHtml(r.dept || '-')}</span><span>${Number(r.qty || 0)}개</span></div>
+            `).join("") : `<div class="shopAdminMiniEmpty"></div><div class="shopAdminMiniEmpty"></div>`}
+          </div>
+        </div>
+      `;
+      bindShopCommonEvents();
+      const selectedRows = () => requestRows.filter(r => app.querySelector(`[data-shop-req="${CSS.escape(r.__key)}"]`)?.checked);
+      document.getElementById("shopApproveBtn")?.addEventListener("click", async ()=>{
+        const rows = selectedRows();
+        if(!rows.length){ alert("승인할 신청 내역을 선택해주세요."); return; }
+        try{
+          const email = await getCurrentUserEmail();
+          for(const r of rows){
+            if(!r._dbid) throw new Error("DB 요청 ID가 없습니다.");
+            await approveRequestByRpc(r._dbid, email || "");
+          }
+          await loadAllFromDB_FORCE();
+          renderShopAdminDetailPage(itemId);
+        }catch(err){
+          alert("승인 반영 실패: " + (err?.message || err));
+        }
+      });
+      document.getElementById("shopRejectBtn")?.addEventListener("click", async ()=>{
+        const rows = selectedRows();
+        if(!rows.length){ alert("반려할 신청 내역을 선택해주세요."); return; }
+        try{
+          const email = await getCurrentUserEmail();
+          for(const r of rows){
+            if(!r._dbid) throw new Error("DB 요청 ID가 없습니다.");
+            await rejectRequestByRpc(r._dbid, email || "");
+          }
+          await loadAllFromDB_FORCE();
+          renderShopAdminDetailPage(itemId);
+        }catch(err){
+          alert("반려 반영 실패: " + (err?.message || err));
+        }
+      });
+      document.getElementById("shopDeleteBtn")?.addEventListener("click", async ()=>{
+        const rows = selectedRows();
+        if(!rows.length){ alert("삭제할 신청 내역을 선택해주세요."); return; }
+        try{
+          await deleteRequestsByKeys(it.id, rows);
+          await loadAllFromDB_FORCE();
+          renderShopAdminDetailPage(itemId);
+        }catch(err){
+          alert("삭제 실패: " + (err?.message || err));
+        }
       });
     }
 
@@ -2101,8 +2594,60 @@ if(item.img && (!item.images || !item.images[0])){
         btn.addEventListener("click", ()=>{ location.hash = "#/shop"; });
       });
       app.querySelectorAll("[data-shop-cart]").forEach(btn => {
-        btn.addEventListener("click", ()=>{ location.hash = "#/shop/cart"; });
+        btn.addEventListener("click", async ()=>{
+          const ok = await isAdminUser();
+          location.hash = ok ? "#/shop" : "#/shop/cart";
+        });
       });
+      app.querySelectorAll("[data-shop-account]").forEach(btn => {
+        btn.addEventListener("click", async ()=>{
+          const ok = await isAdminUser();
+          location.hash = ok ? "#/shop" : "#/shop/account";
+        });
+      });
+      app.querySelectorAll("[data-shop-orders]").forEach(btn => {
+        btn.addEventListener("click", async ()=>{
+          const ok = await isAdminUser();
+          location.hash = ok ? "#/shop" : "#/shop/orders";
+        });
+      });
+    }
+
+
+    function renderStockCatalogSummary(){
+      const cards = [
+        { title:"Major Auction", year:"2026", round:"191회", stock:"10개", id:"offline-auction" },
+        { title:"Contemporary<br>Art Sale", year:"2026", round:"3월", stock:"5개", id:"contemporary-art-auction" },
+        { title:"ZERO BASE", year:"2026", round:"5월 화성", stock:"5개", id:"zero-base" }
+      ];
+
+      return `
+        <div class="stockCatalogSection">
+          <div class="stockCatalogInner">
+            <div class="stockCatalogHead">
+              <div class="stockCatalogTitle">
+                <span>도록</span>
+                <em>|</em>
+                <small>Catalogue</small>
+              </div>
+              <div class="stockCatalogRight">재고</div>
+            </div>
+
+            <div class="stockCatalogCards">
+              ${cards.map(card => `
+                <button class="stockCatalogCard" type="button" data-stock-catalog-apply="${escapeAttr(card.id)}">
+                  <div class="stockCatalogCardTitle">${card.title}</div>
+                  <div class="stockCatalogLine"></div>
+                  <div class="stockCatalogYear">${escapeHtml(card.year)}</div>
+                  <div class="stockCatalogRound">${escapeHtml(card.round)}</div>
+                  <div class="stockCatalogLine"></div>
+                  <div class="stockCatalogQty">${escapeHtml(card.stock)}</div>
+                </button>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+      `;
     }
 
     function renderHome(mode = "request"){
@@ -2117,7 +2662,7 @@ if(item.img && (!item.images || !item.images[0])){
 
       const keyword = (q.value || "").trim().toLowerCase();
       const isStockMode = mode === "list";
-      const showCatalogMenu = !keyword;
+      const showCatalogMenu = false; // 도록 신청하기/도록 메뉴 전체 비노출
 
       const sectionsHtml = data.map((section, sectionIndex) => {
         const filtered = (section.items||[]).filter(it => {
@@ -2150,21 +2695,22 @@ if(item.img && (!item.images || !item.images[0])){
                     ${filtered.map(it => {
                       const stock = calcStock(it);
                       return `
-                        <div class="row ${it.name === "와인박스(1구)" ? "wineboxGap" : ""}">
-                          <div class="card" role="button" tabindex="0" data-open="${escapeAttr(it.id)}">
-                            <div class="thumb">
+                        <div class="row stockStatusRow ${it.name === "와인박스(1구)" ? "wineboxGap" : ""}">
+                          <div class="card stockStatusCard" role="button" tabindex="0" data-open="${escapeAttr(it.id)}">
+                            <div class="thumb stockStatusThumb">
                               ${it.img ? renderSmartImage(it.img, it.name) : iconPlaceholder()}
                             </div>
 
-                            <div class="meta">
+                            <div class="meta stockStatusMeta">
                               <div class="meta-top">
-                                <div class="title">${escapeHtml(it.name)}</div>
-                                <div class="size">${escapeHtml(it.size || "")}</div>
+                                <div class="title stockStatusTitle">${escapeHtml(it.name)}</div>
+                                <div class="size stockStatusSize">${escapeHtml(it.size || "")}</div>
                               </div>
+                              <div class="stockStatusSub">대기 없음 · +0</div>
                             </div>
                           </div>
 
-                          <div class="stock">
+                          <div class="stock stockStatusQty">
                             ${Number.isFinite(stock) ? `${stock.toLocaleString()}<small>개</small>` : `-`}
                           </div>
                         </div>
@@ -2226,7 +2772,8 @@ if(item.img && (!item.images || !item.images[0])){
         `;
       }).join("");
 
-      const catalogMenuHtml = showCatalogMenu ? renderCatalogMenu() : "";
+      // 도록 신청하기 자체 제거: 신청/관리자/재고현황 홈에서 도록 영역을 표시하지 않음
+      const catalogMenuHtml = "";
       app.innerHTML = (catalogMenuHtml + sectionsHtml) || `
         <div class="paper">
           <div class="paper-head">안내</div>
@@ -2347,11 +2894,6 @@ function renderCatalogDetail(catalogId){
         const fallbackYear = currentYear || yearList[0] || "";
         const roundList = Array.isArray(config.data?.[fallbackYear]) ? config.data[fallbackYear] : [];
         const activeRound = roundList.includes(currentRound) ? currentRound : (roundList[0] || "");
-        const catalogViewKey = `catalog_view_mode_${catalogId}`;
-        const isDetailMode = sessionStorage.getItem(catalogViewKey) === "detail";
-        const detailImagePath = galleryImages[0] || "";
-        const roundNumberText = String(activeRound || currentRound || "").replace(/회$/g, "");
-        const detailTitleText = roundNumberText ? `제${roundNumberText}회 미술품 경매 도록` : "미술품 경매 도록";
 
         const yearOptions = [
           `<option value="">${escapeHtml(config.yearPlaceholder || "연도")}</option>`,
@@ -2403,49 +2945,25 @@ function renderCatalogDetail(catalogId){
                     <span class="catalogSelectArrow">▼</span>
                   </div>
                   <div class="catalogDetailAction">
-                    <button class="catalogDetailSubmit" id="catalogRequestSubmitBtn" type="button">${isDetailMode ? "신청하기" : "검색하기"}</button>
+                    <button class="catalogDetailSubmit" id="catalogRequestSubmitBtn" type="button">출고 신청하기</button>
                   </div>
                 </div>
 
-                ${isDetailMode ? `
-                  <div class="catalogSelectedDetail">
-                    <div class="catalogSelectedImage">
-                      ${detailImagePath ? renderSmartImage(detailImagePath, detailTitleText) : `<div class="catalogGalleryPlaceholder">IMAGE</div>`}
-                    </div>
-                    <div class="catalogSelectedInfo">
-                      <div class="catalogSelectedYear">${escapeHtml(fallbackYear || currentYear || "")}</div>
-                      <div class="catalogSelectedTitle">${escapeHtml(detailTitleText)}</div>
-                      <button class="catalogSelectedStock" id="catalogStockOpenBtn" type="button">
-                        <span>재고</span>
-                        <span>${currentStock.toLocaleString()}개</span>
-                      </button>
-                    </div>
+                <div class="catalogStockCaption">현재 재고</div>
+                <div class="catalogStockBox">
+                  <div class="catalogStockRow">
+                    <div class="catalogStockLabel">현재 재고</div>
+                    <div class="catalogStockValue">${currentStock.toLocaleString()}개</div>
                   </div>
-                ` : `
-                  <div class="catalogGalleryTitle">도록</div>
-                  <div class="catalogGalleryGrid">${galleryHtml}</div>
-                `}
+                </div>
+
+                <div class="catalogGalleryTitle">도록</div>
+                <div class="catalogGalleryGrid">${galleryHtml}</div>
               </div>
 
-              ${isDetailMode ? `
-              <div class="detailSectionBlock">}
-raise 'main block not found' unless s.include?(old)
-s=s.sub(old,new)
-old=%Q{                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="modal" id="catalogAddModal" aria-hidden="true">}
-new=%Q{                </div>
-              </div>
-              ` : ""}
-            </div>
-          </div>
-
-          <div class="modal" id="catalogAddModal" aria-hidden="true">
+              <div class="detailSectionBlock">
                 <div class="boxTitleRow detailSectionHead">
-                  <p class="boxTitle">출고 신청 내역</p>
+                  <p class="boxTitle">신청 내역</p>
                   <div class="requestAdminActions">
                     <button class="selDelBtn" id="catalogBulkDeleteRequests" type="button">삭제</button>
                   </div>
@@ -2520,7 +3038,6 @@ new=%Q{                </div>
         const yearSelect = app.querySelector("#catalogYearSelect");
         const roundSelect = app.querySelector("#catalogRoundSelect");
         const submitBtn = app.querySelector("#catalogRequestSubmitBtn");
-        const stockOpenBtn = app.querySelector("#catalogStockOpenBtn");
         const catalogAddModal = app.querySelector("#catalogAddModal");
         const catalogAddOverlay = app.querySelector("#catalogAddOverlay");
         const catalogAddClose = app.querySelector("#catalogAddClose");
@@ -2545,7 +3062,6 @@ new=%Q{                </div>
         if(typeSelect){
           typeSelect.addEventListener("change", ()=>{
             const nextType = typeSelect.value || "offline-auction";
-            sessionStorage.removeItem(`catalog_view_mode_${nextType}`);
             location.hash = `#/request/catalog/${encodeURIComponent(nextType)}`;
           });
         }
@@ -2589,17 +3105,8 @@ new=%Q{                </div>
               round,
               currentStock
             });
-            if(!isDetailMode){
-              sessionStorage.setItem(catalogViewKey, "detail");
-              render();
-              return;
-            }
             openCatalogRequestModal();
           });
-        }
-
-        if(stockOpenBtn){
-          stockOpenBtn.addEventListener("click", openCatalogRequestModal);
         }
 
         if(catalogAddOverlay) catalogAddOverlay.addEventListener("click", closeCatalogRequestModal);
@@ -3000,7 +3507,7 @@ const detailImagesHtml = detailImages.length
 
               <div class="detailSectionBlock">
                 <div class="boxTitleRow detailSectionHead">
-                  <p class="boxTitle">출고 신청 내역</p>
+                  <p class="boxTitle">신청 내역</p>
                   ${(isRequest || isAdmin) ? `
                     <div class="requestAdminActions">
                       ${isAdmin ? `<button class="selDelBtn reqApproveBtn" id="approveRequestsBtn" type="button">승인</button>
@@ -3245,8 +3752,12 @@ const detailImagesHtml = detailImages.length
         if(approveRequestsBtn){
           approveRequestsBtn.addEventListener("click", async ()=>{
             const rows = (it.requests || []).filter(r => selectedRequestKeys.has(r.__key));
-            const pendingRows = rows.filter(r => (r.status || "pending") === "pending");
-            if(pendingRows.length === 0){
+            const approvableRows = rows.filter(r => {
+              const status = r.status || "pending";
+              return status === "pending" || status === "rejected";
+            });
+
+            if(approvableRows.length === 0){
               alert("승인할 요청 내역을 선택해주세요.");
               return;
             }
@@ -3254,7 +3765,7 @@ const detailImagesHtml = detailImages.length
             const approverEmail = await getCurrentUserEmail();
 
             try{
-              for(const r of pendingRows){
+              for(const r of approvableRows){
                 if(!r._dbid){
                   throw new Error("DB 요청 ID가 없습니다.");
                 }
@@ -3556,6 +4067,7 @@ const detailImagesHtml = detailImages.length
       }
 
       const shopItem = hash.match(/^#\/shop\/item\/(.+)$/);
+      const adminShopItem = hash.match(/^#\/admin\/shop\/item\/(.+)$/);
       const requestItem = hash.match(/^#\/request\/item\/(.+)$/);
       const requestCatalogApply = hash.match(/^#\/request\/catalog\/([^/]+)\/apply$/);
       const requestCatalog = hash.match(/^#\/request\/catalog\/([^/]+)$/);
@@ -3571,17 +4083,42 @@ const detailImagesHtml = detailImages.length
       }else if(hash === "#/" || hash === ""){
         await renderMainHome();
       }else if(hash === "#/shop"){
-        renderShopListPage();
+        const ok = await isAdminUser();
+        if(ok) await renderShopAdminRequestsPage();
+        else renderShopListPage();
+      }else if(hash === "#/shop/account"){
+        const ok = await isAdminUser();
+        if(ok) await renderShopAdminRequestsPage();
+        else renderShopAccountPage();
+      }else if(hash === "#/shop/orders"){
+        const ok = await isAdminUser();
+        if(ok) await renderShopAdminRequestsPage();
+        else renderShopOrdersPage();
       }else if(hash === "#/shop/cart"){
-        renderShopCartPage();
+        const ok = await isAdminUser();
+        if(ok) await renderShopAdminRequestsPage();
+        else renderShopCartPage();
+      }else if(adminShopItem){
+        const ok = await isAdminUser();
+        if(!ok){ alert("관리자 권한이 없습니다."); location.hash = "#/"; return; }
+        await renderShopAdminDetailPage(decodeURIComponent(adminShopItem[1]));
       }else if(shopItem){
         renderShopDetailPage(decodeURIComponent(shopItem[1]));
       }else if(hash === "#/request"){
+        const ok = await isAdminUser();
+        if(ok){
+          location.hash = "#/admin";
+          return;
+        }
         renderHome("request");
       }else if(requestCatalogApply){
-        renderCatalogApplyPage(decodeURIComponent(requestCatalogApply[1]));
+        // 도록 신청하기 제거: 기존 링크/북마크로 접근해도 신청 페이지로 돌려보냄
+        location.hash = "#/request";
+        return;
       }else if(requestCatalog){
-        renderCatalogDetail(decodeURIComponent(requestCatalog[1]));
+        // 도록 신청하기 제거: 기존 링크/북마크로 접근해도 신청 페이지로 돌려보냄
+        location.hash = "#/request";
+        return;
       }else if(hash === "#/list"){
         renderHome("list");
       }else if(hash === "#/admin"){
@@ -3725,6 +4262,11 @@ const detailImagesHtml = detailImages.length
       }else if(hash === "#/list"){
         renderHome("list");
       }else{
+        const ok = await isAdminUser();
+        if(ok){
+          location.hash = "#/admin";
+          return;
+        }
         renderHome("request");
       }
     });
@@ -3743,6 +4285,11 @@ const detailImagesHtml = detailImages.length
         }else if(hash === "#/list"){
           renderHome("list");
         }else{
+          const ok = await isAdminUser();
+          if(ok){
+            location.hash = "#/admin";
+            return;
+          }
           renderHome("request");
         }
       }
@@ -3760,12 +4307,25 @@ const detailImagesHtml = detailImages.length
       }else if(hash === "#/list"){
         renderHome("list");
       }else if(hash === "#/shop"){
-        renderShopListPage();
+        const ok = await isAdminUser();
+        if(ok) await renderShopAdminRequestsPage();
+        else renderShopListPage();
+      }else if(hash === "#/shop/account"){
+        const ok = await isAdminUser();
+        if(ok) await renderShopAdminRequestsPage();
+        else renderShopAccountPage();
       }else if(hash === "#/shop/cart"){
-        renderShopCartPage();
-      }else if(shopItem){
-        renderShopDetailPage(decodeURIComponent(shopItem[1]));
+        const ok = await isAdminUser();
+        if(ok) await renderShopAdminRequestsPage();
+        else renderShopCartPage();
+      }else if(/^#\/shop\/item\//.test(hash)){
+        return;
       }else if(hash === "#/request"){
+        const ok = await isAdminUser();
+        if(ok){
+          location.hash = "#/admin";
+          return;
+        }
         renderHome("request");
       }
     });
@@ -3826,6 +4386,7 @@ if(!ok){
 
       try{
         await syncHomeLoginSessionFromSupabase();
+        await syncDefaultItemsToDB();
         await loadAllFromDB_FORCE();
       }catch(err){
         console.error("DB 로드 실패:", err);
@@ -3853,3 +4414,913 @@ if(!ok){
 window.addEventListener("error", function(e){
   console.error("JS 에러:", e.message, e.filename, e.lineno, e.colno);
 });
+
+/* ===== Catalogue page redesign override 2026-04-28 / fixed v4 layout ===== */
+
+function __catalogRoundMeta(catalogId, year, round){
+  const id = String(catalogId || "offline-auction");
+  const y = String(year || "");
+  const r = String(round || "");
+
+  if(id === "offline-auction"){
+    if(r.includes("191")) return { round:"191회", title:"제191회 미술품 경매 도록", date:"04/21(화)", image:"images/2604_191.jpg" };
+    if(r.includes("190")) return { round:"190회", title:"제190회 미술품 경매 도록", date:"02/25(수)", image:"images/2602_190.jpg" };
+    if(r.includes("189")) return { round:"189회", title:"제189회 미술품 경매 도록", date:"01/27(화)", image:"images/2601_189.jpg" };
+    return { round:r || "-", title:`${y || "2026"} Major Auction 도록`, date:"", image:"" };
+  }
+
+  if(id === "contemporary-art-auction"){
+    if(r.includes("6")) return { round:"6월 컨템", title:"6월 컨템포러리 아트 세일 도록", date:"06월", image:"images/2603_contem.jpg" };
+    if(r.includes("3")) return { round:"3월 컨템", title:"3월 컨템포러리 아트 세일 도록", date:"03월", image:"images/2603_contem.jpg" };
+    return { round:r || "-", title:`${y || "2026"} Contemporary Art Sale 도록`, date:"", image:"images/2603_contem.jpg" };
+  }
+
+  if(id === "zero-base"){
+    if(r.includes("5")) return { round:"5월 화성", title:"제로베이스 도록", date:"5월", image:"images/2604_191.jpg" };
+    return { round:r || "-", title:`${y || "2026"} Zero Base 도록`, date:"", image:"images/2604_191.jpg" };
+  }
+
+  return { round:r || "-", title:"도록", date:"", image:"" };
+}
+
+function __catalogYearResults(catalogId, year, round){
+  const config = getUnifiedCatalogConfig(catalogId);
+  const rounds = Array.isArray(config?.data?.[year]) ? config.data[year] : [];
+
+  if(round){
+    return [__catalogRoundMeta(catalogId, year, round)].filter(x => x && x.image);
+  }
+
+  return rounds
+    .map(r => __catalogRoundMeta(catalogId, year, r))
+    .filter(x => x && x.image);
+}
+
+function __goCatalogWholeSection(){
+  location.hash = "#/request";
+  setTimeout(() => {
+    const el = document.querySelector(".catalogMenuSection");
+    if(el){
+      el.scrollIntoView({ behavior:"smooth", block:"start" });
+    }
+  }, 180);
+}
+
+function renderCatalogDetail(catalogId){
+  topbar.style.display = "flex";
+  searchBox.style.display = "none";
+  setTopbarRightSearch();
+  if(topbarLogo) topbarLogo.classList.add("show");
+  updateTopbarLogo();
+  setTopTitleByMode("request");
+  setBodyMode("request");
+
+  const config = getUnifiedCatalogConfig(catalogId);
+  if(!config){
+    app.innerHTML = `<div class="paper"><div class="paper-head">알림</div><div class="paper-body">페이지를 찾을 수 없습니다.</div></div>`;
+    return;
+  }
+
+  const allDepts = ["경영기획팀","인사팀","관재팀","재무팀","서비스운영팀","아카이브팀","대외협력팀","디자인팀","영업팀","브랜드기획팀","고객관리팀","작품관리팀","VIP사업기획팀","웹서비스개발팀"];
+  let reqDateFilter = "";
+  let reqDeptFilter = "전체";
+  let reqStatusFilter = "전체";
+  let selectedRequestKeys = new Set();
+  let viewMode = sessionStorage.getItem(`catalog_view_${catalogId}`) || "gallery";
+
+  function getRequestRows(){
+    let rows = [...getCatalogRequests(catalogId)];
+    if(reqDateFilter) rows = rows.filter(r => toISODateLike(r.d) === reqDateFilter);
+    if(reqDeptFilter !== "전체") rows = rows.filter(r => (r.dept || "-") === reqDeptFilter);
+    if(reqStatusFilter === "전체") rows = rows.filter(r => (r.status || "pending") !== "approved");
+    else rows = rows.filter(r => (r.status || "pending") === reqStatusFilter);
+    return sortByLatestDateAndKey(rows);
+  }
+
+  function tableRows(rows){
+    if(rows.length === 0) return `<div class="logEmpty">내역이 없습니다.</div>`;
+    return rows.map(r => {
+      const key = r.__key;
+      const selected = selectedRequestKeys.has(key);
+      const statusText = requestStatusLabel(r.status);
+      const statusClassName = requestStatusClass(r.status);
+      return `
+        <div class="logRow clickable ${selected ? "selected" : ""}" data-row="${escapeAttr(key)}" data-kind="request">
+          <div class="logDate">${escapeHtml(formatKRDate(r.d))}</div>
+          <div class="logType"><span class="typeBadge request">${escapeHtml(r.t || "신청")}</span></div>
+          <div class="logDept">${escapeHtml(r.dept || "-")}</div>
+          <div class="logType"><span class="typeBadge ${statusClassName}">${escapeHtml(statusText)}</span></div>
+          <div class="logPerson">${escapeHtml(r.person || "-")}</div>
+          <div class="logQty">${Number(r.qty || 0).toLocaleString()}개</div>
+        </div>`;
+    }).join("");
+  }
+
+  function resultCards(year, round){
+    const results = __catalogYearResults(catalogId, year, round);
+    const isRoundSelected = !!round;
+
+    if(!year){
+      return `<div class="catalogEmptyResult">연도를 선택한 뒤 검색해주세요.</div>`;
+    }
+
+    if(!results.length){
+      return `<div class="catalogEmptyResult">해당 연도에 등록된 도록 이미지가 없습니다.</div>`;
+    }
+
+    if(isRoundSelected){
+      const meta = results[0];
+      return `
+        <div class="catalogRoundDetailLayout">
+          <div class="catalogRoundInfo">
+            <div class="catalogYearBadge">${escapeHtml(year)}</div>
+            <h3 class="catalogRoundTitle">${escapeHtml(meta.title || "")}</h3>
+            <p class="catalogRoundDate">${escapeHtml(meta.date || meta.round || "")}</p>
+            <button class="catalogRoundApplyBtn" type="button" data-result-round="${escapeAttr(meta.round || "")}">신청하기</button>
+          </div>
+
+          <button class="catalogRoundImageBtn" type="button" data-result-round="${escapeAttr(meta.round || "")}">
+            <div class="catalogRoundImage">${renderSmartImage(meta.image, meta.title)}</div>
+          </button>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="catalogResultGrid yearOnly">
+        ${results.map(meta => `
+          <button class="catalogResultCard yearOnlyCard" type="button" data-result-round="${escapeAttr(meta.round || "")}">
+            <div class="catalogResultCardImg">${renderSmartImage(meta.image, meta.title)}</div>
+          </button>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function render(){
+    const selected = getCatalogApplySelection(catalogId);
+    const yearList = Object.keys(config.data || {});
+    const currentYear = selected?.year || "";
+    const roundList = Array.isArray(config.data?.[currentYear]) ? config.data[currentYear] : [];
+    const currentRound = selected?.round || "";
+    const activeRound = roundList.includes(currentRound) ? currentRound : "";
+    const requestRows = getRequestRows();
+    const isRoundSelected = viewMode === "result" && !!activeRound;
+
+    const galleryImages = Array.isArray(config.galleryImages) && config.galleryImages.length
+      ? config.galleryImages
+      : ["images/2601_189.jpg","images/2602_190.jpg","images/2603_contem.jpg","images/2604_191.jpg"];
+
+    const galleryHtml = Array.from({ length: 12 }, (_, idx) => {
+      const imagePath = galleryImages[idx % galleryImages.length] || "";
+      return `<button class="catalogGalleryItem" type="button" data-catalog-cover="${idx}">${imagePath ? renderSmartImage(imagePath, `${config.title || "Catalog"} ${idx + 1}`) : `<div class="catalogGalleryPlaceholder">IMAGE</div>`}</button>`;
+    }).join("");
+
+    const yearOptions = [
+      `<option value="">연도</option>`,
+      ...yearList.map(year => `<option value="${escapeAttr(year)}" ${currentYear === year ? "selected" : ""}>${escapeHtml(year)}</option>`)
+    ].join("");
+
+    const roundOptions = [
+      `<option value="">-</option>`,
+      ...roundList.map(round => `<option value="${escapeAttr(round)}" ${activeRound === round ? "selected" : ""}>${escapeHtml(round)}</option>`)
+    ].join("");
+
+    app.innerHTML = `
+      <div class="paper detailPaper requestDetailPaper"></div>
+      <div class="paper-body detailPaperBody">
+        <div class="catalogDetailPage">
+          <div class="catalogDetailTop">
+            <button class="catalogDetailTitle catalogWholeBackBtn" type="button" id="catalogWholeBackBtn">
+              <span class="catalogTitleKr">도록</span><span class="catalogTitleDivider">|</span><span class="catalogTitleEn">Catalogue</span>
+            </button>
+          </div>
+
+          <div class="catalogControlLabel">선택</div>
+          <div class="catalogDetailControlRow">
+            <div class="catalogSelectWrap"><select class="catalogSelect" id="catalogTypeSelect">${(config.typeOptions || getUnifiedCatalogOptions()).map(opt => `<option value="${escapeAttr(opt.id)}" ${String(config.id || "") === String(opt.id) ? "selected" : ""}>${escapeHtml(opt.label)}</option>`).join("")}</select><span class="catalogSelectArrow">▼</span></div>
+            <div class="catalogSelectWrap"><select class="catalogSelect" id="catalogYearSelect">${yearOptions}</select><span class="catalogSelectArrow">▼</span></div>
+            <div class="catalogSelectWrap"><select class="catalogSelect" id="catalogRoundSelect">${roundOptions}</select><span class="catalogSelectArrow">▼</span></div>
+            <div class="catalogDetailAction"><button class="catalogDetailSubmit" id="catalogSearchBtn" type="button">검색하기</button></div>
+          </div>
+
+          ${viewMode === "result" ? `
+            <div class="catalogResultView">
+              ${resultCards(currentYear, activeRound)}
+            </div>` : `
+            <div class="catalogGalleryGrid catalogGridView">${galleryHtml}</div>`}
+        </div>
+
+        ${true ? `
+        <div class="detailSectionBlock">
+          <div class="boxTitleRow detailSectionHead">
+            <p class="boxTitle">신청 내역</p>
+            <div class="requestAdminActions"><button class="selDelBtn" id="catalogBulkDeleteRequests" type="button">삭제</button></div>
+          </div>
+          <div class="logBox requestLogBox requestTable">
+            <div class="logMinWidth">
+              <div class="logHead subtleHead">
+                <div class="logHeadCell"><div class="logHeadLabel">연도. 월. 일.</div></div>
+                <div class="logHeadCell"><div class="logHeadLabel">구분</div></div>
+                <div class="logHeadCell"><div class="logHeadLabel">전체 부서</div></div>
+                <div class="logHeadCell"><div class="logHeadLabel">전체 상태</div></div>
+                <div class="logHeadCell"><div class="logHeadLabel">담당자</div></div>
+                <div class="logHeadCell"><div class="logHeadLabel">수량</div></div>
+              </div>
+              ${tableRows(requestRows)}
+            </div>
+          </div>
+        </div>` : ``}
+      </div>
+
+      <div class="modal" id="catalogAddModal" aria-hidden="true">
+        <div class="modalOverlay" id="catalogAddOverlay"></div>
+        <div class="sheet" role="dialog" aria-modal="true" aria-label="출고 신청하기">
+          <div class="sheetHead"><div>출고 신청하기</div><button class="sheetClose" id="catalogAddClose">닫기</button></div>
+          <div class="sheetBody">
+            <div class="field"><label for="catalogAddDate">날짜</label><input type="date" id="catalogAddDate"></div>
+            <input type="hidden" id="catalogAddType" value="신청">
+            <div class="field"><label for="catalogAddDept">부서</label><select id="catalogAddDept">${allDepts.map(d => `<option value="${escapeAttr(d)}">${escapeHtml(d)}</option>`).join("")}</select></div>
+            <div class="field"><label for="catalogAddQty">수량</label><input id="catalogAddQty" inputmode="numeric" placeholder="예) 100" /></div>
+            <div class="field"><label for="catalogAddPerson">담당자</label><input id="catalogAddPerson" placeholder="" /></div>
+          </div>
+          <div class="sheetFoot"><button class="btn primary" id="catalogAddBtn">출고 신청하기</button></div>
+        </div>
+      </div>`;
+
+    const typeSelect = app.querySelector("#catalogTypeSelect");
+    const yearSelect = app.querySelector("#catalogYearSelect");
+    const roundSelect = app.querySelector("#catalogRoundSelect");
+    const searchBtn = app.querySelector("#catalogSearchBtn");
+    const catalogAddModal = app.querySelector("#catalogAddModal");
+    const catalogAddOverlay = app.querySelector("#catalogAddOverlay");
+    const catalogAddClose = app.querySelector("#catalogAddClose");
+    const catalogAddBtn = app.querySelector("#catalogAddBtn");
+    const catalogAddDate = app.querySelector("#catalogAddDate");
+
+    function openCatalogRequestModal(){
+      if(!catalogAddModal) return;
+      catalogAddModal.classList.add("show");
+      document.body.style.overflow = "hidden";
+      if(catalogAddDate && !catalogAddDate.value) catalogAddDate.value = new Date().toISOString().slice(0, 10);
+    }
+
+    function closeCatalogRequestModal(){
+      if(!catalogAddModal) return;
+      catalogAddModal.classList.remove("show");
+      document.body.style.overflow = "";
+    }
+
+    app.querySelector("#catalogWholeBackBtn")?.addEventListener("click", __goCatalogWholeSection);
+
+    typeSelect?.addEventListener("change", ()=>{
+      const nextType = typeSelect.value || "offline-auction";
+      sessionStorage.removeItem(`catalog_view_${nextType}`);
+      saveCatalogApplySelection(nextType, { year:"", round:"" });
+      location.hash = `#/request/catalog/${encodeURIComponent(nextType)}`;
+    });
+
+    yearSelect?.addEventListener("change", ()=>{
+      const nextYear = yearSelect.value || "";
+      saveCatalogApplySelection(catalogId, {
+        ...getCatalogApplySelection(catalogId),
+        year: nextYear,
+        round: ""
+      });
+      sessionStorage.setItem(`catalog_view_${catalogId}`, "gallery");
+      viewMode = "gallery";
+      render();
+    });
+
+    roundSelect?.addEventListener("change", ()=>{
+      saveCatalogApplySelection(catalogId, {
+        ...getCatalogApplySelection(catalogId),
+        year: yearSelect?.value || "",
+        round: roundSelect.value || ""
+      });
+    });
+
+    searchBtn?.addEventListener("click", ()=>{
+      const year = yearSelect?.value || "";
+      const round = roundSelect?.value || "";
+      if(!year){
+        alert("연도를 선택해주세요.");
+        return;
+      }
+
+      saveCatalogApplySelection(catalogId, { year, round });
+      sessionStorage.setItem(`catalog_view_${catalogId}`, "result");
+      viewMode = "result";
+      render();
+    });
+
+    app.querySelectorAll("[data-catalog-cover]").forEach(btn => {
+      btn.addEventListener("click", ()=>{
+        const year = yearSelect?.value || currentYear || "2026";
+        const nextRounds = Array.isArray(config.data?.[year]) ? config.data[year] : [];
+        const round = roundSelect?.value || nextRounds[0] || "";
+        saveCatalogApplySelection(catalogId, { year, round });
+        sessionStorage.setItem(`catalog_view_${catalogId}`, "result");
+        viewMode = "result";
+        render();
+      });
+    });
+
+    app.querySelectorAll("[data-result-round]").forEach(btn => {
+      btn.addEventListener("click", ()=>{
+        const year = yearSelect?.value || currentYear || "";
+        const round = btn.dataset.resultRound || "";
+        if(!round) return;
+        saveCatalogApplySelection(catalogId, { year, round, currentStock:Number(config.currentStock || 0) });
+        sessionStorage.setItem(`catalog_view_${catalogId}`, "result");
+        viewMode = "result";
+        render();
+        setTimeout(openCatalogRequestModal, 80);
+      });
+    });
+
+    catalogAddOverlay?.addEventListener("click", closeCatalogRequestModal);
+    catalogAddClose?.addEventListener("click", closeCatalogRequestModal);
+
+    catalogAddBtn?.addEventListener("click", async ()=>{
+      const selectedInfo = getCatalogApplySelection(catalogId);
+      const date = app.querySelector("#catalogAddDate")?.value || "";
+      const dept = app.querySelector("#catalogAddDept")?.value || "";
+      const qty = Number(app.querySelector("#catalogAddQty")?.value || 0);
+      const person = (app.querySelector("#catalogAddPerson")?.value || "").trim();
+      const year = selectedInfo?.year || yearSelect?.value || "";
+      const round = selectedInfo?.round || roundSelect?.value || "";
+
+      if(!date || !dept || !qty || !person){ alert("모든 항목을 입력해주세요."); return; }
+      if(!Number.isFinite(qty) || qty <= 0){ alert("수량은 0보다 큰 숫자로 입력해주세요."); return; }
+
+      const rows = getCatalogRequests(catalogId);
+      const row = normalizeLog({ d: date, t: "신청", dept, person, qty, status:"pending", year, round, currentStock:Number(config.currentStock || 0) });
+
+      try{
+        const inserted = await addCatalogRequestToDB(catalogId, row);
+        if(inserted?.id){
+          row._dbid = inserted.id;
+          row.__key = `catalog_req_${inserted.id}`;
+        }
+        rows.push(row);
+        saveCatalogRequests(catalogId, rows);
+        closeCatalogRequestModal();
+        render();
+        alert("출고 신청이 접수되었습니다.");
+      }catch(err){
+        console.error("도록 신청 DB 저장 실패:", err);
+        alert("DB 저장 중 오류가 발생했습니다.");
+      }
+    });
+
+    app.querySelectorAll('.logRow.clickable[data-kind="request"]').forEach(rowEl => {
+      rowEl.addEventListener("click", ()=>{
+        const key = rowEl.dataset.row;
+        if(selectedRequestKeys.has(key)) selectedRequestKeys.delete(key);
+        else selectedRequestKeys.add(key);
+        rowEl.classList.toggle("selected");
+      });
+    });
+
+    app.querySelector("#catalogBulkDeleteRequests")?.addEventListener("click", async ()=>{
+      if(selectedRequestKeys.size === 0){ alert("삭제할 내역을 선택해주세요."); return; }
+
+      const currentRows = getCatalogRequests(catalogId);
+      const rowsToDelete = currentRows.filter(r => selectedRequestKeys.has(r.__key));
+      const nextRows = currentRows.filter(r => !selectedRequestKeys.has(r.__key));
+
+      try{
+        await deleteCatalogRequestsByKeys(catalogId, rowsToDelete);
+        saveCatalogRequests(catalogId, nextRows);
+        selectedRequestKeys.clear();
+        render();
+      }catch(err){
+        console.error("도록 신청내역 DB 삭제 실패:", err);
+        alert("DB 삭제 중 오류가 발생했습니다.");
+      }
+    });
+  }
+
+  render();
+  syncCatalogRequestsFromDB(catalogId).then((changed)=>{
+    if(changed) render();
+  }).catch(err => console.error("도록 신청내역 DB 동기화 실패:", err));
+}
+
+
+
+/* ===== FINAL DIRECT FIX: 물품재고현황 도록 카드 클릭 시 신청 폼 열기 ===== */
+(function(){
+  const STOCK_CATALOG_PAYLOADS = {
+    "offline-auction": { year:"2026", round:"191회", currentStock:10 },
+    "contemporary-art-auction": { year:"2026", round:"3월 컨템", currentStock:5 },
+    "zero-base": { year:"2026", round:"5월 화성", currentStock:5 }
+  };
+
+  function getStockCatalogTitle(catalogId){
+    if(catalogId === "contemporary-art-auction") return "도록 | Contemporary Art Sale";
+    if(catalogId === "zero-base") return "도록 | Zero Base";
+    return "도록 | Major Auction";
+  }
+
+  function ensureStockCatalogApplyModal(){
+    let modal = document.getElementById("stockCatalogApplyModal");
+    if(modal) return modal;
+
+    const depts = ["경영기획팀","인사팀","관재팀","재무팀","서비스운영팀","아카이브팀","대외협력팀","디자인팀","영업팀","브랜드기획팀","고객관리팀","작품관리팀","VIP사업기획팀","웹서비스개발팀"];
+
+    modal = document.createElement("div");
+    modal.className = "modal stockCatalogApplyModal";
+    modal.id = "stockCatalogApplyModal";
+    modal.setAttribute("aria-hidden", "true");
+
+    modal.innerHTML = `
+      <div class="modalOverlay" data-stock-catalog-close="1"></div>
+      <div class="sheet" role="dialog" aria-modal="true" aria-label="출고 신청하기">
+        <div class="sheetHead">
+          <div>출고 신청하기</div>
+          <button class="sheetClose" type="button" data-stock-catalog-close="1">닫기</button>
+        </div>
+        <div class="sheetBody">
+          <div class="field"><label>도록</label><input id="stockCatalogApplyTitle" readonly></div>
+          <div class="field"><label>날짜</label><input type="date" id="stockCatalogApplyDate"></div>
+          <div class="field"><label>부서</label><select id="stockCatalogApplyDept">${depts.map(d => `<option value="${d}">${d}</option>`).join("")}</select></div>
+          <div class="field"><label>수량</label><input id="stockCatalogApplyQty" inputmode="numeric" placeholder="예) 100"></div>
+          <div class="field"><label>담당자</label><input id="stockCatalogApplyPerson" placeholder=""></div>
+        </div>
+        <div class="sheetFoot"><button class="btn primary" id="stockCatalogApplySubmit" type="button">출고 신청하기</button></div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    modal.addEventListener("click", async function(e){
+      if(e.target.closest("[data-stock-catalog-close]")){
+        closeStockCatalogApplyModal();
+        return;
+      }
+
+      const submit = e.target.closest("#stockCatalogApplySubmit");
+      if(!submit) return;
+
+      const catalogId = modal.dataset.catalogId || "offline-auction";
+      const payload = STOCK_CATALOG_PAYLOADS[catalogId] || STOCK_CATALOG_PAYLOADS["offline-auction"];
+
+      const date = modal.querySelector("#stockCatalogApplyDate")?.value || "";
+      const dept = modal.querySelector("#stockCatalogApplyDept")?.value || "";
+      const qty = Number(modal.querySelector("#stockCatalogApplyQty")?.value || 0);
+      const person = (modal.querySelector("#stockCatalogApplyPerson")?.value || "").trim();
+
+      if(!date || !dept || !qty || !person){
+        alert("모든 항목을 입력해주세요.");
+        return;
+      }
+
+      if(!Number.isFinite(qty) || qty <= 0){
+        alert("수량은 0보다 큰 숫자로 입력해주세요.");
+        return;
+      }
+
+      try{
+        const row = normalizeLog({
+          d: date,
+          t: "신청",
+          dept,
+          person,
+          qty,
+          status: "pending",
+          year: payload.year,
+          round: payload.round,
+          currentStock: payload.currentStock
+        });
+
+        const rows = getCatalogRequests(catalogId);
+        try{
+          const inserted = await addCatalogRequestToDB(catalogId, row);
+          if(inserted?.id){
+            row._dbid = inserted.id;
+            row.__key = `catalog_req_${inserted.id}`;
+          }
+        }catch(dbErr){
+          console.error("도록 신청 DB 저장 실패, 로컬 저장으로 진행:", dbErr);
+        }
+
+        rows.push(row);
+        saveCatalogRequests(catalogId, rows);
+        closeStockCatalogApplyModal();
+        alert("출고 신청이 접수되었습니다.");
+      }catch(err){
+        console.error("도록 신청 저장 실패:", err);
+        alert("신청 저장 중 오류가 발생했습니다.");
+      }
+    });
+
+    return modal;
+  }
+
+  function openStockCatalogApplyModal(catalogId){
+    const modal = ensureStockCatalogApplyModal();
+    const payload = STOCK_CATALOG_PAYLOADS[catalogId] || STOCK_CATALOG_PAYLOADS["offline-auction"];
+
+    modal.dataset.catalogId = catalogId;
+    modal.querySelector("#stockCatalogApplyTitle").value = `${getStockCatalogTitle(catalogId)} / ${payload.year} / ${payload.round}`;
+    modal.querySelector("#stockCatalogApplyDate").value = new Date().toISOString().slice(0,10);
+    modal.querySelector("#stockCatalogApplyQty").value = "";
+    modal.querySelector("#stockCatalogApplyPerson").value = "";
+
+    try{
+      saveCatalogApplySelection(catalogId, payload);
+    }catch(err){}
+
+    modal.classList.add("show");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeStockCatalogApplyModal(){
+    const modal = document.getElementById("stockCatalogApplyModal");
+    if(!modal) return;
+    modal.classList.remove("show");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  document.addEventListener("click", function(e){
+    const card = e.target.closest("[data-stock-catalog-apply]");
+    if(!card) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+
+    const catalogId = card.getAttribute("data-stock-catalog-apply") || "offline-auction";
+    openStockCatalogApplyModal(catalogId);
+  }, true);
+})();
+
+/* ===== PATCH: catalog admin approve/reject/delete mirrors item request detail ===== */
+async function upsertCatalogStockToDB(catalogId, year, round, nextStock){
+  if(!dbReady()) return;
+  const payload = {
+    catalog_id: catalogId,
+    catalog_title: getCatalogDisplayTitle(catalogId),
+    catalog_year: String(year || ""),
+    catalog_round: String(round || ""),
+    updated_at: new Date().toISOString()
+  };
+  const { error } = await supabaseClient
+    .from(DB_CATALOG_STOCKS)
+    .upsert(payload, { onConflict: "catalog_id,catalog_year,catalog_round" });
+  if(error) throw error;
+}
+
+async function updateCatalogRequestStatusById(requestId, status, approvedBy){
+  if(!dbReady()) return;
+  const numericId = Number(requestId);
+  if(!Number.isFinite(numericId)) throw new Error("도록 신청 ID가 올바르지 않습니다.");
+  const nowIso = new Date().toISOString();
+  const payload = status === "approved"
+    ? { status:"approved", approved_at:nowIso, approved_by:approvedBy || "", rejected_at:null, rejected_by:null }
+    : { status:"rejected", rejected_at:nowIso, rejected_by:approvedBy || "" };
+  const { error } = await supabaseClient
+    .from(DB_CATALOG_REQUESTS)
+    .update(payload)
+    .eq("id", numericId);
+  if(error) throw error;
+}
+
+async function approveCatalogRequestRow(catalogId, row, approvedBy){
+  if(!row) return;
+  const year = String(row.year || "");
+  const round = String(row.round || "");
+  const qty = Number(row.qty || 0);
+  const dbStock = await getCatalogStockFromDB(catalogId, year, round);
+  const before = Number(dbStock || row.currentStock || 0);
+  const nextStock = Math.max(0, before - qty);
+  await upsertCatalogStockToDB(catalogId, year, round, nextStock);
+  if(row._dbid) await updateCatalogRequestStatusById(row._dbid, "approved", approvedBy);
+  row.status = "approved";
+  row.approved_at = new Date().toISOString();
+  row.approved_by = approvedBy || "";
+  row.currentStock = nextStock;
+}
+
+async function rejectCatalogRequestRow(row, approvedBy){
+  if(!row) return;
+  if(row._dbid) await updateCatalogRequestStatusById(row._dbid, "rejected", approvedBy);
+  row.status = "rejected";
+  row.rejected_at = new Date().toISOString();
+  row.rejected_by = approvedBy || "";
+}
+
+async function renderCatalogDetail(catalogId){
+  topbar.style.display = "flex";
+  searchBox.style.display = "none";
+  setTopbarRightSearch();
+  if(topbarLogo) topbarLogo.classList.add("show");
+  updateTopbarLogo();
+  setTopTitleByMode("request");
+  setBodyMode("request");
+
+  const config = getUnifiedCatalogConfig(catalogId);
+  const isAdmin = await isAdminUser();
+  if(!config){
+    app.innerHTML = `<div class="paper"><div class="paper-head">알림</div><div class="paper-body">페이지를 찾을 수 없습니다.</div></div>`;
+    return;
+  }
+
+  const allDepts = ["경영기획팀","인사팀","관재팀","재무팀","서비스운영팀","아카이브팀","대외협력팀","디자인팀","영업팀","브랜드기획팀","고객관리팀","작품관리팀","VIP사업기획팀","웹서비스개발팀"];
+  let selectedRequestKeys = new Set();
+  let selectedLogKeys = new Set();
+  let viewMode = sessionStorage.getItem(`catalog_view_${catalogId}`) || "gallery";
+
+  function rowHtml(rows, kind="request"){
+    if(!rows.length) return `<div class="logEmpty">내역이 없습니다.</div>`;
+    return rows.map(r => {
+      const key = r.__key;
+      const selected = kind === "log" ? selectedLogKeys.has(key) : selectedRequestKeys.has(key);
+      const type = kind === "log" ? "출고" : "신청";
+      const statusText = requestStatusLabel(r.status);
+      const statusClassName = requestStatusClass(r.status);
+      return `
+        <div class="logRow clickable ${selected ? "selected" : ""}" data-row="${escapeAttr(key)}" data-kind="${escapeAttr(kind)}">
+          <div class="logDate">${escapeHtml(formatKRDate(r.d))}</div>
+          <div class="logType"><span class="typeBadge ${kind === "log" ? "out" : "request"}">${escapeHtml(type)}</span></div>
+          <div class="logDept">${escapeHtml(r.dept || "-")}</div>
+          ${kind === "request" ? `<div class="logType"><span class="typeBadge ${statusClassName}">${escapeHtml(statusText)}</span></div>` : ``}
+          <div class="logPerson">${escapeHtml(r.person || "-")}</div>
+          <div class="logQty">${Number(r.qty || 0).toLocaleString()}개</div>
+        </div>`;
+    }).join("");
+  }
+
+  function resultCards(year, round){
+    const results = __catalogYearResults(catalogId, year, round);
+    if(!year) return `<div class="catalogEmptyResult">연도를 선택한 뒤 검색해주세요.</div>`;
+    if(!results.length) return `<div class="catalogEmptyResult">해당 연도에 등록된 도록 이미지가 없습니다.</div>`;
+    if(round){
+      const meta = results[0];
+      return `
+        <div class="catalogRoundDetailLayout">
+          <div class="catalogRoundInfo">
+            <div class="catalogYearBadge">${escapeHtml(year)}</div>
+            <h3 class="catalogRoundTitle">${escapeHtml(meta.title || "")}</h3>
+            <p class="catalogRoundDate">${escapeHtml(meta.date || meta.round || "")}</p>
+            ${isAdmin
+              ? `<div class="catalogRoundApplyBtn adminStockOnly" aria-label="현재재고">현재 재고 : <b data-catalog-current-stock>0</b>부</div>`
+              : `<button class="catalogRoundApplyBtn" type="button" data-result-round="${escapeAttr(meta.round || "")}">신청하기</button>`}
+          </div>
+          <button class="catalogRoundImageBtn" type="button" data-result-round="${escapeAttr(meta.round || "")}">
+            <div class="catalogRoundImage">${renderSmartImage(meta.image, meta.title)}</div>
+          </button>
+        </div>`;
+    }
+    return `<div class="catalogResultGrid yearOnly">${results.map(meta => `
+      <button class="catalogResultCard yearOnlyCard" type="button" data-result-round="${escapeAttr(meta.round || "")}">
+        <div class="catalogResultCardImg">${renderSmartImage(meta.image, meta.title)}</div>
+      </button>`).join("")}</div>`;
+  }
+
+  function render(){
+    const selected = getCatalogApplySelection(catalogId);
+    const yearList = Object.keys(config.data || {});
+    const currentYear = selected?.year || "";
+    const roundList = Array.isArray(config.data?.[currentYear]) ? config.data[currentYear] : [];
+    const currentRound = selected?.round || "";
+    const activeRound = roundList.includes(currentRound) ? currentRound : "";
+    const isRoundSelected = viewMode === "result" && !!activeRound;
+
+    const allRows = sortByLatestDateAndKey(getCatalogRequests(catalogId));
+    const scopedRows = allRows.filter(r => !isRoundSelected || (String(r.year || "") === String(currentYear || "") && String(r.round || "") === String(activeRound || "")));
+    const requestRows = scopedRows.filter(r => (r.status || "pending") !== "approved");
+    const approvedLogRows = scopedRows.filter(r => (r.status || "pending") === "approved").map(r => normalizeLog({ ...r, t:"출고", __key:r.__key }));
+    const baseCatalogStock = Number(config.currentStock || 0);
+    const approvedOutQty = approvedLogRows.reduce((sum, r) => sum + Number(r.qty || 0), 0);
+    const catalogCurrentStock = Math.max(0, baseCatalogStock - approvedOutQty);
+
+    const galleryImages = Array.isArray(config.galleryImages) && config.galleryImages.length
+      ? config.galleryImages
+      : ["images/2601_189.jpg","images/2602_190.jpg","images/2603_contem.jpg","images/2604_191.jpg"];
+    const galleryHtml = Array.from({ length: 12 }, (_, idx) => {
+      const imagePath = galleryImages[idx % galleryImages.length] || "";
+      return `<button class="catalogGalleryItem" type="button" data-catalog-cover="${idx}">${imagePath ? renderSmartImage(imagePath, `${config.title || "Catalog"} ${idx + 1}`) : `<div class="catalogGalleryPlaceholder">IMAGE</div>`}</button>`;
+    }).join("");
+    const yearOptions = [`<option value="">연도</option>`, ...yearList.map(year => `<option value="${escapeAttr(year)}" ${currentYear === year ? "selected" : ""}>${escapeHtml(year)}</option>`)].join("");
+    const roundOptions = [`<option value="">-</option>`, ...roundList.map(round => `<option value="${escapeAttr(round)}" ${activeRound === round ? "selected" : ""}>${escapeHtml(round)}</option>`)].join("");
+
+    app.innerHTML = `
+      <div class="paper detailPaper requestDetailPaper"></div>
+      <div class="paper-body detailPaperBody">
+        <div class="catalogDetailPage">
+          <div class="catalogDetailTop">
+            <button class="catalogDetailTitle catalogWholeBackBtn" type="button" id="catalogWholeBackBtn">
+              <span class="catalogTitleKr">도록</span><span class="catalogTitleDivider">|</span><span class="catalogTitleEn">Catalogue</span>
+            </button>
+          </div>
+          <div class="catalogControlLabel">선택</div>
+          <div class="catalogDetailControlRow">
+            <div class="catalogSelectWrap"><select class="catalogSelect" id="catalogTypeSelect">${(config.typeOptions || getUnifiedCatalogOptions()).map(opt => `<option value="${escapeAttr(opt.id)}" ${String(config.id || "") === String(opt.id) ? "selected" : ""}>${escapeHtml(opt.label)}</option>`).join("")}</select><span class="catalogSelectArrow">▼</span></div>
+            <div class="catalogSelectWrap"><select class="catalogSelect" id="catalogYearSelect">${yearOptions}</select><span class="catalogSelectArrow">▼</span></div>
+            <div class="catalogSelectWrap"><select class="catalogSelect" id="catalogRoundSelect">${roundOptions}</select><span class="catalogSelectArrow">▼</span></div>
+            <div class="catalogDetailAction"><button class="catalogDetailSubmit" id="catalogSearchBtn" type="button">검색하기</button></div>
+          </div>
+          ${viewMode === "result" ? `<div class="catalogResultView">${resultCards(currentYear, activeRound)}</div>` : `<div class="catalogGalleryGrid catalogGridView">${galleryHtml}</div>`}
+        </div>
+
+        ${true ? `
+        <div class="detailSectionBlock">
+          <div class="boxTitleRow detailSectionHead">
+            <p class="boxTitle">신청 내역</p>
+            <div class="requestAdminActions">
+              ${isAdmin ? `<button class="selDelBtn reqApproveBtn" id="catalogApproveRequestsBtn" type="button">승인</button><button class="selDelBtn reqRejectBtn" id="catalogRejectRequestsBtn" type="button">반려</button>` : ``}
+              <button class="selDelBtn" id="catalogBulkDeleteRequests" type="button">삭제</button>
+            </div>
+          </div>
+          <div class="logBox requestLogBox requestTable">
+            <div class="logMinWidth">
+              <div class="logHead subtleHead">
+                <div class="logHeadCell"><div class="logHeadLabel">연도. 월. 일.</div></div>
+                <div class="logHeadCell"><div class="logHeadLabel">구분</div></div>
+                <div class="logHeadCell"><div class="logHeadLabel">전체 부서</div></div>
+                <div class="logHeadCell"><div class="logHeadLabel">전체 상태</div></div>
+                <div class="logHeadCell"><div class="logHeadLabel">담당자</div></div>
+                <div class="logHeadCell"><div class="logHeadLabel">수량</div></div>
+              </div>
+              ${rowHtml(requestRows, "request")}
+            </div>
+          </div>
+        </div>
+        <div class="detailSectionBlock catalogLogSection">
+          <div class="boxTitleRow detailSectionHead"><p class="boxTitle">입출고 내역</p><div class="requestAdminActions">${isAdmin ? `<button class="selDelBtn" id="catalogBulkDeleteLogs" type="button">삭제</button>` : ``}</div></div>
+          <div class="logBox requestLogBox">
+            <div class="logMinWidth">
+              <div class="logHead subtleHead">
+                <div class="logHeadCell"><div class="logHeadLabel">연도. 월. 일.</div></div>
+                <div class="logHeadCell"><div class="logHeadLabel">전체</div></div>
+                <div class="logHeadCell"><div class="logHeadLabel">전체 부서</div></div>
+                <div class="logHeadCell"><div class="logHeadLabel">담당자</div></div>
+                <div class="logHeadCell"><div class="logHeadLabel">수량</div></div>
+              </div>
+              ${rowHtml(approvedLogRows, "log")}
+            </div>
+          </div>
+          <div class="adminBottomRow catalogStockBottom"><div class="adminBottomLeft"><span>기준재고</span> <b>${Number(catalogCurrentStock || 0).toLocaleString()}</b></div><div class="adminBottomRight"></div></div>
+        </div>` : ``}
+      </div>
+
+      <div class="modal" id="catalogAddModal" aria-hidden="true">
+        <div class="modalOverlay" id="catalogAddOverlay"></div>
+        <div class="sheet" role="dialog" aria-modal="true" aria-label="출고 신청하기">
+          <div class="sheetHead"><div>출고 신청하기</div><button class="sheetClose" id="catalogAddClose">닫기</button></div>
+          <div class="sheetBody">
+            <div class="field"><label for="catalogAddDate">날짜</label><input type="date" id="catalogAddDate"></div>
+            <input type="hidden" id="catalogAddType" value="신청">
+            <div class="field"><label for="catalogAddDept">부서</label><select id="catalogAddDept">${allDepts.map(d => `<option value="${escapeAttr(d)}">${escapeHtml(d)}</option>`).join("")}</select></div>
+            <div class="field"><label for="catalogAddQty">수량</label><input id="catalogAddQty" inputmode="numeric" placeholder="예) 100" /></div>
+            <div class="field"><label for="catalogAddPerson">담당자</label><input id="catalogAddPerson" placeholder="" /></div>
+          </div>
+          <div class="sheetFoot"><button class="btn primary" id="catalogAddBtn">출고 신청하기</button></div>
+        </div>
+      </div>`;
+
+    const currentStockEl = app.querySelector("[data-catalog-current-stock]");
+    if(currentStockEl) currentStockEl.textContent = Number(catalogCurrentStock || 0).toLocaleString();
+
+    const typeSelect = app.querySelector("#catalogTypeSelect");
+    const yearSelect = app.querySelector("#catalogYearSelect");
+    const roundSelect = app.querySelector("#catalogRoundSelect");
+    const searchBtn = app.querySelector("#catalogSearchBtn");
+    const catalogAddModal = app.querySelector("#catalogAddModal");
+    const catalogAddDate = app.querySelector("#catalogAddDate");
+
+    function openCatalogRequestModal(){
+      if(isAdmin) return;
+      catalogAddModal?.classList.add("show");
+      document.body.style.overflow = "hidden";
+      if(catalogAddDate && !catalogAddDate.value) catalogAddDate.value = new Date().toISOString().slice(0, 10);
+    }
+    function closeCatalogRequestModal(){ catalogAddModal?.classList.remove("show"); document.body.style.overflow = ""; }
+
+    app.querySelector("#catalogWholeBackBtn")?.addEventListener("click", __goCatalogWholeSection);
+    typeSelect?.addEventListener("change", ()=>{
+      const nextType = typeSelect.value || "offline-auction";
+      sessionStorage.removeItem(`catalog_view_${nextType}`);
+      saveCatalogApplySelection(nextType, { year:"", round:"" });
+      location.hash = `#/request/catalog/${encodeURIComponent(nextType)}`;
+    });
+    yearSelect?.addEventListener("change", ()=>{
+      saveCatalogApplySelection(catalogId, { ...getCatalogApplySelection(catalogId), year: yearSelect.value || "", round: "" });
+      sessionStorage.setItem(`catalog_view_${catalogId}`, "gallery");
+      viewMode = "gallery";
+      render();
+    });
+    roundSelect?.addEventListener("change", ()=> saveCatalogApplySelection(catalogId, { ...getCatalogApplySelection(catalogId), year: yearSelect?.value || "", round: roundSelect.value || "" }));
+    searchBtn?.addEventListener("click", ()=>{
+      const year = yearSelect?.value || "";
+      const round = roundSelect?.value || "";
+      if(!year){ alert("연도를 선택해주세요."); return; }
+      saveCatalogApplySelection(catalogId, { year, round, currentStock:Number(config.currentStock || 0) });
+      sessionStorage.setItem(`catalog_view_${catalogId}`, "result");
+      viewMode = "result";
+      render();
+    });
+    app.querySelectorAll("[data-catalog-cover]").forEach(btn => btn.addEventListener("click", ()=>{
+      const year = yearSelect?.value || currentYear || "2026";
+      const nextRounds = Array.isArray(config.data?.[year]) ? config.data[year] : [];
+      const round = roundSelect?.value || nextRounds[0] || "";
+      saveCatalogApplySelection(catalogId, { year, round, currentStock:Number(config.currentStock || 0) });
+      sessionStorage.setItem(`catalog_view_${catalogId}`, "result");
+      viewMode = "result";
+      render();
+    }));
+    app.querySelectorAll("[data-result-round]").forEach(btn => btn.addEventListener("click", ()=>{
+      const year = yearSelect?.value || currentYear || "";
+      const round = btn.dataset.resultRound || "";
+      if(!round) return;
+      saveCatalogApplySelection(catalogId, { year, round, currentStock:Number(config.currentStock || 0) });
+      sessionStorage.setItem(`catalog_view_${catalogId}`, "result");
+      viewMode = "result";
+      render();
+      if(!isAdmin) setTimeout(openCatalogRequestModal, 80);
+    }));
+    app.querySelector("#catalogAddOverlay")?.addEventListener("click", closeCatalogRequestModal);
+    app.querySelector("#catalogAddClose")?.addEventListener("click", closeCatalogRequestModal);
+    app.querySelector("#catalogAddBtn")?.addEventListener("click", async ()=>{
+      const selectedInfo = getCatalogApplySelection(catalogId);
+      const date = app.querySelector("#catalogAddDate")?.value || "";
+      const dept = app.querySelector("#catalogAddDept")?.value || "";
+      const qty = Number(app.querySelector("#catalogAddQty")?.value || 0);
+      const person = (app.querySelector("#catalogAddPerson")?.value || "").trim();
+      const year = selectedInfo?.year || yearSelect?.value || "";
+      const round = selectedInfo?.round || roundSelect?.value || "";
+      if(!date || !dept || !qty || !person){ alert("모든 항목을 입력해주세요."); return; }
+      if(!Number.isFinite(qty) || qty <= 0){ alert("수량은 0보다 큰 숫자로 입력해주세요."); return; }
+      const rows = getCatalogRequests(catalogId);
+      const row = normalizeLog({ d: date, t: "신청", dept, person, qty, status:"pending", year, round, currentStock:Number(config.currentStock || 0) });
+      try{
+        const inserted = await addCatalogRequestToDB(catalogId, row);
+        if(inserted?.id){ row._dbid = inserted.id; row.__key = `catalog_req_${inserted.id}`; }
+        rows.push(row);
+        saveCatalogRequests(catalogId, rows);
+        closeCatalogRequestModal();
+        render();
+        alert("출고 신청이 접수되었습니다.");
+      }catch(err){ console.error("도록 신청 DB 저장 실패:", err); alert("DB 저장 중 오류가 발생했습니다."); }
+    });
+
+    app.querySelectorAll('.logRow.clickable').forEach(rowEl => rowEl.addEventListener("click", ()=>{
+      const key = rowEl.dataset.row;
+      const set = rowEl.dataset.kind === "log" ? selectedLogKeys : selectedRequestKeys;
+      if(set.has(key)) set.delete(key); else set.add(key);
+      rowEl.classList.toggle("selected");
+    }));
+    app.querySelector("#catalogApproveRequestsBtn")?.addEventListener("click", async ()=>{
+      const currentRows = getCatalogRequests(catalogId);
+      const approvableRows = currentRows.filter(r => {
+        const status = r.status || "pending";
+        return selectedRequestKeys.has(r.__key) && (status === "pending" || status === "rejected");
+      });
+      if(!approvableRows.length){ alert("승인할 신청 내역을 선택해주세요."); return; }
+      const approverEmail = await getCurrentUserEmail();
+      try{
+        for(const r of approvableRows) await approveCatalogRequestRow(catalogId, r, approverEmail || "");
+        await syncCatalogRequestsFromDB(catalogId);
+        selectedRequestKeys.clear();
+        render();
+      }catch(err){ console.error(err); alert("도록 신청 승인 반영 실패: " + (err?.message || err)); }
+    });
+    app.querySelector("#catalogRejectRequestsBtn")?.addEventListener("click", async ()=>{
+      const currentRows = getCatalogRequests(catalogId);
+      const pendingRows = currentRows.filter(r => selectedRequestKeys.has(r.__key) && (r.status || "pending") === "pending");
+      if(!pendingRows.length){ alert("반려할 신청 내역을 선택해주세요."); return; }
+      const approverEmail = await getCurrentUserEmail();
+      try{
+        for(const r of pendingRows) await rejectCatalogRequestRow(r, approverEmail || "");
+        saveCatalogRequests(catalogId, currentRows);
+        await syncCatalogRequestsFromDB(catalogId);
+        selectedRequestKeys.clear();
+        render();
+      }catch(err){ console.error(err); alert("도록 신청 반려 반영 실패: " + (err?.message || err)); }
+    });
+    app.querySelector("#catalogBulkDeleteRequests")?.addEventListener("click", async ()=>{
+      if(!selectedRequestKeys.size){ alert("삭제할 내역을 선택해주세요."); return; }
+      const currentRows = getCatalogRequests(catalogId);
+      const rowsToDelete = currentRows.filter(r => selectedRequestKeys.has(r.__key));
+      const nextRows = currentRows.filter(r => !selectedRequestKeys.has(r.__key));
+      try{ await deleteCatalogRequestsByKeys(catalogId, rowsToDelete); saveCatalogRequests(catalogId, nextRows); selectedRequestKeys.clear(); render(); }
+      catch(err){ console.error(err); alert("DB 삭제 중 오류가 발생했습니다."); }
+    });
+    app.querySelector("#catalogBulkDeleteLogs")?.addEventListener("click", async ()=>{
+      if(!selectedLogKeys.size){ alert("삭제할 입출고 내역을 선택해주세요."); return; }
+      const currentRows = getCatalogRequests(catalogId);
+      const rowsToDelete = currentRows.filter(r => selectedLogKeys.has(r.__key));
+      const nextRows = currentRows.filter(r => !selectedLogKeys.has(r.__key));
+      try{ await deleteCatalogRequestsByKeys(catalogId, rowsToDelete); saveCatalogRequests(catalogId, nextRows); selectedLogKeys.clear(); render(); }
+      catch(err){ console.error(err); alert("DB 삭제 중 오류가 발생했습니다."); }
+    });
+  }
+
+  render();
+  syncCatalogRequestsFromDB(catalogId).then(changed => { if(changed) render(); }).catch(err => console.error("도록 신청내역 DB 동기화 실패:", err));
+}

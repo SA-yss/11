@@ -53,7 +53,7 @@
     }
 
     .wrap{
-      width:min(calc(100% - 64px), var(--content-max));
+      width:min(calc(100% - 100px), var(--content-max));
       margin:0 auto;
       padding:0 0 80px;
     }
@@ -169,7 +169,7 @@
       align-items:center;
       justify-content:flex-end;
       margin-left:auto;
-      flex:1;
+      flex:0;
     }
 
     .search input{
@@ -206,13 +206,32 @@
     }
 
     .topbarLogo{
-      display:none;
+      display:flex;
       align-items:center;
       justify-content:flex-end;
-      margin-left:16px;
-      padding-right:16px;
-      min-width:120px;
+      flex:0 0 auto;
+      gap:8px;
+      margin-left:8px;
+      padding-right:0;
+      min-width:auto;
+      width:auto;
     }
+
+    .topbar img{
+  width:auto !important;
+  height:22px !important;
+  max-width:140px !important;
+  object-fit:contain;
+  display:block;
+}
+
+/* 모바일 */
+@media (max-width:640px){
+  .topbar img{
+    height:18px !important;
+    max-width:110px !important;
+  }
+}
 
     .topbar.no-search .topbarLogo{
       display:flex;
@@ -220,19 +239,8 @@
 
     .topbarLogo.show{ display:flex; }
 
-    .topbarLogo img{
-      width:100%;
-      max-width:100px;
-      height:40px;
-      object-fit:contain;
-      display:block;
-    }
     
-    @media (max-width: 640px){
-  .topbarLogo img{
-    max-width:80px;   /* 모바일에서 작게 */
-  }
-}
+  
 
     .pill{
       height:36px;
@@ -756,7 +764,7 @@
     .meta-bot span{ white-space:nowrap; }
 
     .title{
-      font-weight:800;
+      font-weight:600;
       font-size:18px;
       line-height:1.2;
       white-space:nowrap;
@@ -1121,7 +1129,7 @@
     .catalogApplyTitle{
       margin:0;
       font-size:20px;
-      font-weight:800;
+      font-weight:600;
       letter-spacing:-0.04em;
       color:#111;
       line-height:1.2;
@@ -1648,20 +1656,20 @@
 }
 
 body{
-  padding-bottom:56px;
+  padding-bottom:50px;
 }
 
 .fab{
-  bottom:86px;
+  bottom:80px;
 }
 
 @media (max-width: 980px){
   .bottomNav{
-    height:68px;
+    height:60px;
   }
 
   .bottomNavBtn{
-    height:52px;
+    height:45px;
   }
 
   .bottomNavBtn svg{
@@ -2141,7 +2149,7 @@ body{
 }
 
     .shopThumb{
-      width:100%;
+      width:90%;
       aspect-ratio:1 / 1;
       background:#fff;
       border:1px solid #d8d8d8;
@@ -2166,7 +2174,7 @@ body{
     }
 
     .shopName{
-      font-size:14px;
+      font-size:16px;
       line-height:1.35;
       color:#111;
       font-weight:500;
@@ -2174,7 +2182,7 @@ body{
     }
 
     .shopPrice{
-      font-size:15px;
+      font-size:19px;
       line-height:1.2;
       color:#111;
       font-weight:700;
@@ -2188,7 +2196,7 @@ body{
 }
 
 .catalogTitleKr{
-  font-size:20px;
+  font-size:22px;
   font-weight:700;
   color:#111;
 }
@@ -2811,9 +2819,9 @@ body.mode-request .topbar.no-search{
 }
 
 .shopPage{
-  width:min(100%, 760px);
+  width:min(100%, 700px);
   margin:0 auto;
-  padding:18px 0 80px;
+  padding:25px 0 80px;
 }
 
 .shopPageHead{
@@ -2834,7 +2842,7 @@ body.mode-request .topbar.no-search{
 .shopPageIcons{
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:12px;
 }
 
 .shopIconBtn{
@@ -2842,7 +2850,7 @@ body.mode-request .topbar.no-search{
   border:0;
   background:transparent;
   color:#999;
-  font-size:15px;
+  font-size:20px;
   cursor:pointer;
   padding:0;
   line-height:1;
@@ -2866,7 +2874,7 @@ body.mode-request .topbar.no-search{
 .shopProductGrid{
   display:grid;
   grid-template-columns:repeat(2, minmax(0, 1fr));
-  gap:42px 50px;
+  gap:55px 50px;
 }
 
 .shopProductCard{
@@ -2889,15 +2897,15 @@ body.mode-request .topbar.no-search{
 }
 
 .shopProductThumb img{
-  width:100%;
-  height:100%;
+  width:95%;
+  height:95%;
   object-fit:contain;
   display:block;
 }
 
 .shopReadyIcon{
-  width:74%;
-  height:74%;
+  width:80%;
+  height:80%;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -2910,7 +2918,7 @@ body.mode-request .topbar.no-search{
 .shopProductName,
 .shopDetailName,
 .shopCartName{
-  font-size:11px;
+  font-size:14px;
   font-weight:500;
   color:#111;
   line-height:1.35;
@@ -2921,7 +2929,7 @@ body.mode-request .topbar.no-search{
 .shopDetailColor,
 .shopCartColor,
 .shopDetailsText{
-  font-size:10px;
+  font-size:13px;
   color:#666;
   line-height:1.6;
 }
@@ -2930,7 +2938,7 @@ body.mode-request .topbar.no-search{
 .shopDetailPrice,
 .shopCartUnit,
 .shopCartPrice{
-  font-size:11px;
+  font-size:16px;
   font-weight:800;
   color:#111;
   line-height:1.5;
@@ -3367,8 +3375,8 @@ body.mode-shop .shopPageIcons{
 }
 
 body.mode-shop .shopIconBtn{
-  width:16px;
-  height:18px;
+  width:28px;
+  height:25px;
   display:inline-flex;
   align-items:center;
   justify-content:center;
@@ -3376,8 +3384,8 @@ body.mode-shop .shopIconBtn{
 }
 
 body.mode-shop .shopIconBtn svg{
-  width:16px;
-  height:18px;
+  width:28px;
+  height:25px;
   display:block;
   fill:none;
   stroke:currentColor;
@@ -3449,294 +3457,1397 @@ body.mode-request .topbarLogo:has(.catalogTopSearch) img{
   display:none !important;
 }
 
-/* ===== 도록 신청하기 페이지: 요청 디자인 반영 v3 ===== */
-body.mode-request .wrap{
-  width:min(calc(100% - 80px), 1040px);
+
+/* ===== SHOP 검색창/아이콘 수정 최종 ===== */
+body.mode-shop .search{
+  position:relative;
+  flex:0 0 auto;
+  width:140px;
+  height:30px;
+  margin-left:auto;
+  margin-right:0;
+  gap:0;
+  justify-content:flex-end;
 }
 
-.catalogDetailPage{
-  width:100%;
-  max-width:980px;
-  margin:0 auto;
-  padding-top:18px;
+body.mode-shop .search input{
+  width:140px !important;
+  height:30px !important;
+  padding:0 30px 6px 0 !important;
+  border:0 !important;
+  border-bottom:1px solid #ccc !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  outline:none !important;
+  font-size:11px !important;
+  color:#111 !important;
+  font-family:inherit !important;
 }
 
-.catalogDetailTop{
-  margin-bottom:30px;
+body.mode-shop .search input:focus{
+  border-bottom-color:#2a2a2aae !important;
 }
 
-.catalogDetailTitle{
-  display:flex;
-  align-items:center;
-  gap:18px;
-  margin:0;
-  line-height:1;
-  letter-spacing:-0.04em;
-}
-
-.catalogTitleKr{
-  font-size:28px;
-  font-weight:800;
-  color:#000;
-}
-
-.catalogTitleDivider{
-  font-size:22px;
-  font-weight:500;
-  color:#111;
-  transform:translateY(-1px);
-}
-
-.catalogTitleEn{
-  font-size:18px;
-  font-weight:400;
-  color:#111;
-  letter-spacing:-0.03em;
-}
-
-.catalogControlLabel{
-  margin:0 0 10px;
-  font-size:16px;
-  font-weight:400;
-  color:#111;
-}
-
-.catalogDetailControlRow{
-  display:grid;
-  grid-template-columns:200px 200px 200px 182px;
-  gap:18px;
-  align-items:center;
-  margin-bottom:48px;
-}
-
-.catalogSelect{
-  height:54px;
-  padding:0 48px 0 26px;
-  border:1px solid #bdbdbd;
-  background:#fff;
-  color:#111;
-  font-size:18px;
-  font-weight:400;
-}
-
-.catalogSelectArrow{
-  right:16px;
-  font-size:22px;
-  color:#5a5a5a;
-}
-
-.catalogDetailSubmit{
-  width:100%;
-  height:54px;
-  border:0;
-  background:#3c3c3c;
-  color:#fff;
-  font-size:18px;
-  font-weight:400;
-}
-
-.catalogGalleryTitle{
-  margin:0 0 8px 0;
-  font-size:11px;
-  font-weight:600;
-  color:#555;
-}
-
-.catalogGalleryGrid{
-  display:grid;
-  grid-template-columns:repeat(5, 1fr);
-  gap:24px 28px;
-  margin:0 0 24px;
-}
-
-.catalogGalleryItem{
-  aspect-ratio:3/4;
-  border:1px solid #e4e4e4;
-  background:#f4f4f4;
-}
-
-.catalogGalleryItem img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-.catalogGalleryPlaceholder{
-  color:#b5b5b5;
-  font-size:11px;
-}
-
-.catalogSelectedDetail{
-  display:grid;
-  grid-template-columns:250px 1fr 182px;
-  column-gap:46px;
-  align-items:end;
-  margin:0 0 52px;
-}
-
-.catalogSelectedImage{
-  width:250px;
-  aspect-ratio:3/4;
-  background:#f4f4f4;
-  overflow:hidden;
-}
-
-.catalogSelectedImage img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
-}
-
-.catalogSelectedInfo{
-  padding-bottom:0;
-  min-width:0;
-}
-
-.catalogSelectedYear{
-  font-size:18px;
-  line-height:1.2;
-  color:#111;
-  font-weight:400;
-  margin-bottom:8px;
-}
-
-.catalogSelectedTitle{
-  font-size:22px;
-  line-height:1.35;
-  color:#111;
-  font-weight:400;
-  letter-spacing:-0.04em;
-  margin-bottom:26px;
-}
-
-.catalogSelectedStock{
-  width:365px;
-  max-width:100%;
-  height:54px;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  align-items:center;
-  border:0;
-  background:#f6f6f6;
-  color:#111;
-  font-family:inherit;
-  font-size:16px;
-  font-weight:400;
+body.mode-shop .searchIcon{
+  position:absolute;
+  right:0;
+  top:50%;
+  transform:translateY(-50%);
+  width:18px;
+  height:18px;
+  background:url('https://cdn-icons-png.flaticon.com/512/622/622669.png') no-repeat center/contain;
+  opacity:.6;
   cursor:pointer;
-  padding:0;
+  filter:grayscale(1);
 }
 
-.catalogSelectedStock span{
+body.mode-shop .shopIconBtn.active{
+  color:#111;
+}
+
+.shopEmptyResult{
+  grid-column:1 / -1;
+  min-height:160px;
   display:flex;
   align-items:center;
   justify-content:center;
-  min-height:54px;
-  position:relative;
+  color:#999;
+  font-size:12px;
 }
 
-.catalogSelectedStock span + span::before{
-  content:"";
-  position:absolute;
-  left:0;
-  top:50%;
-  width:1px;
-  height:22px;
-  background:#9b9b9b;
-  transform:translateY(-50%);
+.shopAccountPage{
+  width:min(100%, 520px);
 }
 
-.catalogSelectedDetail + .detailSectionBlock{
-  margin-top:0;
+.shopAccountPanel{
+  min-height:360px;
+  border:1px solid #eeeeee;
+  background:#fff;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:54px 28px;
 }
 
-.detailSectionBlock{
+.shopAccountIcon{
+  width:74px;
+  height:74px;
+  border:1px solid #e8e8e8;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:22px;
+  color:#777;
+}
+
+.shopAccountIcon svg{
+  width:34px;
+  height:34px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.15;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.shopAccountTitle{
+  font-size:17px;
+  font-weight:700;
+  letter-spacing:.02em;
+  color:#111;
+  margin-bottom:8px;
+}
+
+.shopAccountSub{
+  font-size:12px;
+  font-weight:400;
+  color:#777;
+  margin-bottom:28px;
+}
+
+.shopAccountMenu{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  width:min(100%, 320px);
+}
+
+.shopAccountMenu button{
+  height:42px;
+  border:1px solid #ddd;
+  background:#fff;
+  color:#222;
+  font-size:12px;
+  font-weight:500;
+  cursor:pointer;
+}
+
+.shopAccountMenu button:hover{
+  background:#292929;
+  border-color:#292929;
+  color:#fff;
+}
+
+@media (max-width:640px){
+  body.mode-shop .search{
+    width:120px;
+  }
+
+  body.mode-shop .search input{
+    width:120px !important;
+  }
+
+  .shopAccountPanel{
+    min-height:330px;
+    padding:42px 20px;
+  }
+}
+
+/* ===== Catalogue page redesign 2026-04-28 ===== */
+body.mode-request .wrap{
+  width:min(calc(100% - 64px), 1120px);
+  padding-bottom:70px;
+}
+body.mode-request .topbar{
+  min-height:68px;
+  padding:24px 0 14px;
+}
+body.mode-request .brand{ margin-left:0; }
+body.mode-request .topLogo{ height:25px; max-width:180px; opacity:.45; }
+body.mode-request .topbarLogo{
+  display:flex !important;
+  min-width:110px;
+  margin-left:auto;
+  padding-right:12px;
+}
+body.mode-request .topbarLogo:has(.catalogTopSearch)::after{
+  width:16px;
+  height:16px;
+  right:12px;
+  opacity:.85;
+}
+body.mode-request .catalogTopSearch{
+  width:106px;
+  height:28px;
+  border-bottom:1px solid #d7d7d7 !important;
+  padding:0 26px 4px 0 !important;
+}
+/* 물품신청하기 품목 상세페이지 원복: 상세페이지 숨김 처리 제거 */
+body.mode-request .catalogDetailPage{
   width:100%;
-  max-width:980px;
+  max-width:none;
+  margin:0 auto;
+  padding:0;
+}
+body.mode-request .catalogDetailTop{ margin-top:6px; }
+body.mode-request .catalogDetailTitle{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:0 0 44px;
+  font-size:0;
+  line-height:1;
+  letter-spacing:-0.03em;
+}
+body.mode-request .catalogTitleKr{
+  font-size:18px;
+  font-weight:800;
+  color:#202020;
+}
+body.mode-request .catalogTitleDivider{
+  font-size:16px;
+  color:#333;
+  font-weight:400;
+  transform:translateY(-1px);
+}
+body.mode-request .catalogTitleEn{
+  font-size:15px;
+  font-weight:400;
+  color:#333;
+}
+body.mode-request .catalogControlLabel{
+  margin:0 0 6px 14px;
+  font-size:11px;
+  color:#777;
+  font-weight:400;
+}
+body.mode-request .catalogDetailControlRow{
+  display:grid;
+  grid-template-columns:185px 185px 185px 116px;
+  gap:42px;
+  align-items:end;
+  margin:0 12px 74px;
+}
+body.mode-request .catalogSelectWrap{ position:relative; }
+body.mode-request .catalogSelect{
+  width:100%;
+  height:32px;
+  border:0 !important;
+  border-bottom:1px solid #cfcfcf !important;
+  border-radius:0;
+  background:transparent;
+  padding:0 26px 8px 2px;
+  font-size:14px;
+  font-weight:500;
+  color:#333;
+  outline:none;
+}
+body.mode-request .catalogSelectArrow{
+  right:8px;
+  top:38%;
+  font-size:11px;
+  color:#555;
+}
+body.mode-request .catalogDetailSubmit{
+  height:31px;
+  width:116px;
+  border-radius:2px;
+  background:#2d2d2d;
+  color:#fff;
+  font-size:14px;
+  font-weight:700;
+}
+.catalogGalleryGrid.catalogGridView{
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  gap:58px 74px;
+  margin:0 0 70px;
+  padding:0;
+}
+.catalogGalleryGrid.catalogGridView .catalogGalleryItem{
+  width:100%;
+  max-width:184px;
+  aspect-ratio:3/4;
+  margin:0 auto;
+  border:0;
+  background:transparent;
+  overflow:visible;
+  box-shadow:none;
+}
+.catalogGalleryGrid.catalogGridView .catalogGalleryItem img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.22));
+}
+.catalogGalleryGrid.catalogGridView .catalogGalleryPlaceholder{ background:#f7f7f7; color:#bbb; }
+.catalogResultView{
+  margin:0 0 0;
+}
+.catalogResultLabel{
+  margin:0 0 110px 14px;
+  font-size:11px;
+  color:#777;
+}
+.catalogResultMain{
+  display:grid;
+  grid-template-columns:minmax(0, 1fr) 310px;
+  gap:90px;
+  align-items:center;
+  padding:0 44px 58px 14px;
+  border-bottom:1px solid #d7d7d7;
+}
+.catalogResultInfo{ align-self:end; padding-bottom:4px; }
+.catalogYearBadge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:70px;
+  height:22px;
+  padding:0 14px;
+  margin:0 0 12px;
+  background:#f2f2f2;
+  color:#333;
+  font-size:15px;
+  font-weight:700;
+}
+.catalogResultTitle{
+  margin:0 0 2px;
+  font-size:24px;
+  line-height:1.2;
+  letter-spacing:-0.05em;
+  font-weight:800;
+  color:#202020;
+}
+.catalogResultDate{
+  margin:0 0 32px;
+  font-size:17px;
+  color:#222;
+}
+.catalogResultApplyBtn{
+  width:282px;
+  height:42px;
+  border:0;
+  border-radius:2px;
+  background:#2d2d2d;
+  color:#fff;
+  font-size:16px;
+  font-weight:800;
+  cursor:pointer;
+}
+.catalogResultCover{
+  width:250px;
+  aspect-ratio:3/4;
+  justify-self:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.catalogResultCover img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.25));
+}
+body.mode-request .detailSectionBlock{
+  margin:48px 2px 0;
+}
+body.mode-request .detailSectionHead{
+  margin-bottom:8px;
+}
+body.mode-request .boxTitle{
+  font-size:11px;
+  color:#777;
+  font-weight:400;
+  letter-spacing:0;
+  text-transform:none;
+}
+body.mode-request .requestAdminActions .selDelBtn{
+  width:62px;
+  min-width:62px;
+  height:26px;
+  padding:0;
+  border-color:#cfcfcf;
+  font-size:11px;
+}
+body.mode-request .requestLogBox{
+  border-color:#e0e0e0;
+}
+body.mode-request .requestTable .logHead,
+body.mode-request .requestTable .logRow{
+  grid-template-columns:1fr 1fr 1.55fr 1.3fr 1.1fr 1fr;
+}
+body.mode-request .logHead{
+  min-height:38px;
+  background:#fafafa;
+}
+body.mode-request .logRow{
+  min-height:52px;
+}
+body.mode-request .logHead > div,
+body.mode-request .logRow > div{
+  padding:0 10px;
+}
+body.mode-request .logHeadLabel,
+body.mode-request .logHeadCell,
+body.mode-request .logDate,
+body.mode-request .logType,
+body.mode-request .logDept,
+body.mode-request .logPerson,
+body.mode-request .logQty{
+  font-size:11px;
+  color:#555;
+}
+body.mode-request .headerFilterDate,
+body.mode-request .headerFilterSelect{
+  border:0 !important;
+  background:transparent !important;
+  font-size:11px !important;
+  text-align:center;
+  color:#555;
+}
+@media (max-width: 760px){
+  body.mode-request .wrap{ width:min(calc(100% - 32px), 1120px); }
+  body.mode-request .catalogDetailControlRow{
+    grid-template-columns:1fr;
+    gap:14px;
+    margin:0 0 38px;
+  }
+  body.mode-request .catalogDetailSubmit{ width:100%; height:38px; }
+  .catalogGalleryGrid.catalogGridView{ grid-template-columns:repeat(2,1fr); gap:34px 26px; }
+  .catalogResultMain{ grid-template-columns:1fr; gap:28px; padding:0 0 42px; }
+  .catalogResultCover{ width:min(68vw,230px); order:-1; }
+  .catalogResultLabel{ margin-bottom:34px; }
+  .catalogResultApplyBtn{ width:100%; }
+}
+
+
+/* ===== FIX: round detail layout web/mobile ===== */
+.catalogWholeBackBtn{
+  border:0;
+  background:transparent;
+  padding:0;
+  margin:0;
+  display:inline-flex;
+  align-items:center;
+  cursor:pointer;
+  font-family:inherit;
+}
+
+.catalogWholeBackBtn:hover{
+  opacity:.72;
+}
+
+.catalogResultGrid.yearOnly{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:34px 36px;
+  align-items:start;
+  width:100%;
+}
+
+.catalogResultCard{
+  border:0;
+  background:transparent;
+  padding:0;
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+}
+
+.catalogResultCardImg{
+  width:100%;
+  aspect-ratio:3 / 4;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:transparent;
+  overflow:hidden;
+}
+
+.catalogResultCardImg img{
+  width:80% !important;
+  height:80% !important;
+  max-width:80% !important;
+  max-height:80% !important;
+  object-fit:contain !important;
+  display:block;
+}
+
+/* 회차 상세: 웹 */
+.catalogRoundDetailLayout{
+  width:100%;
+  display:grid;
+  grid-template-columns:minmax(240px, 1fr) minmax(220px, 320px);
+  align-items:end;
+  gap:70px;
+  padding:8px 0 10px;
+}
+
+.catalogRoundInfo{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:flex-end;
+  padding-bottom:6px;
+}
+
+.catalogYearBadge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:56px;
+  height:28px;
+  padding:0 14px;
+  background:#f3f3f3;
+  font-size:14px;
+  font-weight:700;
+  color:#333;
+  margin-bottom:8px;
+}
+
+.catalogRoundTitle{
+  margin:0 0 4px;
+  font-size:20px;
+  line-height:1.25;
+  font-weight:800;
+  letter-spacing:-0.05em;
+  color:#111;
+}
+
+.catalogRoundDate{
+  margin:0 0 28px;
+  font-size:15px;
+  line-height:1.2;
+  color:#111;
+  font-weight:500;
+}
+
+.catalogRoundApplyBtn{
+  width:230px;
+  height:42px;
+  border:0;
+  background:#2d2d2d;
+  color:#fff;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+  font-family:inherit;
+}
+
+.catalogRoundImageBtn{
+  border:0;
+  background:transparent;
+  padding:0;
+  cursor:pointer;
+  justify-self:end;
+}
+
+.catalogRoundImage{
+  width:260px;
+  aspect-ratio:3 / 4;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:visible;
+}
+
+.catalogRoundImage img{
+  width:100% !important;
+  height:100% !important;
+  max-width:100% !important;
+  max-height:100% !important;
+  object-fit:contain !important;
+  display:block;
+  box-shadow:0 4px 8px rgba(0,0,0,.18);
+}
+
+.catalogEmptyResult{
+  width:100%;
+  padding:48px 0;
+  text-align:center;
+  font-size:13px;
+  color:#777;
+}
+
+/* 모바일 회차 상세 */
+@media (max-width:640px){
+  .catalogResultGrid.yearOnly{
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:26px 18px;
+  }
+
+  .catalogResultCardImg img{
+    width:86% !important;
+    height:86% !important;
+    max-width:86% !important;
+    max-height:86% !important;
+  }
+
+  .catalogRoundDetailLayout{
+    display:flex;
+    flex-direction:column-reverse;
+    align-items:center;
+    gap:28px;
+    padding:4px 0 16px;
+  }
+
+  .catalogRoundImageBtn{
+    width:100%;
+    display:flex;
+    justify-content:center;
+  }
+
+  .catalogRoundImage{
+    width:min(54vw, 210px);
+  }
+
+  .catalogRoundInfo{
+    width:100%;
+    align-items:flex-start;
+    padding:0 16px;
+  }
+
+  .catalogYearBadge{
+    min-width:70px;
+    height:32px;
+    font-size:16px;
+    margin-bottom:10px;
+  }
+
+  .catalogRoundTitle{
+    font-size:22px;
+    line-height:1.25;
+    margin-bottom:4px;
+  }
+
+  .catalogRoundDate{
+    font-size:16px;
+    margin-bottom:22px;
+  }
+
+  .catalogRoundApplyBtn{
+    width:100%;
+    height:42px;
+    font-size:16px;
+  }
+}
+
+
+/* ===== PURE IMAGE FIX (완전 배경 제거) ===== */
+.catalogRoundImage,
+.catalogResultCardImg{
+  background:transparent !important;
+  border:none !important;
+  box-shadow:none !important;
+  padding:0 !important;
+}
+
+.catalogRoundImage img,
+.catalogResultCardImg img{
+  background:transparent !important;
+  box-shadow:none !important;
+  padding:0 !important;
+  margin:0 !important;
+}
+
+.catalogResultCard,
+.catalogRoundImageBtn{
+  background:transparent !important;
+  border:none !important;
+  box-shadow:none !important;
+}
+
+
+
+/* ===== 물품재고현황 페이지 디자인 + 클릭 폼 FINAL DIRECT ===== */
+body.mode-list{ background:#fff; }
+
+body.mode-list .wrap{
+  width:min(calc(100% - 32px), 720px) !important;
+  padding:0 0 80px !important;
+}
+
+body.mode-list .topbar{
+  padding:18px 0 12px !important;
+  margin:0 0 10px !important;
+  min-height:60px !important;
+}
+
+body.mode-list .section{ margin-top:24px !important; }
+
+body.mode-list .secHead{
+  margin:0 0 18px !important;
+  padding:0 !important;
+  border:0 !important;
+}
+
+body.mode-list .secHead h2{
+  font-size:14px !important;
+  font-weight:800 !important;
+  color:#222 !important;
+  letter-spacing:-0.03em !important;
+  text-transform:none !important;
+}
+
+.stockCatalogSection{
+  position:relative;
+  left:50%;
+  width:100vw;
+  margin-left:-50vw;
+  background:#f2f2f2;
+  padding:24px 0 20px;
+  margin-top:14px;
+  margin-bottom:24px;
+}
+
+.stockCatalogInner{
+  width:min(calc(100% - 32px), 720px);
   margin:0 auto;
 }
 
-.detailSectionHead{
-  margin:0 0 10px;
+.stockCatalogHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:18px;
 }
 
-.detailSectionHead .boxTitle{
+.stockCatalogTitle{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  color:#111;
+}
+
+.stockCatalogTitle span{
+  font-size:15px;
+  font-weight:800;
+}
+
+.stockCatalogTitle em{
+  font-style:normal;
+  font-size:12px;
+  color:#777;
+}
+
+.stockCatalogTitle small{
+  font-size:12px;
+  color:#777;
+  font-weight:400;
+}
+
+.stockCatalogRight{
+  font-size:14px;
+  font-weight:800;
+  color:#111;
+}
+
+.stockCatalogCards{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:14px;
+}
+
+.stockCatalogCard{
+  min-height:128px;
+  border:0;
+  background:#fff;
+  padding:17px 10px 12px;
+  text-align:center;
+  cursor:pointer;
+  font-family:inherit;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.stockCatalogCardTitle{
+  min-height:32px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:13px;
+  line-height:1.15;
+  font-weight:900;
+  color:#222;
+}
+
+.stockCatalogLine{
+  width:100%;
+  height:1px;
+  background:#d9d9d9;
+  margin:10px 0 8px;
+}
+
+.stockCatalogYear{
+  font-size:11px;
+  color:#777;
+  line-height:1.2;
+}
+
+.stockCatalogRound{
+  margin-top:2px;
+  font-size:12px;
+  color:#111;
+  font-weight:500;
+  line-height:1.2;
+}
+
+.stockCatalogQty{
+  margin-top:auto;
+  font-size:15px;
+  font-weight:900;
+  color:#18bfc0;
+  line-height:1.2;
+}
+
+body.mode-list .list{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:8px !important;
+}
+
+body.mode-list .stockStatusRow{
+  display:grid !important;
+  grid-template-columns:minmax(0, 1fr) 86px !important;
+  gap:0 !important;
+  min-height:62px !important;
+}
+
+body.mode-list .stockStatusCard{
+  min-height:62px !important;
+  padding:8px 10px !important;
+  gap:12px !important;
+  border:1px solid #e8e8e8 !important;
+  border-right:0 !important;
+  background:#fff !important;
+  transform:none !important;
+}
+
+body.mode-list .stockStatusThumb{
+  width:46px !important;
+  height:46px !important;
+  flex:0 0 46px !important;
+  border:0 !important;
+  background:#f5f5f5 !important;
+}
+
+body.mode-list .stockStatusTitle{
+  font-size:13px !important;
+  line-height:1.2 !important;
+  font-weight:900 !important;
+  margin-bottom:2px !important;
+}
+
+body.mode-list .stockStatusSize{
+  font-size:10px !important;
+  color:#777 !important;
+}
+
+.stockStatusSub{
+  font-size:10px;
+  color:#4a7bd0;
+}
+
+body.mode-list .stockStatusQty{
+  min-height:62px !important;
+  padding:0 8px !important;
+  font-size:14px !important;
+  font-weight:900 !important;
+  background:#fbfbfb !important;
+  border:1px solid #e8e8e8 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+.stockCatalogApplyModal.modal{ display:none; }
+.stockCatalogApplyModal.modal.show{ display:block !important; }
+
+/* PATCH: 도록 관리자 신청/입출고 내역 버튼 및 재고 표시 */
+.catalogRoundApplyBtn.adminStockOnly{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  background:#f3f3f3 !important;
+  color:#111 !important;
+  cursor:default !important;
+  border:0;
+}
+.catalogRoundApplyBtn.adminStockOnly b{font-weight:800;}
+.catalogLogSection{margin-top:34px;}
+.catalogStockBottom{margin-top:22px;}
+.catalogStockBottom .adminBottomLeft{font-size:15px;color:#657085;font-weight:700;}
+.catalogStockBottom .adminBottomLeft b{font-size:16px;margin-left:6px;color:#657085;}
+
+/* 관리자 전용 도록 홈 요약 리스트 */
+.adminCatalogHomeSection{
+  margin:34px 0 22px;
+  width:min(100%, 360px);
+}
+.adminCatalogHomeTitle{
+  margin:0 0 12px;
+  font-size:12px;
+  font-weight:600;
+  color:#111;
+  letter-spacing:-0.03em;
+}
+.adminCatalogHomeList{
+  background:#fafafa;
+  border:0;
+  padding:10px 18px;
+}
+.adminCatalogHomeRow{
+  width:100%;
+  min-height:58px;
+  display:grid;
+  grid-template-columns:minmax(0, 1fr) auto auto;
+  align-items:center;
+  gap:12px;
+  border:0;
+  border-bottom:1px solid #dddddd;
+  background:transparent;
+  padding:10px 0;
+  text-align:left;
+  font-family:inherit;
+  cursor:pointer;
+}
+.adminCatalogHomeRow:last-child{ border-bottom:0; }
+.adminCatalogHomeMain{
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  gap:3px;
+}
+.adminCatalogHomeMain strong{
+  font-size:13px;
+  line-height:1.2;
+  font-weight:700;
+  color:#171717;
+  letter-spacing:-0.03em;
+}
+.adminCatalogHomeMain em{
+  font-style:normal;
+  font-size:10px;
+  line-height:1.2;
+  color:#777;
+  letter-spacing:-0.02em;
+}
+.adminCatalogHomeStatus,
+.adminCatalogHomeQty{
+  font-size:12px;
+  line-height:1;
+  color:#21b7b2;
+  font-weight:600;
+  white-space:nowrap;
+}
+.adminCatalogHomeRow:hover .adminCatalogHomeMain strong{
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+@media (max-width:640px){
+  .adminCatalogHomeSection{ width:100%; margin-top:24px; }
+  .adminCatalogHomeList{ padding:8px 14px; }
+}
+
+
+/* ===== PATCH: 관리자 도록 요약 박스 - 아래 봉투 리스트와 가로/내부선/내용 정렬 ===== */
+.adminCatalogHomeSection{
+  width:100% !important;
+  max-width:none !important;
+  margin:34px 0 42px !important;
+}
+
+.adminCatalogHomeTitle{
+  margin:0 0 12px !important;
+  font-size:12px !important;
+  font-weight:600 !important;
+  color:#111 !important;
+  letter-spacing:-0.03em !important;
+}
+
+.adminCatalogHomeList{
+  width:100% !important;
+  background:#fafafa !important;
+  border:0 !important;
+  padding:26px 32px !important;
+}
+
+.adminCatalogHomeRow{
+  width:100% !important;
+  min-height:70px !important;
+  display:grid !important;
+  grid-template-columns:minmax(260px, 1fr) 96px 72px !important;
+  align-items:center !important;
+  gap:14px !important;
+  border:0 !important;
+  border-bottom:1px solid #dddddd !important;
+  background:transparent !important;
+  padding:14px 0 !important;
+  text-align:left !important;
+  font-family:inherit !important;
+  cursor:pointer !important;
+}
+
+.adminCatalogHomeRow:last-child{
+  border-bottom:0 !important;
+}
+
+.adminCatalogHomeMain{
+  display:flex !important;
+  flex-direction:column !important;
+  min-width:0 !important;
+  gap:4px !important;
+}
+
+.adminCatalogHomeMain strong{
+  font-size:16px !important;
+  line-height:1.2 !important;
+  font-weight:700 !important;
+  color:#171717 !important;
+  letter-spacing:-0.04em !important;
+}
+
+.adminCatalogHomeMain em{
+  font-style:normal !important;
+  font-size:13px !important;
+  line-height:1.25 !important;
+  color:#777 !important;
+  letter-spacing:-0.03em !important;
+}
+
+.adminCatalogHomeStatus,
+.adminCatalogHomeQty{
+  font-size:15px !important;
+  line-height:1 !important;
+  color:#21b7b2 !important;
+  font-weight:700 !important;
+  white-space:nowrap !important;
+  text-align:right !important;
+}
+
+.adminCatalogHomeRow:hover .adminCatalogHomeMain strong{
+  text-decoration:underline !important;
+  text-underline-offset:3px !important;
+}
+
+@media (max-width:640px){
+  .adminCatalogHomeSection{
+    width:100% !important;
+    margin-top:24px !important;
+  }
+
+  .adminCatalogHomeList{
+    padding:16px 18px !important;
+  }
+
+  .adminCatalogHomeRow{
+    min-height:62px !important;
+    grid-template-columns:minmax(0, 1fr) auto auto !important;
+    gap:10px !important;
+    padding:12px 0 !important;
+  }
+
+  .adminCatalogHomeMain strong{
+    font-size:14px !important;
+  }
+
+  .adminCatalogHomeMain em,
+  .adminCatalogHomeStatus,
+  .adminCatalogHomeQty{
+    font-size:12px !important;
+  }
+}
+
+/* ===== SHOP cart/order/admin request update ===== */
+.shopSubTitle{
+  margin:26px 0 24px;
+  font-size:18px;
+  font-weight:700;
+  letter-spacing:-0.04em;
+  color:#222;
+}
+
+.shopCartPage .shopCartList{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.shopCartRow{
+  position:relative;
+  display:grid;
+  grid-template-columns:160px minmax(0,1fr) 104px;
+  align-items:center;
+  min-height:172px;
+  border:1px solid #d8d8d8;
+  background:#fff;
+  padding:22px 36px 22px 26px;
+  column-gap:22px;
+}
+
+.shopCartRemove{
+  position:absolute;
+  right:14px;
+  top:10px;
+  width:20px;
+  height:20px;
+  border:0;
+  background:transparent;
+  color:#777;
+  font-size:22px;
+  line-height:18px;
+  cursor:pointer;
+}
+
+.shopCartThumb{
+  width:142px;
+  height:118px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  background:#fff;
+}
+
+.shopCartThumb img{
+  width:100% !important;
+  height:100% !important;
+  object-fit:contain !important;
+}
+
+.shopCartName{
+  font-size:15px;
+  font-weight:700;
+  color:#222;
+  margin-bottom:2px;
+}
+
+.shopCartColor{
+  font-size:13px;
+  color:#777;
+  margin-bottom:8px;
+}
+
+.shopQtyControl{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:2px 0 8px;
+}
+
+.shopQtyControl span{
+  min-width:20px;
+  height:22px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid #d7d7d7;
+  color:#777;
+  font-size:14px;
+}
+
+.shopQtyControl button{
+  border:0;
+  background:transparent;
+  padding:0;
+  color:#777;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.shopCartUnit{
   font-size:16px;
   font-weight:700;
-  color:#666;
+  color:#111;
 }
 
-.requestAdminActions .selDelBtn{
-  width:96px;
-  height:36px;
-  font-size:13px;
+.shopCartPrice{
+  align-self:end;
+  justify-self:end;
+  font-size:18px;
+  font-weight:800;
+  color:#111;
+}
+
+.shopOrderBtn{
+  width:196px;
+  height:42px;
+  display:block;
+  margin:44px 0 0 auto;
+  border:0;
+  background:#9fd7d4;
+  color:#fff;
+  font-size:16px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.shopOrderHistoryList,
+.shopAdminRequestList{
+  display:flex;
+  flex-direction:column;
+  gap:22px;
+}
+
+.shopOrderNo{
+  height:28px;
+  display:flex;
+  align-items:center;
+  padding:0 10px;
+  margin-bottom:8px;
+  background:#f4f4f4;
+  color:#111;
+  font-size:11px;
+  font-weight:700;
+}
+
+.shopOrderRow{
+  display:grid;
+  grid-template-columns:110px minmax(0,1fr);
+  align-items:center;
+  gap:16px;
+  min-height:114px;
+  border:1px solid #dcdcdc;
+  padding:16px 18px;
   background:#fff;
 }
 
-.requestLogBox{
-  border:1px solid #ddd;
-}
-
-.requestTable .logHead{
-  min-height:58px;
-  background:#f7f7f7;
-}
-
-.requestTable .logHead,
-.requestTable .logRow{
-  grid-template-columns:170px 120px 170px 160px 170px 120px;
-}
-
-.requestTable .headerFilterDate,
-.requestTable .headerFilterSelect{
-  height:38px;
-  border:1px solid #ddd;
-  border-radius:0;
+.shopOrderThumb,
+.shopAdminRequestThumb,
+.shopAdminDetailImg{
+  display:flex;
+  align-items:center;
+  justify-content:center;
   background:#fff;
-  font-size:13px;
-  font-weight:600;
+  overflow:hidden;
 }
 
-.requestTable .logEmpty{
-  padding:22px 24px;
-  min-height:58px;
+.shopOrderThumb{ width:100px; height:82px; }
+.shopOrderThumb img,
+.shopAdminRequestThumb img,
+.shopAdminDetailImg img{
+  width:100% !important;
+  height:100% !important;
+  object-fit:contain !important;
+}
+
+.shopOrderName{
   font-size:12px;
-  color:#666;
-  background:#fff;
+  font-weight:700;
+  color:#222;
 }
+.shopOrderColor{
+  font-size:10px;
+  color:#777;
+  margin-bottom:7px;
+}
+.shopOrderLine{
+  height:1px;
+  background:#d6d6d6;
+  margin-bottom:8px;
+}
+.shopOrderMeta{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:11px;
+}
+.shopOrderMeta span{ color:#ff4b4b; font-weight:700; }
+.shopOrderMeta em{ color:#777; font-style:normal; }
+.shopOrderTotal{
+  margin-top:10px;
+  text-align:right;
+  font-size:14px;
+  font-weight:800;
+}
+.shopGrandTotal{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:32px;
+  padding:18px 0;
+  border-top:1px solid #ddd;
+  border-bottom:1px solid #ddd;
+  font-size:12px;
+}
+.shopGrandTotal strong{ font-size:14px; }
 
-@media (max-width: 760px){
-  body.mode-request .wrap{
-    width:min(calc(100% - 32px), 1040px);
-  }
-  .catalogTitleKr{font-size:24px;}
-  .catalogTitleEn{font-size:14px;}
-  .catalogDetailControlRow{
-    grid-template-columns:1fr;
-    gap:10px;
-    margin-bottom:32px;
-  }
-  .catalogSelect,
-  .catalogDetailSubmit{
-    height:48px;
-    font-size:15px;
-  }
-  .catalogGalleryGrid{
-    grid-template-columns:repeat(2, 1fr);
-    gap:18px;
-  }
-  .catalogSelectedDetail{
-    grid-template-columns:1fr;
-    gap:24px;
-    align-items:start;
-  }
-  .catalogSelectedImage{
-    width:min(70vw, 260px);
-  }
-  .catalogSelectedTitle{font-size:19px;}
-  .catalogSelectedStock{width:100%;}
-  .requestTable .logHead,
-  .requestTable .logRow{
-    grid-template-columns:130px 100px 130px 120px 130px 100px;
-  }
+.shopAdminRequestCard{
+  width:100%;
+  display:grid;
+  grid-template-columns:160px minmax(0,1fr);
+  gap:30px;
+  align-items:center;
+  min-height:156px;
+  padding:24px 36px;
+  border:1px solid #d8d8d8;
+  background:#fff;
+  text-align:left;
+  cursor:pointer;
+  font-family:inherit;
+}
+.shopAdminRequestThumb{ width:136px; height:108px; }
+.shopAdminRequestName{ font-size:15px; font-weight:700; color:#222; }
+.shopAdminRequestColor{ font-size:12px; color:#777; margin-top:2px; }
+.shopAdminRequestLine{ height:1px; background:#d5d5d5; margin:8px 0 12px; }
+.shopAdminRequestStatus{
+  display:flex;
+  justify-content:space-between;
+  color:#e03d3d;
+  font-size:14px;
+  margin-bottom:12px;
+}
+.shopAdminRequestStatus em{ font-style:normal; }
+.shopAdminRequestBottom{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:15px;
+  color:#111;
+}
+.shopAdminRequestBottom strong,
+.shopAdminRequestBottom b{ font-weight:800; }
+
+.shopAdminDetailHero{
+  display:grid;
+  grid-template-columns:150px minmax(0,1fr);
+  gap:28px;
+  align-items:center;
+  margin:38px 0 52px;
+}
+.shopAdminDetailImg{ width:150px; height:130px; }
+.shopAdminDetailName{ font-size:13px; font-weight:700; }
+.shopAdminDetailColor{ font-size:11px; color:#777; }
+.shopAdminDetailLine{ height:1px; background:#d7d7d7; margin:8px 0; }
+.shopAdminStock{ display:flex; align-items:center; justify-content:space-between; font-size:13px; font-weight:700; }
+.shopAdminStock strong{ font-size:14px; }
+.shopAdminTableTitleRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin:0 0 8px;
+}
+.shopAdminTableTitleRow h3{
+  margin:0;
+  font-size:12px;
+  font-weight:500;
+  color:#555;
+}
+.shopAdminActions{ display:flex; gap:8px; }
+.shopAdminActions button{
+  height:24px;
+  min-width:40px;
+  padding:0 12px;
+  border:1px solid #d7d7d7;
+  background:#fff;
+  color:#111;
+  font-size:11px;
+  cursor:pointer;
+}
+#shopApproveBtn{ background:#e6f1ff; border-color:#c7dcfb; }
+#shopRejectBtn{ background:#ffe9e9; border-color:#ffd1d1; }
+.shopAdminMiniTable{
+  border:1px solid #e2e2e2;
+  margin-bottom:24px;
+}
+.shopAdminMiniHead,
+.shopAdminMiniRow{
+  display:grid;
+  grid-template-columns:1fr .8fr 1fr 1fr;
+  align-items:center;
+  min-height:26px;
+  font-size:10px;
+  color:#222;
+  text-align:center;
+}
+.shopAdminMiniHead{
+  background:#f8f8f8;
+  border-bottom:1px solid #e2e2e2;
+}
+.shopAdminMiniRow{
+  border-bottom:1px solid #eee;
+  position:relative;
+}
+.shopAdminMiniRow input{
+  position:absolute;
+  left:8px;
+  top:50%;
+  transform:translateY(-50%);
+}
+.shopAdminMiniRow.noCheck{
+  position:static;
+}
+.shopAdminMiniEmpty{ height:27px; border-bottom:1px solid #eee; }
+.shopAdminLogTitleRow{ margin-top:46px; }
+
+@media (max-width:640px){
+  .shopSubTitle{ margin:22px 0 20px; font-size:16px; }
+  .shopCartRow{ grid-template-columns:110px minmax(0,1fr); padding:16px 18px; gap:14px; min-height:132px; }
+  .shopCartThumb{ width:104px; height:92px; }
+  .shopCartPrice{ grid-column:2; justify-self:end; font-size:15px; }
+  .shopOrderBtn{ width:190px; margin-top:36px; }
+  .shopAdminRequestCard{ grid-template-columns:130px minmax(0,1fr); gap:18px; padding:22px 26px; }
+  .shopAdminRequestThumb{ width:116px; height:96px; }
+  .shopAdminDetailHero{ grid-template-columns:118px minmax(0,1fr); gap:18px; }
+  .shopAdminDetailImg{ width:118px; height:106px; }
 }

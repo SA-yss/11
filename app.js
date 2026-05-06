@@ -1,7 +1,7 @@
 /* app.js - 메인 기능 코드 */
 
-const SUPABASE_URL = "https://iznnctfnmeiqdjljounq.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_9p50RVtpPdmZOG2emGTDVg_NQ3bp8U8";
+const SUPABASE_URL = "https://mpyxzzbmpweakzjemngm.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_TzdeL4ssUn7nB8uAeQCthA_t4xBkbSf";
 
     let supabaseClient = null;
 
@@ -1936,7 +1936,7 @@ if(item.img && (!item.images || !item.images[0])){
 
     try{
       const res = await fetch(
-        "https://iznnctfnmeiqdjljounq.supabase.co/functions/v1/admin-reset-password",
+        "https://mpyxzzbmpweakzjemngm.supabase.co/functions/v1/admin-reset-password",
         {
           method: "POST",
           mode: "cors",
